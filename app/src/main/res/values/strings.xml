@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">FoodBook</string>
+
+    <!--Facebook-->
+    <string name="facebook_app_id">126458661438360</string>
+    <string name="fb_login_protocol_scheme">fb126458661438360</string>
+
 </resources>

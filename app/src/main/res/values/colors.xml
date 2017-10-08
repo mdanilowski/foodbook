@@ -3,4 +3,12 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <!--Declared colors-->
+    <color name="white_100">#FFFFFFFF</color>
+    <color name="white_98">#98FFFFFF</color>
+    <color name="black_100">#FF000000</color>
+
+    <!--Branding-->
+    <color name="facebook_branding">#3b5998</color>
 </resources>

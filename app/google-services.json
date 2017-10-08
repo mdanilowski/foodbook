@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "850651869840",
+    "firebase_url": "https://foodbook-36969.firebaseio.com",
+    "project_id": "foodbook-36969",
+    "storage_bucket": "foodbook-36969.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850651869840:android:c92ad1e7d80ae117",
+        "android_client_info": {
+          "package_name": "pl.mdanilowski.foodbook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "850651869840-bqjjnfv2n50m0dt8ltkpd255bog6iita.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pl.mdanilowski.foodbook",
+            "certificate_hash": "daf3e64f593e39abcceb065e58a6f8ea12205841"
+          }
+        },
+        {
+          "client_id": "850651869840-e6qv9mo3l418n4km5fkm1heuvbad5rhf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4xn1j5nm-ymthX3GjzSCIqa55psw22Vw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "850651869840-e6qv9mo3l418n4km5fkm1heuvbad5rhf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
