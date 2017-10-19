@@ -107,7 +107,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
 
     private Subscription observeSignInFacebookAttachCallack(){
         return view.setUpFacebookSignInButton().subscribe(__ ->
-                LoginManager.getInstance().logInWithReadPermissions(model.getActivity(), Arrays.asList("public_profile", "user_friends")));
+                LoginManager.getInstance().logInWithReadPermissions(model.getActivity(), Arrays.asList("public_profile", "user_friends", "email")));
     }
 
     //Google login code

@@ -41,7 +41,7 @@ public class WelcomeSliderPageFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.welcome_icon_with_text, container,false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.view_welcome_icon_with_text, container,false);
         ((ImageView) rootView.findViewById(R.id.ivWelcomePager)).setImageResource(imgId);
         ((TextView) rootView.findViewById(R.id.tvWelcomePagerText)).setText(pagerText);
         return rootView;

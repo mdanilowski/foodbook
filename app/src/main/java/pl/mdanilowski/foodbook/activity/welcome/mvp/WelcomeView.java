@@ -18,7 +18,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.mdanilowski.foodbook.R;
-import pl.mdanilowski.foodbook.adapter.WelcomePagerAdapter;
+import pl.mdanilowski.foodbook.adapter.pagerAdapters.WelcomePagerAdapter;
 import rx.Observable;
 
 public class WelcomeView extends FrameLayout {

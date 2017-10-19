@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context="pl.mdanilowski.foodbook.activity.splash.SplashActivity">
+    tools:fragment="pl.mdanilowski.foodbook.activity.splash.SplashActivity">
 
     <ImageView
         android:layout_width="match_parent"

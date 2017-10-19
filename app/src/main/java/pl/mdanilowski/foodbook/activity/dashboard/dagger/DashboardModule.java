@@ -1,5 +1,8 @@
 package pl.mdanilowski.foodbook.activity.dashboard.dagger;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import dagger.Module;
 import dagger.Provides;
 import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
@@ -24,20 +27,25 @@ public class DashboardModule {
 
     @Provides
     @DashboardScope
-    public DashboardModel model(DashboardActivity activity) {
+    public DashboardModel model() {
         return new DashboardModel(activity);
     }
 
     @Provides
     @DashboardScope
-    public DashboardView view(DashboardActivity dashboardActivity) {
-        return new DashboardView(dashboardActivity);
+    public DashboardView view() {
+        return new DashboardView(activity);
     }
 
     @Provides
     @DashboardScope
-    public DashboardPresenter presenter(DashboardModel model, DashboardView view) {
-        return new DashboardPresenter(model, view);
+    public DashboardPresenter presenter(DashboardModel model, DashboardView view, FirebaseUser user) {
+        return new DashboardPresenter(model, view, user);
     }
 
+    @Provides
+    @DashboardScope
+    public FirebaseUser user(FirebaseAuth firebaseAuth){
+        return firebaseAuth.getCurrentUser();
+    }
 }

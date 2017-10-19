@@ -1,8 +1,13 @@
 <resources>
-    <string name="app_name">FoodBook</string>
+    <string name="app_name" translatable="false">FoodBook</string>
+
 
     <!--Facebook-->
-    <string name="facebook_app_id">126458661438360</string>
-    <string name="fb_login_protocol_scheme">fb126458661438360</string>
+    <string name="facebook_app_id" translatable="false">126458661438360</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb126458661438360</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="home_page">Home page</string>
 
 </resources>

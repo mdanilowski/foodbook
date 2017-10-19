@@ -1,4 +1,4 @@
-package pl.mdanilowski.foodbook.adapter;
+package pl.mdanilowski.foodbook.adapter.pagerAdapters;
 
 
 import android.support.v4.app.Fragment;
