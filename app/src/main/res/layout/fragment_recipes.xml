@@ -5,9 +5,34 @@
     android:background="@color/colorPrimary"
     tools:fragment="pl.mdanilowski.foodbook.fragment.dashboard.RecipesFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvRecipesRecyclerView"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvRecipesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ProgressBar
+            android:id="@+id/pbRecipes"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="16dp"
+            android:indeterminate="true"
+            android:max="100" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabAddRecipe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/rvRecipesRecyclerView"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="16dp"
+            android:src="@mipmap/ic_add"
+            tools:ignore="RelativeOverlap" />
+    </RelativeLayout>
 </FrameLayout>

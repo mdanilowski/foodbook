@@ -3,31 +3,33 @@ package pl.mdanilowski.foodbook.fragment.dashboard;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.net.UnknownHostException;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.mdanilowski.foodbook.R;
+import pl.mdanilowski.foodbook.activity.addRecipe.AddRecipeActivity;
 import pl.mdanilowski.foodbook.adapter.recyclerAdapters.RecipesAdapter;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.service.FoodBookService;
+import pl.mdanilowski.foodbook.utils.InformationDialog;
 import rx.Observable;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -37,9 +39,6 @@ public class RecipesFragment extends Fragment {
     CompositeSubscription compositeSubscription;
 
     @Inject
-    FirebaseFirestore db;
-
-    @Inject
     FirebaseAuth firebaseAuth;
 
     FirebaseUser firebaseUser;
@@ -47,8 +46,13 @@ public class RecipesFragment extends Fragment {
     @BindView(R.id.rvRecipesRecyclerView)
     RecyclerView recyclerView;
 
+    @BindView(R.id.pbRecipes)
+    ProgressBar pbRecipes;
+
+    @BindView(R.id.fabAddRecipe)
+    FloatingActionButton fabAddRecipe;
+
     RecipesAdapter recipesAdapter;
-    ArrayList<Recipe> recipes = new ArrayList<>();
     FoodBookService foodBookService = new FoodBookService();
 
     private OnFragmentInteractionListener onFragmentInteractionListener;
@@ -67,6 +71,7 @@ public class RecipesFragment extends Fragment {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         firebaseUser = firebaseAuth.getCurrentUser();
         compositeSubscription = new CompositeSubscription();
+        recipesAdapter = new RecipesAdapter(this);
     }
 
 
@@ -75,17 +80,24 @@ public class RecipesFragment extends Fragment {
                              Bundle savedInstanceState) {
         ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.fragment_recipes, container, false);
         ButterKnife.bind(this, viewGroup);
+        pbRecipes.setVisibility(View.GONE);
+        fabAddRecipe.setOnClickListener(__ -> AddRecipeActivity.start(getActivity()));
         return viewGroup;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        recipesAdapter = new RecipesAdapter(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
-        recyclerView.setAdapter(recipesAdapter);
         recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(recipesAdapter);
         compositeSubscription.add(observeUserRecipes());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        compositeSubscription.remove(observeUserRecipes());
     }
 
     @Override
@@ -112,14 +124,21 @@ public class RecipesFragment extends Fragment {
 
     Subscription observeUserRecipes() {
         return getUsersRecipes(firebaseUser.getUid())
-                .subscribe(documentSnapshots -> {
-                    for (DocumentSnapshot documentSnapshot : documentSnapshots)
-                        recipes.add(documentSnapshot.toObject(Recipe.class));
-                    recipesAdapter.setRecipes(recipes);
-                }, Throwable::printStackTrace);
+                .subscribe(documentSnapshot -> {
+                    recipesAdapter.addRecipe(documentSnapshot);
+                    pbRecipes.setVisibility(View.GONE);
+                    new Handler().postDelayed(() -> recyclerView.smoothScrollToPosition(0), 1);
+                }, throwable -> {
+                    if (throwable instanceof UnknownHostException) {
+                        InformationDialog informationDialog = InformationDialog.newInstance("Failed loading data", "Check network connection and try again");
+                        informationDialog.show(getChildFragmentManager(), "fragment_alert");
+                    }
+                    pbRecipes.setVisibility(View.GONE);
+                });
     }
 
-    Observable<List<DocumentSnapshot>> getUsersRecipes(String uid) {
-        return foodBookService.getUsersRecipes(uid);
+    Observable<Recipe> getUsersRecipes(String uid) {
+        pbRecipes.setVisibility(View.VISIBLE);
+        return foodBookService.getUsersRecipesRealtime(uid);
     }
 }

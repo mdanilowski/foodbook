@@ -123,6 +123,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
             } else {
+                Log.d("ERROR", result.getStatus().toString());
                 Toast.makeText(model.getActivity(), "Authentication failed", Toast.LENGTH_SHORT).show();
             }
         }

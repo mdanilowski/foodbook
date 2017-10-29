@@ -9,5 +9,16 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="home_page">Home page</string>
+    <string name="recipe_name">Enter recipe name</string>
+    <string name="add_photo">ADD PHOTO</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="enter_ingredient">Enter ingredient</string>
+    <string name="description">Description</string>
+    <string name="write_how_to_make_that_recipe">Write how to make your recipe…</string>
+    <string name="enter_tag">Enter tag</string>
+    <string name="add_recipe">Add recipe</string>
+    <string name="tags">Tags</string>
+    <string name="uploading_photos">Uploading photos…</string>
+    <string name="searchHint">Search foodbook</string>
 
 </resources>

@@ -2,4 +2,13 @@
 <resources>
     <string name="app_name">FoodBook</string>
     <string name="home_page">Strona główna</string>
+    <string name="recipe_name">Wpisz nazwę przepisu</string>
+    <string name="add_photo">DODAJ ZDJĘCIE</string>
+    <string name="ingredients">Składniki</string>
+    <string name="enter_ingredient">Wpisz składnik</string>
+    <string name="description">Opis</string>
+    <string name="write_how_to_make_that_recipe">Napisz jak przyrządzić przepis…</string>
+    <string name="enter_tag">Wpisz tag</string>
+    <string name="add_recipe">Dodaj przepis</string>
+    <string name="tags">Tagi</string>
 </resources>

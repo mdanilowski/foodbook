@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#001621</color>
     <color name="colorAccent">#00c1ff</color>
 
+    <color name="colorAccentShade">#AB00c1ff</color>
+
     <!--Declared colors-->
     <color name="white_100">#FFFFFFFF</color>
     <color name="white_98">#98FFFFFF</color>

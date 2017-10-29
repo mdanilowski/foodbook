@@ -33,6 +33,11 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         notifyDataSetChanged();
     }
 
+    public void addRecipe(Recipe recipe) {
+        recipes.add(0, recipe);
+        notifyItemInserted(0);
+    }
+
     @Override
     public RecipeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View recipeView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_my_recipe, parent, false);
@@ -45,7 +50,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         holder.tvFoodName.setText(recipe.getName());
         holder.tvLikesCount.setText(String.valueOf(recipe.getLikes()));
         holder.tvCommentCount.setText(String.valueOf(recipe.getComments().size()));
-        Glide.with(fragment).load(recipe.getPhotosUrls().get(0)).into(holder.ivFoodImage);
+        if (recipe.getPhotosUrls() != null && !recipe.getPhotosUrls().isEmpty())
+            Glide.with(fragment).load(recipe.getPhotosUrls().get(0)).into(holder.ivFoodImage);
     }
 
     @Override
