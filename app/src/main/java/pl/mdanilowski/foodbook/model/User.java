@@ -1,31 +1,59 @@
 package pl.mdanilowski.foodbook.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Serializable {
 
+    private String uid;
     private String name;
-    private String surename;
     private String email;
     private int gender;
     private String avatarUrl;
+    private String backgroundImage;
     private int totalLikes;
     private int recipesCount;
-    private List<Friend> friends;
+    private int followrsCount;
+    private String aboutMe;
+    private String country;
+    private String city;
+    private List<Follower> followers = new ArrayList<>();
+    private List<Follower> following = new ArrayList<>();
 
     public User() {
     }
 
-    public User(String name, String surename, String email, int gender, String avatarUrl, int totalLikes, int recipesCount, List<Friend> friends) {
+    public User(String uid, String name, String email, int gender, String avatarUrl, String backgroundImage, int totalLikes, int recipesCount, int followrsCount, String aboutMe, String country, String city, List<Follower> followers) {
+        this.uid = uid;
         this.name = name;
-        this.surename = surename;
         this.email = email;
         this.gender = gender;
         this.avatarUrl = avatarUrl;
+        this.backgroundImage = backgroundImage;
         this.totalLikes = totalLikes;
         this.recipesCount = recipesCount;
-        this.friends = friends;
+        this.followrsCount = followrsCount;
+        this.aboutMe = aboutMe;
+        this.country = country;
+        this.city = city;
+        this.followers = followers;
+    }
+
+    public List<Follower> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(List<Follower> following) {
+        this.following = following;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getName() {
@@ -34,14 +62,6 @@ public class User implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getSurename() {
-        return surename;
-    }
-
-    public void setSurename(String surename) {
-        this.surename = surename;
     }
 
     public String getEmail() {
@@ -84,11 +104,51 @@ public class User implements Serializable {
         this.recipesCount = recipesCount;
     }
 
-    public List<Friend> getFriends() {
-        return friends;
+    public int getFollowrsCount() {
+        return followrsCount;
     }
 
-    public void setFriends(List<Friend> friends) {
-        this.friends = friends;
+    public void setFollowrsCount(int followrsCount) {
+        this.followrsCount = followrsCount;
+    }
+
+    public List<Follower> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<Follower> followers) {
+        this.followers = followers;
+    }
+
+    public String getAboutMe() {
+        return aboutMe;
+    }
+
+    public void setAboutMe(String aboutMe) {
+        this.aboutMe = aboutMe;
+    }
+
+    public String getBackgroundImage() {
+        return backgroundImage;
+    }
+
+    public void setBackgroundImage(String backgroundImage) {
+        this.backgroundImage = backgroundImage;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

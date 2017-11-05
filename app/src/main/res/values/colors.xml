@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1d3c49</color>
-    <color name="colorPrimaryDark">#001621</color>
-    <color name="colorAccent">#00c1ff</color>
+    <color name="colorPrimary">#37474f</color>
+    <color name="colorPrimaryDark">#102027</color>
+    <color name="colorAccent">#1de9b6</color>
 
-    <color name="colorAccentShade">#AB00c1ff</color>
+    <color name="colorAccentShade">#AB1de9b6</color>
 
     <!--Declared colors-->
     <color name="white_100">#FFFFFFFF</color>
@@ -13,4 +13,5 @@
 
     <!--Branding-->
     <color name="facebook_branding">#3b5998</color>
+    <color name="transparent">#00000000</color>
 </resources>

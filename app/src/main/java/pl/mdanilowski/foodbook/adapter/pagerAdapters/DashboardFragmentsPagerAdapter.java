@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import pl.mdanilowski.foodbook.activity.dashboard.mvp.DashboardPresenter;
 import pl.mdanilowski.foodbook.fragment.dashboard.HomeFragment;
 import pl.mdanilowski.foodbook.fragment.dashboard.RecipeIdeasFragment;
 import pl.mdanilowski.foodbook.fragment.dashboard.RecipesFragment;
@@ -13,9 +14,11 @@ import pl.mdanilowski.foodbook.fragment.dashboard.SearchFragment;
 public class DashboardFragmentsPagerAdapter extends FragmentStatePagerAdapter {
 
     private final int FRAGMENT_COUNT = 4;
+    private DashboardPresenter context;
 
-    public DashboardFragmentsPagerAdapter(FragmentManager fm) {
+    public DashboardFragmentsPagerAdapter(FragmentManager fm, DashboardPresenter context) {
         super(fm);
+        this.context = context;
     }
 
     @Override
@@ -26,7 +29,7 @@ public class DashboardFragmentsPagerAdapter extends FragmentStatePagerAdapter {
             case 1:
                 return RecipesFragment.newInstance();
             case 2:
-                return SearchFragment.newInstance();
+                return SearchFragment.newInstance(uid -> context.model.startProfileActivity(uid));
             case 3:
                 return RecipeIdeasFragment.newInstance();
             default:

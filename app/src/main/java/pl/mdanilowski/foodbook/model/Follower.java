@@ -2,7 +2,7 @@ package pl.mdanilowski.foodbook.model;
 
 import java.io.Serializable;
 
-public class Friend implements Serializable {
+public class Follower implements Serializable {
 
     private String uid;
     private String avatarUrl;
@@ -11,10 +11,10 @@ public class Friend implements Serializable {
     private int recipeCount;
     private int totalLikes;
 
-    public Friend() {
+    public Follower() {
     }
 
-    public Friend(String uid, String avatarUrl, String name, String surename, int recipeCount, int totalLikes) {
+    public Follower(String uid, String avatarUrl, String name, String surename, int recipeCount, int totalLikes) {
         this.uid = uid;
         this.avatarUrl = avatarUrl;
         this.name = name;

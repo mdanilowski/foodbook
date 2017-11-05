@@ -11,10 +11,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.mikepenz.materialdrawer.Drawer;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,6 +20,7 @@ import pl.mdanilowski.foodbook.activity.base.BasePresenter;
 import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
 import pl.mdanilowski.foodbook.adapter.pagerAdapters.DashboardFragmentsPagerAdapter;
 import pl.mdanilowski.foodbook.app.App;
+import pl.mdanilowski.foodbook.model.Follower;
 import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.model.User;
 import pl.mdanilowski.foodbook.utils.MaterialDrawerBuilder;
@@ -31,15 +29,18 @@ import rx.Subscription;
 public class DashboardPresenter extends BasePresenter {
 
     private DashboardView view;
-    private DashboardModel model;
-    FirebaseUser user;
-    Drawer drawer;
+    public DashboardModel model;
+    private FirebaseUser user;
+    private Drawer drawer;
+    private String searchQuery = "";
 
-    List<Uri> addedRecipeUris = new ArrayList<>();
-    List<Uri> images = new ArrayList<>();
-    StorageReference storageReference;
-    UploadTask uploadTask;
-    Recipe recipeForUpload = null;
+    private List<Uri> addedRecipeUris = new ArrayList<>();
+    private List<Uri> images = new ArrayList<>();
+    private Recipe recipeForUpload = null;
+
+    public String getSearchQuery() {
+        return searchQuery;
+    }
 
     public DashboardPresenter(DashboardModel model, DashboardView view, FirebaseUser user) {
         this.model = model;
@@ -51,8 +52,18 @@ public class DashboardPresenter extends BasePresenter {
     public void onCreate() {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         compositeSubscription.add(observeAvatarClick());
+        compositeSubscription.add(observeFindUser());
         setViewPagerAndTabs();
         setToolbarAndDrawer();
+        handleIntent();
+    }
+
+    public void onNewIntent(Intent intent) {
+        model.getActivity().setIntent(intent);
+        handleIntent();
+    }
+
+    private void handleIntent() {
         if (model.getIsRecipeAddedExtra()) {
             images = model.getRecipeUriListFromIntent();
             recipeForUpload = model.getRecipeFromIntent();
@@ -62,28 +73,32 @@ public class DashboardPresenter extends BasePresenter {
             if (images.isEmpty()) {
                 compositeSubscription.add(observeAddingRecipe());
             }
+            model.getActivity().getIntent().putExtra(DashboardActivity.IS_RECIPE_ADDED, false);
         }
-        model.getActivity().getIntent().putExtra(DashboardActivity.IS_RECIPE_ADDED, false);
-        compositeSubscription.add(observeFindUser());
-        if(Intent.ACTION_SEARCH.equals(model.getActivity().getIntent().getAction())){
-            String searchQuery = model.getActivity().getIntent().getStringExtra(SearchManager.QUERY);
-            Toast.makeText(view.getContext(), searchQuery, Toast.LENGTH_SHORT).show();
-            view.dashboardViewPager.setCurrentItem(3);
+        if (model.getIsNewIntentSearch()) {
+            searchQuery = model.getActivity().getIntent().getStringExtra(SearchManager.QUERY);
+            view.dashboardViewPager.setCurrentItem(2);
         }
     }
-
 
     @Override
     public void onDestroy() {
         compositeSubscription.clear();
     }
 
+    private Subscription observeAddingRecipe() {
+        return foodBookService.addRecipeToUser(user.getUid(), recipeForUpload)
+                .subscribe(__ -> view.showSnackBarWithText("Added recipe"),
+                        throwable -> {
+                            view.showSnackBarWithText("Failed to add recipe");
+                            throwable.printStackTrace();
+                        });
+    }
+
     private void uploadImage(Uri uri) {
         view.showImageUploadingProgress();
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        storageReference = storage.getReference().child(user.getUid() + "/" + imageFileName);
-        uploadTask = storageReference.putFile(uri);
+        StorageReference storageReference = storage.getReference().child(user.getUid() + "/" + uri.getLastPathSegment());
+        UploadTask uploadTask = storageReference.putFile(uri);
         uploadTask
                 .addOnFailureListener(command -> {
                     addedRecipeUris.add(null);
@@ -92,12 +107,7 @@ public class DashboardPresenter extends BasePresenter {
                 })
                 .addOnSuccessListener(command -> {
                     addedRecipeUris.add(command.getDownloadUrl());
-                    File file = new File(uri.getPath());
-                    if (model.getActivity().getContentResolver().delete(uri, null, null) != 0) {
-                        Toast.makeText(view.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(view.getContext(), "NOT deleted", Toast.LENGTH_SHORT).show();
-                    }
+                    model.getActivity().getContentResolver().delete(uri, null, null);
                     Toast.makeText(model.getActivity(), "Uploaded image", Toast.LENGTH_SHORT).show();
                 })
                 .addOnCompleteListener(task -> {
@@ -117,15 +127,6 @@ public class DashboardPresenter extends BasePresenter {
                 );
     }
 
-    private Subscription observeAddingRecipe() {
-        return foodBookService.addRecipeToUser(user.getUid(), recipeForUpload)
-                .subscribe(__ -> view.showSnackBarWithText("Added recipe"),
-                        throwable -> {
-                            view.showSnackBarWithText("Failed to add recipe");
-                            throwable.printStackTrace();
-                        });
-    }
-
     private Subscription observeAvatarClick() {
         return view.avatarClick().subscribe(__ -> drawer.openDrawer());
     }
@@ -133,28 +134,53 @@ public class DashboardPresenter extends BasePresenter {
     private Subscription observeFindUser() {
         return foodBookService.findUserByUid(user.getUid()).subscribe(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                Log.d("USER", "User exists");
+                foodBookSimpleStorage.saveUser(documentSnapshot.toObject(User.class));
+                compositeSubscription.add(observeFindUsersFriends());
             } else {
                 compositeSubscription.add(observeAddUser());
             }
         });
     }
 
+    private Subscription observeFindUsersFriends() {
+        return foodBookService.getUsersFriends(user.getUid())
+                .subscribe(documentChange -> {
+                    User user = foodBookSimpleStorage.getUser();
+                    switch (documentChange.getType()) {
+                        case ADDED:
+                            user.getFollowers().add(documentChange.getDocument().toObject(Follower.class));
+                            foodBookSimpleStorage.saveUser(user);
+                            break;
+                        case REMOVED:
+
+                            Follower follower = documentChange.getDocument().toObject(Follower.class);
+                            Iterator<Follower> iterator = user.getFollowers().iterator();
+                            while (iterator.hasNext()) {
+                                if (iterator.next().getUid().equals(follower.getUid()))
+                                    iterator.remove();
+                            }
+                            foodBookSimpleStorage.saveUser(user);
+                    }
+                });
+    }
+
     private Subscription observeAddUser() {
         User newUser = new User();
-        String[] nameAndSurename = user.getDisplayName().split(" ");
-        if (nameAndSurename.length >= 1)
-            newUser.setName(nameAndSurename[0]);
-        if (nameAndSurename.length >= 2)
-            newUser.setSurename(nameAndSurename[1]);
-        if (user.getPhotoUrl() != null)
-            newUser.setAvatarUrl(user.getPhotoUrl().toString());
+        newUser.setName(user.getDisplayName());
+        newUser.setAvatarUrl(user.getPhotoUrl().toString());
         newUser.setEmail(user.getEmail());
-        newUser.setFriends(new ArrayList<>());
+        newUser.setFollowers(new ArrayList<>());
         newUser.setTotalLikes(0);
         newUser.setRecipesCount(0);
+        newUser.setBackgroundImage(null);
+        newUser.setAboutMe("Hello, I haven't filled this yet... be patient ;)");
+        newUser.setCountry("");
+        newUser.setCity("");
         return foodBookService.setUser(user.getUid(), newUser).subscribe(
-                __ -> Log.d("USER", "User added"),
+                __ -> {
+                    Log.d("_USER", "User added");
+                    compositeSubscription.add(observeFindUsersFriends());
+                },
                 Throwable::printStackTrace
         );
     }
@@ -165,7 +191,7 @@ public class DashboardPresenter extends BasePresenter {
     }
 
     private void setViewPagerAndTabs() {
-        view.dashboardViewPager.setAdapter(new DashboardFragmentsPagerAdapter(model.getFragmentManager()));
+        view.dashboardViewPager.setAdapter(new DashboardFragmentsPagerAdapter(model.getFragmentManager(), this));
         view.dashboardTabs.setupWithViewPager(view.dashboardViewPager);
         view.dashboardViewPager.setOffscreenPageLimit(4);
         setTabIcons();

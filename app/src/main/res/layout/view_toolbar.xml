@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="@dimen/toolbar"
     android:background="@color/colorPrimary">
 
     <de.hdodenhof.circleimageview.CircleImageView

@@ -78,6 +78,11 @@ public class DashboardActivity extends BaseActivity implements RecipesFragment.O
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        presenter.onNewIntent(intent);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
     }
@@ -86,6 +91,10 @@ public class DashboardActivity extends BaseActivity implements RecipesFragment.O
     protected void onDestroy() {
         super.onDestroy();
         presenter.onDestroy();
+    }
+
+    public DashboardPresenter getPresenter() {
+        return presenter;
     }
 
     @Override

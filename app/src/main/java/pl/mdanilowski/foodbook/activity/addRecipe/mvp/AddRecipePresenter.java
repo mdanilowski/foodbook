@@ -36,6 +36,7 @@ public class AddRecipePresenter extends BasePresenter {
 
 
     public AddRecipePresenter(AddRecipeView view, AddRecipeModel model) {
+        App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         this.view = view;
         this.model = model;
     }
@@ -43,7 +44,6 @@ public class AddRecipePresenter extends BasePresenter {
 
     @Override
     public void onCreate() {
-        App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         user = firebaseAuth.getCurrentUser();
         compositeSubscription.add(observeAddPhotoClick());
         compositeSubscription.add(observeAddIngredientClick());

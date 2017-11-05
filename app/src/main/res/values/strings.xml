@@ -20,5 +20,14 @@
     <string name="tags">Tags</string>
     <string name="uploading_photos">Uploading photos…</string>
     <string name="searchHint">Search foodbook</string>
+    <string name="add_friend">Add follower</string>
+    <string name="followers">followers</string>
+    <string name="recipes">recipes</string>
+    <string name="following">following</string>
+    <string name="follow">follow</string>
+    <string name="location">Location</string>
+    <string name="about_me">About me</string>
+    <string name="email_address">Email address</string>
+    <string name="name">Name</string>
 
 </resources>

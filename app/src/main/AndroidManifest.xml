@@ -32,18 +32,12 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
-                android:resource="@xml/searchable"
-                android:value=".activity.dashboard.DashboardActivity"/>
+                android:resource="@xml/searchable" />
         </activity>
-
-        <meta-data
-            android:name="android.app.default_searchable"
-            android:value=".activity.dashboard.DashboardActivity" />
-
         <activity
             android:name=".activity.welcome.WelcomeActivity"
             android:screenOrientation="portrait" />
@@ -74,7 +68,7 @@
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
         <provider
-            android:name="pl.mdanilowski.foodbook.ext.GenericFileProvider"
+            android:name=".ext.GenericFileProvider"
             android:authorities="${applicationId}.pl.mdanilowski.foodbook.ext"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -82,6 +76,8 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
+        <activity android:name=".activity.profile.ProfileActivity"></activity>
     </application>
 
 </manifest>

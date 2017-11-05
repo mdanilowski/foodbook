@@ -27,7 +27,7 @@ import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
 import rx.Observable;
 
 @SuppressLint("ViewConstructor")
-public class DashboardView extends FrameLayout implements SearchView.OnQueryTextListener {
+public class DashboardView extends FrameLayout {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -50,8 +50,6 @@ public class DashboardView extends FrameLayout implements SearchView.OnQueryText
     @BindView(R.id.pbUploadingImages)
     ProgressBar pbUploadingImages;
 
-    String queryText;
-
     public DashboardView(@NonNull DashboardActivity dashboardActivity) {
         super(dashboardActivity);
 
@@ -73,7 +71,6 @@ public class DashboardView extends FrameLayout implements SearchView.OnQueryText
         SearchManager searchManager = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);
         ComponentName componentName = new ComponentName(this.getContext(), DashboardActivity.class);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
-        searchView.setOnQueryTextListener(this);
     }
 
     public void setToolbarProfileImage(String uri) {
@@ -94,16 +91,5 @@ public class DashboardView extends FrameLayout implements SearchView.OnQueryText
 
     public void showSnackBarWithText(String text){
         Snackbar.make(this, text, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        queryText = query;
-        return true;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        return false;
     }
 }
