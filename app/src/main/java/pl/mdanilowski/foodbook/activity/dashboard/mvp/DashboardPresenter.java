@@ -20,7 +20,6 @@ import pl.mdanilowski.foodbook.activity.base.BasePresenter;
 import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
 import pl.mdanilowski.foodbook.adapter.pagerAdapters.DashboardFragmentsPagerAdapter;
 import pl.mdanilowski.foodbook.app.App;
-import pl.mdanilowski.foodbook.model.Follower;
 import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.model.User;
 import pl.mdanilowski.foodbook.utils.MaterialDrawerBuilder;
@@ -86,15 +85,6 @@ public class DashboardPresenter extends BasePresenter {
         compositeSubscription.clear();
     }
 
-    private Subscription observeAddingRecipe() {
-        return foodBookService.addRecipeToUser(user.getUid(), recipeForUpload)
-                .subscribe(__ -> view.showSnackBarWithText("Added recipe"),
-                        throwable -> {
-                            view.showSnackBarWithText("Failed to add recipe");
-                            throwable.printStackTrace();
-                        });
-    }
-
     private void uploadImage(Uri uri) {
         view.showImageUploadingProgress();
         StorageReference storageReference = storage.getReference().child(user.getUid() + "/" + uri.getLastPathSegment());
@@ -127,6 +117,15 @@ public class DashboardPresenter extends BasePresenter {
                 );
     }
 
+    private Subscription observeAddingRecipe() {
+        return foodBookService.addRecipeToUser(user.getUid(), recipeForUpload)
+                .subscribe(__ -> view.showSnackBarWithText(view.getResources().getString(R.string.added_recipe)),
+                        throwable -> {
+                            view.showSnackBarWithText(view.getResources().getString(R.string.failed_to_add_recipe));
+                            throwable.printStackTrace();
+                        });
+    }
+
     private Subscription observeAvatarClick() {
         return view.avatarClick().subscribe(__ -> drawer.openDrawer());
     }
@@ -143,18 +142,17 @@ public class DashboardPresenter extends BasePresenter {
     }
 
     private Subscription observeFindUsersFriends() {
-        return foodBookService.getUsersFriends(user.getUid())
+        return foodBookService.getUsersFollowedByUser(user.getUid())
                 .subscribe(documentChange -> {
                     User user = foodBookSimpleStorage.getUser();
                     switch (documentChange.getType()) {
                         case ADDED:
-                            user.getFollowers().add(documentChange.getDocument().toObject(Follower.class));
+                            user.getFollowing().add(documentChange.getDocument().toObject(User.class));
                             foodBookSimpleStorage.saveUser(user);
                             break;
                         case REMOVED:
-
-                            Follower follower = documentChange.getDocument().toObject(Follower.class);
-                            Iterator<Follower> iterator = user.getFollowers().iterator();
+                            User follower = documentChange.getDocument().toObject(User.class);
+                            Iterator<User> iterator = user.getFollowing().iterator();
                             while (iterator.hasNext()) {
                                 if (iterator.next().getUid().equals(follower.getUid()))
                                     iterator.remove();
@@ -166,12 +164,16 @@ public class DashboardPresenter extends BasePresenter {
 
     private Subscription observeAddUser() {
         User newUser = new User();
+        newUser.setUid(user.getUid());
         newUser.setName(user.getDisplayName());
         newUser.setAvatarUrl(user.getPhotoUrl().toString());
         newUser.setEmail(user.getEmail());
         newUser.setFollowers(new ArrayList<>());
+        newUser.setFollowing(new ArrayList<>());
         newUser.setTotalLikes(0);
         newUser.setRecipesCount(0);
+        newUser.setFollowersCount(0);
+        newUser.setFollowingCount(0);
         newUser.setBackgroundImage(null);
         newUser.setAboutMe("Hello, I haven't filled this yet... be patient ;)");
         newUser.setCountry("");

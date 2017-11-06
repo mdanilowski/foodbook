@@ -15,7 +15,6 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.profile.ProfileActivity;
-import pl.mdanilowski.foodbook.model.Follower;
 import pl.mdanilowski.foodbook.model.User;
 
 @SuppressLint("ViewConstructor")
@@ -51,7 +50,7 @@ public class ProfileView extends FrameLayout {
     @BindView(R.id.tvlocation)
     TextView tvLocation;
 
-    @BindView(R.id.toolbar)
+    @BindView(R.id.toolbarProfile)
     Toolbar toolbar;
 
     public ProfileView(ProfileActivity activity) {
@@ -73,13 +72,14 @@ public class ProfileView extends FrameLayout {
             Glide.with(this).load(userData.getAvatarUrl()).into(ivProfileImage);
         else ivProfileImage.setImageResource(R.color.accent);
         tvRecipesCount.setText(String.valueOf(userData.getRecipesCount()));
-        tvFollowersCount.setText(String.valueOf(userData.getFollowrsCount()));
+        tvFollowersCount.setText(String.valueOf(userData.getFollowersCount()));
         boolean isBeingFollowed = false;
-        for (Follower f : currentUser.getFollowers()) {
+        for (User f : currentUser.getFollowers()) {
             if (f.getUid().equals(userData.getUid())) {
                 isBeingFollowed = true;
             }
         }
+
         if (isBeingFollowed) {
             llFriend.setVisibility(VISIBLE);
         } else llAddFriend.setVisibility(VISIBLE);

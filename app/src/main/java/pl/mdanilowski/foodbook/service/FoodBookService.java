@@ -6,6 +6,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,15 +104,20 @@ public class FoodBookService {
                                             subscriber.onNext(dc.getDocument().toObject(Recipe.class));
                                     }
                                 }
-
                             }
                         }));
     }
 
     public Observable<Void> followUser(User user, User currentUser) {
         return Observable.create(subscriber -> {
-            firestore.collection(FirestoreConstants.USERS).document(user.getUid()).collection(FirestoreConstants.FOLLOWERS).document(currentUser.getUid())
-                    .set(currentUser).addOnSuccessListener(subscriber::onNext)
+            WriteBatch batch = firestore.batch();
+
+            DocumentReference dRef1 = firestore.collection(FirestoreConstants.USERS).document(user.getUid()).collection(FirestoreConstants.FOLLOWERS).document(currentUser.getUid());
+            DocumentReference dRef2 = firestore.collection(FirestoreConstants.USERS).document(currentUser.getUid()).collection(FirestoreConstants.FOLLOWING).document(user.getUid());
+            batch.set(dRef1, currentUser);
+            batch.set(dRef2, user);
+            batch.commit()
+                    .addOnSuccessListener(subscriber::onNext)
                     .addOnFailureListener(subscriber::onError);
         });
     }
@@ -124,8 +130,8 @@ public class FoodBookService {
         });
     }
 
-    public Observable<DocumentChange> getUsersFriends(String uid) {
-        return Observable.create(subscriber -> firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.FOLLOWERS)
+    public Observable<DocumentChange> getUsersFollowedByUser(String uid) {
+        return Observable.create(subscriber -> firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.FOLLOWING)
                 .addSnapshotListener((snapshot, e) -> {
                     if (e != null) {
                         subscriber.onError(e);

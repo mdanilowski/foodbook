@@ -92,6 +92,7 @@ public class RecipesFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(recipesAdapter);
         compositeSubscription.add(observeUserRecipes());
+        pbRecipes.setVisibility(View.GONE);
     }
 
     @Override

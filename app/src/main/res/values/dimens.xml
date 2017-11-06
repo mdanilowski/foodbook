@@ -2,4 +2,5 @@
 <resources>
     <dimen name="toolbar">64dp</dimen>
     <dimen name="toolbar_profile">40dp</dimen>
+    <dimen name="avatar_width">40dp</dimen>
 </resources>

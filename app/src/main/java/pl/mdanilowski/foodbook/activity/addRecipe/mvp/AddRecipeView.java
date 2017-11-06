@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -24,14 +23,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.addRecipe.AddRecipeActivity;
 import pl.mdanilowski.foodbook.adapter.recyclerAdapters.AddRecipePhotosAdapter;
-import pl.mdanilowski.foodbook.model.Ingredient;
 import pl.mdanilowski.foodbook.utils.SwipeDismissTouchListener;
 import rx.Observable;
 
 public class AddRecipeView extends FrameLayout {
-
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
 
     @BindView(R.id.etName)
     EditText etName;
@@ -147,15 +142,12 @@ public class AddRecipeView extends FrameLayout {
         llIngredients.addView(view);
     }
 
-    public List<Ingredient> prepareIngredients(){
-        List<Ingredient> ingredients = new ArrayList<>();
+    public List<String> prepareIngredients(){
+        List<String> ingredients = new ArrayList<>();
         EditText et;
-        Ingredient ingredient;
         for(int i=0; i<llIngredients.getChildCount(); i++){
             et = (EditText) llIngredients.getChildAt(i);
-            ingredient = new Ingredient();
-            ingredient.setName(String.valueOf(et.getText()));
-            ingredients.add(ingredient);
+            ingredients.add(String.valueOf(et.getText()));
         }
         return ingredients;
     }

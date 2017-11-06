@@ -11,4 +11,6 @@
     <string name="enter_tag">Wpisz tag</string>
     <string name="add_recipe">Dodaj przepis</string>
     <string name="tags">Tagi</string>
+    <string name="added_recipe">Added recipe</string>
+    <string name="failed_to_add_recipe">Failed to add recipe</string>
 </resources>

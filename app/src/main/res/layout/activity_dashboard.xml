@@ -1,47 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:fragment="pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <include layout="@layout/view_toolbar" />
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|snap">
+
+            <include
+                app:layout_collapseMode="parallax"
+                layout="@layout/view_toolbar"/>
+        </android.support.design.widget.CollapsingToolbarLayout>
+
 
         <include layout="@layout/view_tab_layout" />
 
         <LinearLayout
             android:id="@+id/llUploading"
-            android:visibility="gone"
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
             <TextView
-                android:text="@string/uploading_photos"
-                android:textColor="@color/white_100"
-                android:gravity="center_horizontal"
-                android:layout_gravity="center_horizontal"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:text="@string/uploading_photos"
+                android:textColor="@color/white_100" />
+
             <ProgressBar
                 android:id="@+id/pbUploadingImages"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_marginRight="16dp"
-                android:layout_marginLeft="16dp"
-                android:max="100"
-                android:indeterminate="true"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:indeterminate="true"
+                android:max="100" />
         </LinearLayout>
-
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vpDashboardViewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+</android.support.design.widget.CoordinatorLayout>
+

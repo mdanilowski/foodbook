@@ -14,17 +14,32 @@ public class User implements Serializable {
     private String backgroundImage;
     private int totalLikes;
     private int recipesCount;
-    private int followrsCount;
+    private int followersCount;
+    private int followingCount;
     private String aboutMe;
     private String country;
     private String city;
-    private List<Follower> followers = new ArrayList<>();
-    private List<Follower> following = new ArrayList<>();
+    private List<User> followers = new ArrayList<>();
+    private List<User> following = new ArrayList<>();
 
     public User() {
     }
 
-    public User(String uid, String name, String email, int gender, String avatarUrl, String backgroundImage, int totalLikes, int recipesCount, int followrsCount, String aboutMe, String country, String city, List<Follower> followers) {
+    public User(String uid,
+                String name,
+                String email,
+                int gender,
+                String avatarUrl,
+                String backgroundImage,
+                int totalLikes,
+                int recipesCount,
+                int followersCount,
+                int followingCount,
+                String aboutMe,
+                String country,
+                String city,
+                List<User> followers,
+                List<User> following) {
         this.uid = uid;
         this.name = name;
         this.email = email;
@@ -33,20 +48,15 @@ public class User implements Serializable {
         this.backgroundImage = backgroundImage;
         this.totalLikes = totalLikes;
         this.recipesCount = recipesCount;
-        this.followrsCount = followrsCount;
+        this.followersCount = followersCount;
+        this.followingCount = followingCount;
         this.aboutMe = aboutMe;
         this.country = country;
         this.city = city;
         this.followers = followers;
-    }
-
-    public List<Follower> getFollowing() {
-        return following;
-    }
-
-    public void setFollowing(List<Follower> following) {
         this.following = following;
     }
+
 
     public String getUid() {
         return uid;
@@ -104,20 +114,12 @@ public class User implements Serializable {
         this.recipesCount = recipesCount;
     }
 
-    public int getFollowrsCount() {
-        return followrsCount;
+    public int getFollowersCount() {
+        return followersCount;
     }
 
-    public void setFollowrsCount(int followrsCount) {
-        this.followrsCount = followrsCount;
-    }
-
-    public List<Follower> getFollowers() {
-        return followers;
-    }
-
-    public void setFollowers(List<Follower> followers) {
-        this.followers = followers;
+    public void setFollowersCount(int followersCount) {
+        this.followersCount = followersCount;
     }
 
     public String getAboutMe() {
@@ -150,5 +152,29 @@ public class User implements Serializable {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public List<User> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<User> followers) {
+        this.followers = followers;
+    }
+
+    public List<User> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(List<User> following) {
+        this.following = following;
+    }
+
+    public int getFollowingCount() {
+        return followingCount;
+    }
+
+    public void setFollowingCount(int followingCount) {
+        this.followingCount = followingCount;
     }
 }

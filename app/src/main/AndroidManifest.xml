@@ -77,7 +77,8 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".activity.profile.ProfileActivity"></activity>
+        <activity android:name=".activity.profile.ProfileActivity" />
+        <activity android:name=".activity.recipeDetails.RecipeDetailsActivity"></activity>
     </application>
 
 </manifest>

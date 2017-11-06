@@ -20,7 +20,7 @@ public class Recipe implements Serializable {
     @SerializedName("addDate")
     private Date addDate;
     @SerializedName("ingredients")
-    private List<Ingredient> ingredients;
+    private List<String> ingredients;
     @SerializedName("comments")
     private List<Comment> comments;
     @SerializedName("tags")
@@ -31,7 +31,7 @@ public class Recipe implements Serializable {
     public Recipe() {
     }
 
-    public Recipe(String name, String description, int likes, boolean isMine, Date addDate, List<Ingredient> ingredients, List<Comment> comments, List<String> tags, List<String> photosUrls) {
+    public Recipe(String name, String description, int likes, boolean isMine, Date addDate, List<String> ingredients, List<Comment> comments, List<String> tags, List<String> photosUrls) {
         this.name = name;
         this.description = description;
         this.likes = likes;
@@ -83,11 +83,11 @@ public class Recipe implements Serializable {
         this.addDate = addDate;
     }
 
-    public List<Ingredient> getIngredients() {
+    public List<String> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(List<Ingredient> ingredients) {
+    public void setIngredients(List<String> ingredients) {
         this.ingredients = ingredients;
     }
 

@@ -4,7 +4,8 @@
     <color name="colorPrimaryDark">#102027</color>
     <color name="colorAccent">#1de9b6</color>
 
-    <color name="colorAccentShade">#AB1de9b6</color>
+    <color name="colorAccent_30">#301de9b6</color>
+    <color name="colorPrimaryDark_80">#80102027</color>
 
     <!--Declared colors-->
     <color name="white_100">#FFFFFFFF</color>

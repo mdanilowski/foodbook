@@ -23,7 +23,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.fragment.dashboard.SearchFragment;
-import pl.mdanilowski.foodbook.model.Follower;
 import pl.mdanilowski.foodbook.model.User;
 import pl.mdanilowski.foodbook.utils.Storage.FoodBookSimpleStorage;
 
@@ -62,7 +61,7 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
         holder.tvEmail.setText(user.getEmail());
         holder.ibAddFriend.setVisibility(View.VISIBLE);
         holder.ivFriend.setVisibility(View.INVISIBLE);
-        for (Follower follower : foodBookSimpleStorage.getUser().getFollowing()) {
+        for (User follower : foodBookSimpleStorage.getUser().getFollowing()) {
             if (user.getUid().equals(follower.getUid())) {
                 holder.ibAddFriend.setVisibility(View.INVISIBLE);
                 holder.ivFriend.setVisibility(View.VISIBLE);
@@ -108,12 +107,12 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
             ButterKnife.bind(this, itemView);
         }
 
-        public void bind(User user, OnResultClickListener listener){
+        public void bind(User user, OnResultClickListener listener) {
             itemView.setOnClickListener(v -> listener.onItemClick(user));
         }
     }
 
-    public interface OnResultClickListener{
+    public interface OnResultClickListener {
         void onItemClick(User user);
     }
 }

@@ -9,7 +9,7 @@
     tools:context="pl.mdanilowski.foodbook.activity.addRecipe.AddRecipeActivity">
 
     <include
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbarProfile"
         layout="@layout/view_toolbar" />
 
     <ScrollView

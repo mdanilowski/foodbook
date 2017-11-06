@@ -1,38 +1,49 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
     tools:fragment="pl.mdanilowski.foodbook.fragment.dashboard.RecipesFragment">
 
     <RelativeLayout
+        android:id="@+id/relative"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvRecipesRecyclerView"
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:background="@color/colorPrimary"
+            android:fillViewport="true">
 
-        <ProgressBar
-            android:id="@+id/pbRecipes"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_margin="16dp"
-            android:indeterminate="true"
-            android:max="100" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabAddRecipe"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/rvRecipesRecyclerView"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="16dp"
-            android:src="@mipmap/ic_add"
-            tools:ignore="RelativeOverlap" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvRecipesRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </android.support.v4.widget.NestedScrollView>
     </RelativeLayout>
-</FrameLayout>
+
+
+    <ProgressBar
+        android:id="@+id/pbRecipes"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="16dp"
+        android:indeterminate="true"
+        android:max="100"
+        app:layout_anchor="@+id/nestedScrollView"
+        app:layout_anchorGravity="left|center" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabAddRecipe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@mipmap/ic_add"
+        app:layout_anchor="@+id/relative"
+        app:layout_anchorGravity="right|bottom" />
+</android.support.design.widget.CoordinatorLayout>
+

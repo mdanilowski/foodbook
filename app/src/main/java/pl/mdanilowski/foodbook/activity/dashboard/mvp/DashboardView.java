@@ -74,7 +74,7 @@ public class DashboardView extends FrameLayout {
     }
 
     public void setToolbarProfileImage(String uri) {
-        Glide.with(this).load(uri).into(ivAvatar);
+        Glide.with(toolbar).load(uri).into(ivAvatar);
     }
 
     public Observable<Void> avatarClick() {
