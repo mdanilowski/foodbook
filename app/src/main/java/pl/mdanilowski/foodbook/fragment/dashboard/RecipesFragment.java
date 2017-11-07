@@ -54,14 +54,16 @@ public class RecipesFragment extends Fragment {
 
     RecipesAdapter recipesAdapter;
     FoodBookService foodBookService = new FoodBookService();
+    OnAdapterItemClickListener listener;
 
     private OnFragmentInteractionListener onFragmentInteractionListener;
 
     public RecipesFragment() {
     }
 
-    public static RecipesFragment newInstance() {
+    public static RecipesFragment newInstance(OnAdapterItemClickListener listener) {
         RecipesFragment fragment = new RecipesFragment();
+        fragment.listener = listener;
         return fragment;
     }
 
@@ -71,7 +73,7 @@ public class RecipesFragment extends Fragment {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         firebaseUser = firebaseAuth.getCurrentUser();
         compositeSubscription = new CompositeSubscription();
-        recipesAdapter = new RecipesAdapter(this);
+        recipesAdapter = new RecipesAdapter(this, recipe -> listener.onAdapterItemClick(recipe));
     }
 
 
@@ -141,5 +143,10 @@ public class RecipesFragment extends Fragment {
     Observable<Recipe> getUsersRecipes(String uid) {
         pbRecipes.setVisibility(View.VISIBLE);
         return foodBookService.getUsersRecipesRealtime(uid);
+    }
+
+
+    public interface OnAdapterItemClickListener {
+        void onAdapterItemClick(Recipe recipe);
     }
 }

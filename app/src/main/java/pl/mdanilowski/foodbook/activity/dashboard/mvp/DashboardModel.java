@@ -9,6 +9,7 @@ import java.util.List;
 import pl.mdanilowski.foodbook.activity.addRecipe.AddRecipeActivity;
 import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
 import pl.mdanilowski.foodbook.activity.profile.ProfileActivity;
+import pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity;
 import pl.mdanilowski.foodbook.model.Recipe;
 
 public class DashboardModel {
@@ -53,6 +54,10 @@ public class DashboardModel {
 
     public void startProfileActivity(String uid){
         ProfileActivity.start(activity, uid);
+    }
+
+    public void startRecipeDetailsActivity(Recipe recipe){
+        RecipeDetailsActivity.start(activity, recipe);
     }
 }
 

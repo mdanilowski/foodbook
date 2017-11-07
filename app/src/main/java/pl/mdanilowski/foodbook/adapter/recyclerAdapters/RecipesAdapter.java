@@ -23,9 +23,11 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     private List<Recipe> recipes = new ArrayList<>();
     private Fragment fragment;
+    OnRecipeClickListener listener;
 
-    public RecipesAdapter(Fragment fragment) {
+    public RecipesAdapter(Fragment fragment, OnRecipeClickListener listener) {
         this.fragment = fragment;
+        this.listener = listener;
     }
 
     public void setRecipes(List<Recipe> recipes) {
@@ -47,6 +49,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
         Recipe recipe = recipes.get(position);
+        holder.bind(recipe, listener);
         holder.tvFoodName.setText(recipe.getName());
         holder.tvLikesCount.setText(String.valueOf(recipe.getLikes()));
         holder.tvCommentCount.setText(String.valueOf(recipe.getComments().size()));
@@ -76,5 +79,13 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+
+        public void bind(Recipe recipe, OnRecipeClickListener listener) {
+            itemView.setOnClickListener(__ -> listener.onRecipeClick(recipe));
+        }
+    }
+
+    public interface OnRecipeClickListener {
+        void onRecipeClick(Recipe recipe);
     }
 }

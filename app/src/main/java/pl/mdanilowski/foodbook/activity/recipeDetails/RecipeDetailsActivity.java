@@ -1,27 +1,52 @@
 package pl.mdanilowski.foodbook.activity.recipeDetails;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import butterknife.ButterKnife;
-import pl.mdanilowski.foodbook.R;
+import javax.inject.Inject;
+
+import pl.mdanilowski.foodbook.activity.recipeDetails.dagger.DaggerRecipeDetailsComponent;
+import pl.mdanilowski.foodbook.activity.recipeDetails.dagger.RecipeDetailsModule;
+import pl.mdanilowski.foodbook.activity.recipeDetails.mvp.RecipeDetailsPresenter;
+import pl.mdanilowski.foodbook.activity.recipeDetails.mvp.RecipeDetailsView;
+import pl.mdanilowski.foodbook.model.Recipe;
 
 public class RecipeDetailsActivity extends AppCompatActivity {
+
+    public static final String RECIPE = "RECIPE";
+
+    @Inject
+    RecipeDetailsView view;
+
+    @Inject
+    RecipeDetailsPresenter presenter;
+
+    public static void start(Context context, Recipe recipe) {
+        Intent intent = new Intent(context, RecipeDetailsActivity.class);
+        intent.putExtra(RECIPE, recipe);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipe_details);
-        ButterKnife.bind(this);
-//
-//        List<String> list = Arrays.asList("https://cdn.pixabay.com/photo/2016/03/28/12/35/cat-1285634_960_720.png",
-//                "https://www.w3schools.com/howto/img_fjords.jpg",
-//                "https://www.w3schools.com/w3css/img_lights.jpg",
-//                "http://www.menucool.com/slider/prod/image-slider-2.jpg",
-//                "http://images.freeimages.com/images/small-previews/2fe/butterfly-1390152.jpg",
-//                "http://www.dam7.com/Images/Puppy/images/myspace-puppy-images-0005.jpg");
-//        recipeImages.setAdapter(new RecipePagerAdapter(this, list));
-//        tabDots.setupWithViewPager(recipeImages);
+        DaggerRecipeDetailsComponent.builder().recipeDetailsModule(new RecipeDetailsModule(this)).build().inject(this);
 
+        setContentView(view);
+        presenter.onCreate();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

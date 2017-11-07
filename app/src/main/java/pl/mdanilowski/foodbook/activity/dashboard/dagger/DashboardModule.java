@@ -45,7 +45,7 @@ public class DashboardModule {
 
     @Provides
     @DashboardScope
-    public FirebaseUser user(FirebaseAuth firebaseAuth){
+    public FirebaseUser user(FirebaseAuth firebaseAuth) {
         return firebaseAuth.getCurrentUser();
     }
 }

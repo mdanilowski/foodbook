@@ -21,10 +21,14 @@ public class RecipePagerAdapter extends PagerAdapter {
     Context context;
 
 
-    public RecipePagerAdapter(Context context, List<String> imagesUrls) {
-        this.imagesUrls = imagesUrls;
+    public RecipePagerAdapter(Context context) {
         this.context = context;
         inflater = LayoutInflater.from(context);
+    }
+
+    public void setImages(List<String> imageUrls){
+        this.imagesUrls = imageUrls;
+        notifyDataSetChanged();
     }
 
     @Override

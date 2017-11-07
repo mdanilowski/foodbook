@@ -1,29 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity">
 
-    <android.support.design.widget.CoordinatorLayout
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <android.support.v4.view.ViewPager
-            android:id="@+id/vpRecipeImages"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"/>
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabDots"
+        <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_anchor="@+id/vpRecipeImages"
-            app:tabBackground="@drawable/tab_selector"
-            app:tabGravity="center"
-            app:tabIndicatorHeight="0dp"
-            app:layout_anchorGravity="bottom|center" />
-    </android.support.design.widget.CoordinatorLayout>
+            app:layout_scrollFlags="scroll|snap">
+
+            <include layout="@layout/view_toolbar_dafault" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/toolbar">
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/vpRecipeImages"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp" />
+
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/tabDots"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/vpRecipeImages"
+                    app:layout_anchor="@+id/vpRecipeImages"
+                    app:layout_anchorGravity="bottom|center"
+                    app:tabBackground="@drawable/tab_selector"
+                    app:tabGravity="center"
+                    app:tabIndicatorHeight="0dp" />
+            </RelativeLayout>
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
 
 
-</LinearLayout>
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvRecipeName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16sp"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="Naleśniki w sosie słodko kwaśnym"
+                android:textColor="@color/white_100"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:padding="8dp"
+                android:text="Składniki:"
+                android:textColor="@color/white_98"
+                android:textSize="12sp"
+                android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/tvIngredients"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:padding="8dp"
+                android:text="Składniki"
+                android:textColor="@color/white_100"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:padding="8dp"
+                android:text="Opis:"
+                android:textColor="@color/white_98"
+                android:textSize="12sp"
+                android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:padding="8dp"
+                android:text="Opis"
+                android:textColor="@color/white_100"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:padding="8dp"
+                android:text="Opis:"
+                android:textColor="@color/white_98"
+                android:textSize="12sp"
+                android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/tvTags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:padding="8dp"
+                android:text="Tags"
+                android:textColor="@color/white_100"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.TabLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/primary_dark"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        app:tabIndicatorHeight="0dp">
+
+        <android.support.design.widget.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="true"
+            android:icon="@mipmap/ic_share"
+            tools:targetApi="lollipop" />
+
+        <android.support.design.widget.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="true"
+            android:icon="@mipmap/ic_like_border"
+            tools:targetApi="lollipop" />
+
+        <android.support.design.widget.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="true"
+            android:icon="@mipmap/ic_comment"
+            tools:targetApi="lollipop" />
+    </android.support.design.widget.TabLayout>
+</android.support.design.widget.CoordinatorLayout>
+

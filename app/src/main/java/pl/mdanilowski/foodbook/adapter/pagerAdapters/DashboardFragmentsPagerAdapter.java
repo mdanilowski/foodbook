@@ -27,7 +27,7 @@ public class DashboardFragmentsPagerAdapter extends FragmentStatePagerAdapter {
             case 0:
                 return HomeFragment.newInstance();
             case 1:
-                return RecipesFragment.newInstance();
+                return RecipesFragment.newInstance(recipe -> context.model.startRecipeDetailsActivity(recipe));
             case 2:
                 return SearchFragment.newInstance(uid -> context.model.startProfileActivity(uid));
             case 3:
