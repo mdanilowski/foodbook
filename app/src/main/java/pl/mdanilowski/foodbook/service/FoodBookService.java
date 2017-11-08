@@ -14,6 +14,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import pl.mdanilowski.foodbook.app.App;
+import pl.mdanilowski.foodbook.model.Comment;
 import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.model.User;
 import pl.mdanilowski.foodbook.utils.FirestoreConstants;
@@ -37,15 +38,15 @@ public class FoodBookService {
                         .addOnFailureListener(subscriber::onError));
     }
 
-    public Observable<DocumentSnapshot> findUserByUid(String uid) {
+    public Observable<User> findUserByUid(String uid) {
         return Observable.create(subscriber ->
                 firestore.collection(FirestoreConstants.USERS).document(uid)
                         .addSnapshotListener((documentSnapshot, e) -> {
-                            if (e != null) {
+                            if (e != null || !documentSnapshot.exists()) {
                                 subscriber.onError(e);
                             }
-                            if (documentSnapshot != null) {
-                                subscriber.onNext(documentSnapshot);
+                            if (documentSnapshot != null && documentSnapshot.exists()) {
+                                subscriber.onNext(documentSnapshot.toObject(User.class));
                             }
                         }));
     }
@@ -101,11 +102,30 @@ public class FoodBookService {
                                 for (DocumentChange dc : snapshot.getDocumentChanges()) {
                                     switch (dc.getType()) {
                                         case ADDED:
-                                            subscriber.onNext(dc.getDocument().toObject(Recipe.class));
+                                            Recipe recipe = dc.getDocument().toObject(Recipe.class);
+                                            recipe.setRid(dc.getDocument().getId());
+                                            getCommentsForRecipe(uid, recipe.getRid())
+                                                    .subscribe(comments -> {
+                                                        recipe.setComments(comments);
+                                                        subscriber.onNext(recipe);
+                                                    });
                                     }
                                 }
                             }
                         }));
+    }
+
+    public Observable<List<Comment>> getCommentsForRecipe(String uid, String rid) {
+        return Observable.create(subscriber ->
+                firestore.collection(FirestoreConstants.USER_RECIPES)
+                        .document(uid)
+                        .collection(FirestoreConstants.RECIPES)
+                        .document(rid)
+                        .collection(FirestoreConstants.COMMENTS)
+                        .get()
+                        .addOnSuccessListener(snapshot -> subscriber.onNext(snapshot.toObjects(Comment.class)))
+                        .addOnFailureListener(subscriber::onError)
+        );
     }
 
     public Observable<Void> followUser(User user, User currentUser) {
@@ -118,14 +138,6 @@ public class FoodBookService {
             batch.set(dRef2, user);
             batch.commit()
                     .addOnSuccessListener(subscriber::onNext)
-                    .addOnFailureListener(subscriber::onError);
-        });
-    }
-
-    public Observable<Void> setFollowingUser(User user, User currentUser) {
-        return Observable.create(subscriber -> {
-            firestore.collection(FirestoreConstants.USERS).document(currentUser.getUid()).collection(FirestoreConstants.FOLLOWING).document(user.getUid())
-                    .set(user).addOnSuccessListener(subscriber::onNext)
                     .addOnFailureListener(subscriber::onError);
         });
     }

@@ -9,6 +9,7 @@ import java.util.List;
 
 public class Recipe implements Serializable {
 
+    private String rid;
     @SerializedName("name")
     private String name;
     @SerializedName("description")
@@ -113,5 +114,13 @@ public class Recipe implements Serializable {
 
     public void setPhotosUrls(List<String> photosUrls) {
         this.photosUrls = photosUrls;
+    }
+
+    public String getRid() {
+        return rid;
+    }
+
+    public void setRid(String rid) {
+        this.rid = rid;
     }
 }

@@ -12,6 +12,7 @@ import pl.mdanilowski.foodbook.activity.profile.dagger.ProfileModule;
 import pl.mdanilowski.foodbook.activity.profile.mvp.ProfilePresenter;
 import pl.mdanilowski.foodbook.activity.profile.mvp.ProfileView;
 import pl.mdanilowski.foodbook.app.App;
+import pl.mdanilowski.foodbook.model.User;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -22,10 +23,17 @@ public class ProfileActivity extends AppCompatActivity {
     ProfilePresenter presenter;
 
     public static final String USER_UID = "USER_UID";
+    public static final String USER = "USER";
 
     public static void start(Context context, String uid) {
         Intent intent = new Intent(context, ProfileActivity.class);
         intent.putExtra(USER_UID, uid);
+        context.startActivity(intent);
+    }
+
+    public static void start(Context context, User user) {
+        Intent intent = new Intent(context, ProfileActivity.class);
+        intent.putExtra(USER, user);
         context.startActivity(intent);
     }
 

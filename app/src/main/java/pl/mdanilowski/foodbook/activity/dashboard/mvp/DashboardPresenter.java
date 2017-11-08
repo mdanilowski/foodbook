@@ -131,14 +131,10 @@ public class DashboardPresenter extends BasePresenter {
     }
 
     private Subscription observeFindUser() {
-        return foodBookService.findUserByUid(user.getUid()).subscribe(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                foodBookSimpleStorage.saveUser(documentSnapshot.toObject(User.class));
-                compositeSubscription.add(observeFindUsersFriends());
-            } else {
-                compositeSubscription.add(observeAddUser());
-            }
-        });
+        return foodBookService.findUserByUid(user.getUid()).subscribe(retrievedUser -> {
+            foodBookSimpleStorage.saveUser(retrievedUser);
+            compositeSubscription.add(observeFindUsersFriends());
+        }, __ -> compositeSubscription.add(observeAddUser()));
     }
 
     private Subscription observeFindUsersFriends() {

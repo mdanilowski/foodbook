@@ -41,7 +41,6 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -116,7 +115,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:padding="8dp"
-                android:text="Opis:"
+                android:text="Tagi:"
                 android:textColor="@color/white_98"
                 android:textSize="12sp"
                 android:textStyle="italic" />
@@ -131,40 +130,110 @@
                 android:text="Tags"
                 android:textColor="@color/white_100"
                 android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@color/primary_dark" />
+
+            <LinearLayout
+                android:weightSum="3"
+                android:layout_margin="16dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="1232 Shares"
+                    android:textColor="@color/white_98"
+                    android:layout_height="wrap_content"
+                    />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="1232 Likes"
+                    android:textColor="@color/white_98"
+                    android:layout_height="wrap_content"
+                    />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="1232 Comments"
+                    android:textColor="@color/white_98"
+                    android:layout_height="wrap_content"
+                    />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@color/primary_dark" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <ImageView
+                    android:id="@+id/ivShare"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@mipmap/ic_share"
+                    android:tint="@color/accent"
+                    tools:targetApi="lollipop" />
+                <ImageView
+                    android:id="@+id/ivLike"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@mipmap/ic_like_border"
+                    android:tint="@color/accent"
+                    tools:targetApi="lollipop" />
+                <ImageView
+                    android:id="@+id/ivComment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@mipmap/ic_comment"
+                    android:tint="@color/accent"
+                    tools:targetApi="lollipop" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@color/primary_dark" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvComments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
-
     </android.support.v4.widget.NestedScrollView>
-
-    <android.support.design.widget.TabLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/primary_dark"
-        app:layout_behavior="@string/bottom_sheet_behavior"
-        app:tabIndicatorHeight="0dp">
-
-        <android.support.design.widget.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:focusable="true"
-            android:icon="@mipmap/ic_share"
-            tools:targetApi="lollipop" />
-
-        <android.support.design.widget.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:focusable="true"
-            android:icon="@mipmap/ic_like_border"
-            tools:targetApi="lollipop" />
-
-        <android.support.design.widget.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:focusable="true"
-            android:icon="@mipmap/ic_comment"
-            tools:targetApi="lollipop" />
-    </android.support.design.widget.TabLayout>
 </android.support.design.widget.CoordinatorLayout>
 

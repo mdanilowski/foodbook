@@ -7,12 +7,11 @@ import java.io.Serializable;
 
 public class Comment implements Serializable {
 
+    private String cid;
     @SerializedName("uid")
     private String uid;
     @SerializedName("name")
     private String name;
-    @SerializedName("surename")
-    private String surename;
     @SerializedName("avatar")
     private String avatarUrl;
     @SerializedName("comment")
@@ -21,10 +20,9 @@ public class Comment implements Serializable {
     public Comment() {
     }
 
-    public Comment(String uid, String name, String surename, String avatarUrl, String commentText) {
+    public Comment(String uid, String name, String avatarUrl, String commentText) {
         this.uid = uid;
         this.name = name;
-        this.surename = surename;
         this.avatarUrl = avatarUrl;
         this.commentText = commentText;
     }
@@ -45,14 +43,6 @@ public class Comment implements Serializable {
         this.name = name;
     }
 
-    public String getSurename() {
-        return surename;
-    }
-
-    public void setSurename(String surename) {
-        this.surename = surename;
-    }
-
     public String getAvatarUrl() {
         return avatarUrl;
     }
@@ -67,5 +57,13 @@ public class Comment implements Serializable {
 
     public void setCommentText(String commentText) {
         this.commentText = commentText;
+    }
+
+    public String getCid() {
+        return cid;
+    }
+
+    public void setCid(String cid) {
+        this.cid = cid;
     }
 }

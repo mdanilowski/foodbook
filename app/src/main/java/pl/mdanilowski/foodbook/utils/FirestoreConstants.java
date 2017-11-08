@@ -8,5 +8,6 @@ public class FirestoreConstants {
     public static final String USERS = "users";
     public static final String FOLLOWERS = "followers";
     public static final String FOLLOWING = "following";
+    public static final String COMMENTS = "comments";
     public static final String RECIPE_ADDED = "recipe-added";
 }

@@ -32,5 +32,7 @@
     <string name="added_recipe">Added recipe</string>
     <string name="failed_to_add_recipe">Failed to add recipe</string>
     <string name="recipe">Recipe</string>
+    <string name="no_user">No such user</string>
+    <string name="no_user_message">That user does not exist</string>
 
 </resources>
