@@ -156,6 +156,20 @@ public class FoodBookService {
                 }));
     }
 
+    public Observable<DocumentChange> getUsersFollowers(String uid) {
+        return Observable.create(subscriber -> firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.FOLLOWERS)
+                .addSnapshotListener((snapshot, e) -> {
+                    if (e != null) {
+                        subscriber.onError(e);
+                    }
+                    if (snapshot != null && !snapshot.isEmpty()) {
+                        for (DocumentChange dc : snapshot.getDocumentChanges()) {
+                            subscriber.onNext(dc);
+                        }
+                    }
+                }));
+    }
+
     private CollectionReference getUsersRecipesEndpoint(String uid) {
         return firestore.collection(FirestoreConstants.USER_RECIPES).document(uid).collection(FirestoreConstants.RECIPES);
     }
