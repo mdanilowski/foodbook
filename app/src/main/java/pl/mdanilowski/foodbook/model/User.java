@@ -19,6 +19,7 @@ public class User implements Serializable {
     private String aboutMe;
     private String country;
     private String city;
+    private List<String> likedRecipes = new ArrayList<>();
     private List<User> followers = new ArrayList<>();
     private List<User> following = new ArrayList<>();
 
@@ -38,6 +39,7 @@ public class User implements Serializable {
                 String aboutMe,
                 String country,
                 String city,
+                List<String> likedRecipes,
                 List<User> followers,
                 List<User> following) {
         this.uid = uid;
@@ -53,6 +55,7 @@ public class User implements Serializable {
         this.aboutMe = aboutMe;
         this.country = country;
         this.city = city;
+        this.likedRecipes = likedRecipes;
         this.followers = followers;
         this.following = following;
     }
@@ -176,5 +179,13 @@ public class User implements Serializable {
 
     public void setFollowingCount(int followingCount) {
         this.followingCount = followingCount;
+    }
+
+    public List<String> getLikedRecipes() {
+        return likedRecipes;
+    }
+
+    public void setLikedRecipes(List<String> likedRecipes) {
+        this.likedRecipes = likedRecipes;
     }
 }

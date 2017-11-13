@@ -7,7 +7,10 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.List;
 
@@ -16,6 +19,7 @@ import butterknife.ButterKnife;
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity;
 import pl.mdanilowski.foodbook.adapter.pagerAdapters.RecipePagerAdapter;
+import rx.Observable;
 
 public class RecipeDetailsView extends FrameLayout {
 
@@ -46,6 +50,15 @@ public class RecipeDetailsView extends FrameLayout {
     @BindView(R.id.rvComments)
     RecyclerView rvComments;
 
+    @BindView(R.id.ivShare)
+    ImageView ivShare;
+
+    @BindView(R.id.ivLike)
+    ImageView ivLike;
+
+    @BindView(R.id.ivComment)
+    ImageView ivComment;
+
     RecipePagerAdapter recipePagerAdapter;
 
     public RecipeDetailsView(@NonNull RecipeDetailsActivity recipeDetailsActivity) {
@@ -63,6 +76,9 @@ public class RecipeDetailsView extends FrameLayout {
         recipeDetailsActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
         tvToolbarTitle.setText(R.string.recipe);
         toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
+
+        rvComments.setFocusable(false);
+        tvRecipeName.requestFocus();
     }
 
     public void setPagerImages(List<String> images) {
@@ -93,5 +109,9 @@ public class RecipeDetailsView extends FrameLayout {
             formattedTags.append("\n");
         }
         this.tvTags.setText(formattedTags.toString());
+    }
+
+    Observable<Void> likeClick() {
+        return RxView.clicks(ivLike);
     }
 }

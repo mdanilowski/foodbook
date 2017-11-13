@@ -1,6 +1,8 @@
 package pl.mdanilowski.foodbook.adapter.recyclerAdapters;
 
 
+import android.app.Activity;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -22,11 +25,16 @@ import pl.mdanilowski.foodbook.model.Recipe;
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeViewHolder> {
 
     private List<Recipe> recipes = new ArrayList<>();
-    private Fragment fragment;
+    private Context context;
     OnRecipeClickListener listener;
 
-    public RecipesAdapter(Fragment fragment, OnRecipeClickListener listener) {
-        this.fragment = fragment;
+    public RecipesAdapter(Fragment context, OnRecipeClickListener listener) {
+        this.context = context.getContext();
+        this.listener = listener;
+    }
+
+    public RecipesAdapter(Activity context, OnRecipeClickListener listener) {
+        this.context = context;
         this.listener = listener;
     }
 
@@ -37,6 +45,10 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     public void addRecipe(Recipe recipe) {
         recipes.add(0, recipe);
+        Collections.sort(recipes, (o1, o2) -> {
+            if(o1.getAddDate().before(o2.getAddDate())) return 1;
+            else return -1;
+        });
         notifyItemInserted(0);
     }
 
@@ -54,7 +66,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         holder.tvLikesCount.setText(String.valueOf(recipe.getLikes()));
         holder.tvCommentCount.setText(String.valueOf(recipe.getComments().size()));
         if (recipe.getPhotosUrls() != null && !recipe.getPhotosUrls().isEmpty())
-            Glide.with(fragment).load(recipe.getPhotosUrls().get(0)).into(holder.ivFoodImage);
+            Glide.with(context).load(recipe.getPhotosUrls().get(0)).into(holder.ivFoodImage);
     }
 
     @Override

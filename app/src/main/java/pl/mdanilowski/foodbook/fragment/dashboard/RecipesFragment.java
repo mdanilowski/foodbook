@@ -1,7 +1,5 @@
 package pl.mdanilowski.foodbook.fragment.dashboard;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -41,6 +39,9 @@ public class RecipesFragment extends Fragment {
     @Inject
     FirebaseAuth firebaseAuth;
 
+    @Inject
+    FoodBookService foodBookService;
+
     FirebaseUser firebaseUser;
 
     @BindView(R.id.rvRecipesRecyclerView)
@@ -53,10 +54,7 @@ public class RecipesFragment extends Fragment {
     FloatingActionButton fabAddRecipe;
 
     RecipesAdapter recipesAdapter;
-    FoodBookService foodBookService = new FoodBookService();
     OnAdapterItemClickListener listener;
-
-    private OnFragmentInteractionListener onFragmentInteractionListener;
 
     public RecipesFragment() {
     }
@@ -75,7 +73,6 @@ public class RecipesFragment extends Fragment {
         compositeSubscription = new CompositeSubscription();
         recipesAdapter = new RecipesAdapter(this, recipe -> listener.onAdapterItemClick(recipe));
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -104,25 +101,9 @@ public class RecipesFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            onFragmentInteractionListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
-        onFragmentInteractionListener = null;
         compositeSubscription.clear();
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 
     Subscription observeUserRecipes() {

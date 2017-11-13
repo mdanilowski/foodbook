@@ -1,6 +1,10 @@
 package pl.mdanilowski.foodbook.activity.recipeDetails.mvp;
 
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseUser;
 
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
@@ -8,10 +12,15 @@ import pl.mdanilowski.foodbook.adapter.recyclerAdapters.CommentsAdapter;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.utils.InformationDialog;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class RecipeDetailsPresenter extends BasePresenter {
 
     public static final String NO_USER = "no_user";
+
+    FirebaseUser user;
 
     private RecipeDetailsView view;
     private RecipeDetailsModel model;
@@ -34,6 +43,8 @@ public class RecipeDetailsPresenter extends BasePresenter {
         recipe = model.getRecipeFromIntent();
         setRecipeContent();
         setComments();
+        user = firebaseAuth.getCurrentUser();
+        compositeSubscription.add(observeLikeClick());
     }
 
     private void setComments() {
@@ -55,6 +66,16 @@ public class RecipeDetailsPresenter extends BasePresenter {
 
     @Override
     public void onDestroy() {
+        compositeSubscription.clear();
+    }
 
+    Subscription observeLikeClick() {
+        return view.likeClick().observeOn(Schedulers.io())
+                .switchMap(code -> foodBookService.likeRecipe(user.getUid(), recipe.getOid(), recipe))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(code -> {
+                    Toast.makeText(view.getContext(), "CODE: " + code, Toast.LENGTH_SHORT).show();
+                    Log.d("LIKE", String.valueOf(code));
+                }, Throwable::printStackTrace);
     }
 }

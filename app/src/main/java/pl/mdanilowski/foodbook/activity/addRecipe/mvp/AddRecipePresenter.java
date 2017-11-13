@@ -72,7 +72,8 @@ public class AddRecipePresenter extends BasePresenter {
         return view.addRecipeClick().subscribe(__ -> {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Recipe recipe = new Recipe(String.valueOf(view.etName.getText()),
+            Recipe recipe = new Recipe(user.getUid(),
+                    String.valueOf(view.etName.getText()),
                     String.valueOf(view.etDescription.getText()),
                     0,
                     true,

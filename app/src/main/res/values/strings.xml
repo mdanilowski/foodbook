@@ -7,7 +7,7 @@
     <string name="fb_login_protocol_scheme" translatable="false">fb126458661438360</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank context</string>
     <string name="home_page">Home page</string>
     <string name="recipe_name">Enter recipe name</string>
     <string name="add_photo">ADD PHOTO</string>
@@ -34,5 +34,6 @@
     <string name="recipe">Recipe</string>
     <string name="no_user">No such user</string>
     <string name="no_user_message">That user does not exist</string>
+    <string name="recipes_owned_by">Recipes owned by</string>
 
 </resources>

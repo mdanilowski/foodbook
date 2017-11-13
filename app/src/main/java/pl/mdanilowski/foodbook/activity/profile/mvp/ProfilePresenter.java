@@ -21,10 +21,11 @@ public class ProfilePresenter extends BasePresenter {
     @Override
     public void onCreate() {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
-        User userFromIntent = model.getUserFromIntent();
-        if (userFromIntent == null)
+        user = model.getUserFromIntent();
+        if (user == null)
             compositeSubscription.add(observeGetUser());
-        else view.setUserData(foodBookSimpleStorage.getUser(), userFromIntent);
+        else view.setUserData(foodBookSimpleStorage.getUser(), user);
+        compositeSubscription.add(observeRecipesClick());
     }
 
     @Override
@@ -41,5 +42,9 @@ public class ProfilePresenter extends BasePresenter {
                     Toast.makeText(view.getContext(), "Can't get user", Toast.LENGTH_SHORT).show();
                     throwable.printStackTrace();
                 });
+    }
+
+    private Subscription observeRecipesClick(){
+        return view.clicksRecipes().subscribe(__ -> model.startUsersRecipesActivity(user));
     }
 }

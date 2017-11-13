@@ -9,13 +9,18 @@ import java.util.List;
 
 public class Recipe implements Serializable {
 
+    @SerializedName("rid")
     private String rid;
+    @SerializedName("oid")
+    private String oid;
     @SerializedName("name")
     private String name;
     @SerializedName("description")
     private String description;
     @SerializedName("likes")
     private int likes;
+    @SerializedName("shares")
+    private int shares;
     @SerializedName("isMine")
     private boolean isMine;
     @SerializedName("addDate")
@@ -32,7 +37,8 @@ public class Recipe implements Serializable {
     public Recipe() {
     }
 
-    public Recipe(String name, String description, int likes, boolean isMine, Date addDate, List<String> ingredients, List<Comment> comments, List<String> tags, List<String> photosUrls) {
+    public Recipe(String oid, String name, String description, int likes, boolean isMine, Date addDate, List<String> ingredients, List<Comment> comments, List<String> tags, List<String> photosUrls) {
+        this.oid = oid;
         this.name = name;
         this.description = description;
         this.likes = likes;
@@ -122,5 +128,21 @@ public class Recipe implements Serializable {
 
     public void setRid(String rid) {
         this.rid = rid;
+    }
+
+    public int getShares() {
+        return shares;
+    }
+
+    public void setShares(int shares) {
+        this.shares = shares;
+    }
+
+    public String getOid() {
+        return oid;
+    }
+
+    public void setOid(String oid) {
+        this.oid = oid;
     }
 }

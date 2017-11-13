@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.jakewharton.rxbinding.view.RxView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -16,6 +17,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.profile.ProfileActivity;
 import pl.mdanilowski.foodbook.model.User;
+import rx.Observable;
 
 @SuppressLint("ViewConstructor")
 public class ProfileView extends FrameLayout {
@@ -49,6 +51,12 @@ public class ProfileView extends FrameLayout {
 
     @BindView(R.id.tvlocation)
     TextView tvLocation;
+
+    @BindView(R.id.llRecipes)
+    LinearLayout llRecipes;
+
+    @BindView(R.id.llFollowers)
+    LinearLayout llFollowers;
 
     @BindView(R.id.toolbarProfile)
     Toolbar toolbar;
@@ -87,5 +95,9 @@ public class ProfileView extends FrameLayout {
         tvEmail.setText(userData.getEmail());
         tvAbout.setText(userData.getAboutMe());
         tvLocation.setText(String.format("%s, %s", userData.getCountry(), userData.getCity()));
+    }
+
+    Observable<Void> clicksRecipes(){
+        return RxView.clicks(llRecipes);
     }
 }

@@ -13,7 +13,7 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_scrollFlags="scroll|snap">
+            app:layout_scrollFlags="scroll">
 
             <include layout="@layout/view_toolbar_dafault" />
 
@@ -231,8 +231,10 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rvComments"
+                android:nestedScrollingEnabled="false"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                tools:targetApi="lollipop" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

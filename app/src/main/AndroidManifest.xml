@@ -78,7 +78,8 @@
         </provider>
 
         <activity android:name=".activity.profile.ProfileActivity" />
-        <activity android:name=".activity.recipeDetails.RecipeDetailsActivity"></activity>
+        <activity android:name=".activity.recipeDetails.RecipeDetailsActivity" />
+        <activity android:name=".activity.usersRecipes.UsersRecipesActivity"></activity>
     </application>
 
 </manifest>

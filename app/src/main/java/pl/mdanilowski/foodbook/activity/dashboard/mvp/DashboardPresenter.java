@@ -133,11 +133,12 @@ public class DashboardPresenter extends BasePresenter {
     private Subscription observeFindUser() {
         return foodBookService.findUserByUid(user.getUid()).subscribe(retrievedUser -> {
             foodBookSimpleStorage.saveUser(retrievedUser);
-            compositeSubscription.add(observeFindUsersFriends());
+            compositeSubscription.add(observeFollowedByUser());
+            compositeSubscription.add(observeUsersLikedRecipes());
         }, __ -> compositeSubscription.add(observeAddUser()));
     }
 
-    private Subscription observeFindUsersFriends() {
+    private Subscription observeFollowedByUser() {
         return foodBookService.getUsersFollowedByUser(user.getUid())
                 .subscribe(documentChange -> {
                     User user = foodBookSimpleStorage.getUser();
@@ -158,12 +159,31 @@ public class DashboardPresenter extends BasePresenter {
                 });
     }
 
+    private Subscription observeUsersLikedRecipes() {
+        return foodBookService.getUsersLikedRecipes(user.getUid())
+                .subscribe(documentChange -> {
+                    User user = foodBookSimpleStorage.getUser();
+                    Recipe r = documentChange.getDocument().toObject(Recipe.class);
+                    switch (documentChange.getType()) {
+                        case ADDED:
+                            foodBookSimpleStorage.addRecipeToLiked(r.getRid());
+                            user.getLikedRecipes().add(r.getRid());
+                            break;
+                        case REMOVED:
+                            foodBookSimpleStorage.removeLikedRecipe(r.getRid());
+                            user.getLikedRecipes().remove(r.getRid());
+                            break;
+                    }
+                });
+    }
+
     private Subscription observeAddUser() {
         User newUser = new User();
         newUser.setUid(user.getUid());
         newUser.setName(user.getDisplayName());
         newUser.setAvatarUrl(user.getPhotoUrl().toString());
         newUser.setEmail(user.getEmail());
+        newUser.setLikedRecipes(new ArrayList<>());
         newUser.setFollowers(new ArrayList<>());
         newUser.setFollowing(new ArrayList<>());
         newUser.setTotalLikes(0);
@@ -177,7 +197,7 @@ public class DashboardPresenter extends BasePresenter {
         return foodBookService.setUser(user.getUid(), newUser).subscribe(
                 __ -> {
                     Log.d("_USER", "User added");
-                    compositeSubscription.add(observeFindUsersFriends());
+                    compositeSubscription.add(observeFollowedByUser());
                 },
                 Throwable::printStackTrace
         );

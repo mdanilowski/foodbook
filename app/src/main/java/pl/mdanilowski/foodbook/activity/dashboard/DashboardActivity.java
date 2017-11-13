@@ -18,14 +18,11 @@ import pl.mdanilowski.foodbook.activity.dashboard.dagger.DashboardModule;
 import pl.mdanilowski.foodbook.activity.dashboard.mvp.DashboardPresenter;
 import pl.mdanilowski.foodbook.activity.dashboard.mvp.DashboardView;
 import pl.mdanilowski.foodbook.app.App;
-import pl.mdanilowski.foodbook.fragment.dashboard.HomeFragment;
 import pl.mdanilowski.foodbook.fragment.dashboard.RecipeIdeasFragment;
-import pl.mdanilowski.foodbook.fragment.dashboard.RecipesFragment;
 import pl.mdanilowski.foodbook.fragment.dashboard.SearchFragment;
 import pl.mdanilowski.foodbook.model.Recipe;
 
-public class DashboardActivity extends BaseActivity implements RecipesFragment.OnFragmentInteractionListener,
-        HomeFragment.OnFragmentInteractionListener,
+public class DashboardActivity extends BaseActivity implements
         SearchFragment.OnFragmentInteractionListener,
         RecipeIdeasFragment.OnFragmentInteractionListener {
 
@@ -80,11 +77,6 @@ public class DashboardActivity extends BaseActivity implements RecipesFragment.O
     @Override
     protected void onNewIntent(Intent intent) {
         presenter.onNewIntent(intent);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     @Override

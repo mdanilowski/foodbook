@@ -17,7 +17,12 @@ import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.Comment;
 import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.model.User;
+import pl.mdanilowski.foodbook.model.userUpdates.NewFollowersComment;
+import pl.mdanilowski.foodbook.model.userUpdates.NewFollowersRecipe;
 import pl.mdanilowski.foodbook.utils.FirestoreConstants;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rx.Observable;
 
 public class FoodBookService {
@@ -25,8 +30,16 @@ public class FoodBookService {
     @Inject
     FirebaseFirestore firestore;
 
+    @Inject
+    FoodBookApi foodBookApi;
+
     public FoodBookService() {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
+    }
+
+    public FoodBookService(FoodBookApi api) {
+        App.getApplicationInstance().getFoodbookAppComponent().inject(this);
+
     }
 
     public Observable<Void> setUser(String uid, User user) {
@@ -46,7 +59,9 @@ public class FoodBookService {
                                 subscriber.onError(e);
                             }
                             if (documentSnapshot != null && documentSnapshot.exists()) {
-                                subscriber.onNext(documentSnapshot.toObject(User.class));
+                                User user = documentSnapshot.toObject(User.class);
+                                user.setUid(documentSnapshot.getId());
+                                subscriber.onNext(user);
                             }
                         }));
     }
@@ -90,31 +105,6 @@ public class FoodBookService {
                         .addOnFailureListener(subscriber::onError));
     }
 
-    public Observable<Recipe> getUsersRecipesRealtime(String uid) {
-        return Observable.create(subscriber ->
-                getUsersRecipesEndpoint(uid)
-                        .orderBy("addDate", Query.Direction.ASCENDING)
-                        .addSnapshotListener((snapshot, e) -> {
-                            if (e != null) {
-                                subscriber.onError(e);
-                            }
-                            if (snapshot != null && !snapshot.isEmpty()) {
-                                for (DocumentChange dc : snapshot.getDocumentChanges()) {
-                                    switch (dc.getType()) {
-                                        case ADDED:
-                                            Recipe recipe = dc.getDocument().toObject(Recipe.class);
-                                            recipe.setRid(dc.getDocument().getId());
-                                            getCommentsForRecipe(uid, recipe.getRid())
-                                                    .subscribe(comments -> {
-                                                        recipe.setComments(comments);
-                                                        subscriber.onNext(recipe);
-                                                    });
-                                    }
-                                }
-                            }
-                        }));
-    }
-
     public Observable<List<Comment>> getCommentsForRecipe(String uid, String rid) {
         return Observable.create(subscriber ->
                 firestore.collection(FirestoreConstants.USER_RECIPES)
@@ -141,6 +131,8 @@ public class FoodBookService {
                     .addOnFailureListener(subscriber::onError);
         });
     }
+
+    // ######################  REALTIME LISTENERS  ##########################
 
     public Observable<DocumentChange> getUsersFollowedByUser(String uid) {
         return Observable.create(subscriber -> firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.FOLLOWING)
@@ -170,7 +162,111 @@ public class FoodBookService {
                 }));
     }
 
+    public Observable<DocumentChange> getUsersLikedRecipes(String uid) {
+        return Observable.create(subscriber ->
+                firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.LIKED_RECIPES)
+                        .orderBy("likeDate", Query.Direction.ASCENDING)
+                        .addSnapshotListener((snapshot, e) -> {
+                            if (e != null) {
+                                subscriber.onError(e);
+                            }
+                            if (snapshot != null && !snapshot.isEmpty()) {
+                                for (DocumentChange dc : snapshot.getDocumentChanges()) {
+                                    subscriber.onNext(dc);
+                                }
+                            }
+                        }));
+    }
+
+
+    public Observable<Recipe> getUsersRecipesRealtime(String uid) {
+        return Observable.create(subscriber ->
+                getUsersRecipesEndpoint(uid)
+                        .orderBy("addDate", Query.Direction.ASCENDING)
+                        .addSnapshotListener((snapshot, e) -> {
+                            if (e != null) {
+                                subscriber.onError(e);
+                            }
+                            if (snapshot != null && !snapshot.isEmpty()) {
+                                for (DocumentChange dc : snapshot.getDocumentChanges()) {
+                                    switch (dc.getType()) {
+                                        case ADDED:
+                                            Recipe recipe = dc.getDocument().toObject(Recipe.class);
+                                            recipe.setRid(dc.getDocument().getId());
+                                            getCommentsForRecipe(uid, recipe.getRid())
+                                                    .subscribe(comments -> {
+                                                        recipe.setComments(comments);
+                                                        subscriber.onNext(recipe);
+                                                    });
+                                    }
+                                }
+                            }
+                        }));
+    }
+
+    public Observable<NewFollowersRecipe> getNewFollowersRecipesRealtime(String uid) {
+        return Observable.create(subscriber ->
+                firestore.collection(FirestoreConstants.USER_UPDATES)
+                        .document(uid)
+                        .collection(FirestoreConstants.FOLLOWERS_RECIPES)
+                        .orderBy("addDate", Query.Direction.ASCENDING)
+                        .addSnapshotListener((snapshot, e) -> {
+                            if (e != null) {
+                                subscriber.onError(e);
+                            }
+                            if (snapshot != null && !snapshot.isEmpty()) {
+                                for (DocumentChange dc : snapshot.getDocumentChanges()) {
+                                    switch (dc.getType()) {
+                                        case ADDED:
+                                            subscriber.onNext(dc.getDocument().toObject(NewFollowersRecipe.class));
+                                    }
+                                }
+                            }
+                        })
+        );
+    }
+
+    public Observable<NewFollowersComment> getNewFollowersCommentRealtime(String uid) {
+        return Observable.create(subscriber ->
+                firestore.collection(FirestoreConstants.USER_UPDATES)
+                        .document(uid)
+                        .collection(FirestoreConstants.FOLLOWERS_COMMENTS)
+                        .orderBy("addDate", Query.Direction.ASCENDING)
+                        .addSnapshotListener((snapshot, e) -> {
+                            if (e != null) {
+                                subscriber.onError(e);
+                            }
+                            if (snapshot != null && !snapshot.isEmpty()) {
+                                for (DocumentChange dc : snapshot.getDocumentChanges()) {
+                                    switch (dc.getType()) {
+                                        case ADDED:
+                                            subscriber.onNext(dc.getDocument().toObject(NewFollowersComment.class));
+                                    }
+                                }
+                            }
+                        }));
+    }
+
+    // ######################  ENDPOINT DECLARATION  ##########################
+
     private CollectionReference getUsersRecipesEndpoint(String uid) {
         return firestore.collection(FirestoreConstants.USER_RECIPES).document(uid).collection(FirestoreConstants.RECIPES);
+    }
+
+    //  ####################### HTTP CALLS ###########################
+
+    public Observable<Integer> likeRecipe(String uid, String oid, Recipe recipe) {
+        return Observable.create(subscriber ->
+                foodBookApi.recipeLiked(uid, oid, recipe).enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        subscriber.onNext(response.code());
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        subscriber.onError(t);
+                    }
+                }));
     }
 }
