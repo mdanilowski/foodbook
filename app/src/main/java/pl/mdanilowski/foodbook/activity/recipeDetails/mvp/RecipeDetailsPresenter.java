@@ -62,6 +62,13 @@ public class RecipeDetailsPresenter extends BasePresenter {
         view.setTvDescription(recipe.getDescription());
         view.setTvIngredients(recipe.getIngredients());
         view.setTvTags(recipe.getTags());
+        view.setShareCount(recipe.getShares());
+        view.setLikesCount(recipe.getLikes());
+        if (recipe.getComments() == null) {
+            view.setCommentsCount(0);
+        } else {
+            view.setCommentsCount(recipe.getComments().size());
+        }
     }
 
     @Override
@@ -70,12 +77,30 @@ public class RecipeDetailsPresenter extends BasePresenter {
     }
 
     Subscription observeLikeClick() {
-        return view.likeClick().observeOn(Schedulers.io())
+        return view.likeClick()
+                .doOnNext(__ -> {
+                    view.setRecipeLiked();
+                    view.setLikesCount(recipe.getLikes() + 1);
+                    observeRecipeLiked(user, recipe);
+                })
+                .observeOn(Schedulers.io())
                 .switchMap(code -> foodBookService.likeRecipe(user.getUid(), recipe.getOid(), recipe))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(code -> {
                     Toast.makeText(view.getContext(), "CODE: " + code, Toast.LENGTH_SHORT).show();
                     Log.d("LIKE", String.valueOf(code));
                 }, Throwable::printStackTrace);
+    }
+
+    Subscription observeRecipeLiked(FirebaseUser user, Recipe recipe) {
+        return foodBookService.likeRecipe(user, recipe)
+                .subscribe(__ -> {
+                            Log.i("RECIPE_LIKED", "RECIPE LIKED: " + recipe.getRid());
+                        }, throwable -> {
+                            view.setRecipeNotLiked();
+                            view.setLikesCount(recipe.getLikes());
+                            Toast.makeText(view.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                        }
+                );
     }
 }

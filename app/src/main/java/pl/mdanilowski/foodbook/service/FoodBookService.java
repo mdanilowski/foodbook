@@ -1,5 +1,6 @@
 package pl.mdanilowski.foodbook.service;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -118,6 +119,8 @@ public class FoodBookService {
         );
     }
 
+    // #################### BATCH WRITES ##############################
+
     public Observable<Void> followUser(User user, User currentUser) {
         return Observable.create(subscriber -> {
             WriteBatch batch = firestore.batch();
@@ -129,6 +132,25 @@ public class FoodBookService {
             batch.commit()
                     .addOnSuccessListener(subscriber::onNext)
                     .addOnFailureListener(subscriber::onError);
+        });
+    }
+
+    public Observable<DocumentReference> likeRecipe(FirebaseUser currentUser, Recipe recipe) {
+        return Observable.create(subscriber -> {
+
+            DocumentReference dRef = firestore.collection(FirestoreConstants.USER_RECIPES).document(recipe.getOid()).collection(FirestoreConstants.RECIPES).document(recipe.getRid());
+            CollectionReference cRef = firestore.collection(FirestoreConstants.USERS).document(currentUser.getUid()).collection(FirestoreConstants.LIKED_RECIPES);
+
+            firestore.runTransaction(transaction -> {
+                DocumentSnapshot snapshot = transaction.get(dRef);
+                long newLikesCount = snapshot.getLong("likes") + 1;
+                transaction.update(dRef, "likes", newLikesCount);
+                return null;
+            }).addOnSuccessListener(command ->
+                    cRef.add(recipe)
+                            .addOnSuccessListener(subscriber::onNext)
+                            .addOnFailureListener(subscriber::onError)
+            ).addOnFailureListener(subscriber::onError);
         });
     }
 

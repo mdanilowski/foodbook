@@ -1,6 +1,8 @@
 package pl.mdanilowski.foodbook.activity.recipeDetails.mvp;
 
+import android.annotation.SuppressLint;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -59,6 +61,15 @@ public class RecipeDetailsView extends FrameLayout {
     @BindView(R.id.ivComment)
     ImageView ivComment;
 
+    @BindView(R.id.tvSharesCount)
+    TextView tvSharesCount;
+
+    @BindView(R.id.tvLikesCount)
+    TextView tvLikesCount;
+
+    @BindView(R.id.tvCommentCount)
+    TextView tvCommentsCount;
+
     RecipePagerAdapter recipePagerAdapter;
 
     public RecipeDetailsView(@NonNull RecipeDetailsActivity recipeDetailsActivity) {
@@ -109,6 +120,34 @@ public class RecipeDetailsView extends FrameLayout {
             formattedTags.append("\n");
         }
         this.tvTags.setText(formattedTags.toString());
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void setShareCount(int count) {
+        tvSharesCount.setText(String.format("%d %s", count, " shares"));
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void setLikesCount(int count) {
+        tvLikesCount.setText(String.format("%d %s", count, " likes"));
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void setCommentsCount(int count) {
+        tvCommentsCount.setText(String.format("%d %s", count, " comments"));
+    }
+
+    public void setRecipeLiked() {
+        Drawable likeDrawable = getResources().getDrawable(R.mipmap.ic_like_fill);
+        likeDrawable.setColorFilter(getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
+        ivLike.setImageDrawable(likeDrawable);
+    }
+
+    public void setRecipeNotLiked() {
+
+        Drawable likeDrawable = getResources().getDrawable(R.mipmap.ic_like_border);
+        likeDrawable.setColorFilter(getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
+        ivLike.setImageDrawable(likeDrawable);
     }
 
     Observable<Void> likeClick() {
