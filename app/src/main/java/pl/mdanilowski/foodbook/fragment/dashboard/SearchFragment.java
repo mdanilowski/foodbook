@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
 import pl.mdanilowski.foodbook.adapter.recyclerAdapters.SearchResultsAdapter;
 import pl.mdanilowski.foodbook.app.App;
+import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.service.FoodBookService;
 import pl.mdanilowski.foodbook.utils.Storage.FoodBookSimpleStorage;
 
@@ -85,11 +87,16 @@ public class SearchFragment extends Fragment {
         super.onResume();
         queryText = ((DashboardActivity) getActivity()).getPresenter().getSearchQuery();
         if (!queryText.isEmpty()) {
-            String[] queryStringTable = queryText.split(" ");
             if (foodBookSimpleStorage.getUser() != null)
-                foodBookService.getUsersByNameAndSurename(queryStringTable).subscribe(users -> {
-                    searchResultsAdapter.setUsers(users);
-                }, Throwable::printStackTrace);
+//                foodBookService.getUsersByNameAndSurename(queryText)
+//                        .subscribe(users -> {
+//                    searchResultsAdapter.setUsers(users);
+//                }, Throwable::printStackTrace);
+                foodBookService.getRecipesByWords(queryText).subscribe(recipes -> {
+                   for(Recipe r: recipes){
+                       Log.d("RECIPE_QUERIED", r.getName());
+                   }
+                });
         }
     }
 

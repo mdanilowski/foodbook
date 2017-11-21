@@ -4,6 +4,7 @@ package pl.mdanilowski.foodbook.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class Comment implements Serializable {
 
@@ -16,6 +17,8 @@ public class Comment implements Serializable {
     private String avatarUrl;
     @SerializedName("comment")
     private String commentText;
+    @SerializedName("addDate")
+    private Date addDate;
 
     public Comment() {
     }
@@ -65,5 +68,13 @@ public class Comment implements Serializable {
 
     public void setCid(String cid) {
         this.cid = cid;
+    }
+
+    public Date getAddDate() {
+        return addDate;
+    }
+
+    public void setAddDate(Date addDate) {
+        this.addDate = addDate;
     }
 }

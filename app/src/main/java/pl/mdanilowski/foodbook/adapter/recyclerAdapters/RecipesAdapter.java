@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -50,6 +51,26 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
             else return -1;
         });
         notifyItemInserted(0);
+    }
+
+    public void updateRecipe(Recipe recipe){
+        for(Recipe r: recipes){
+            if(r.getRid().equals(recipe.getRid())){
+                recipes.set(recipes.indexOf(r), recipe);
+                notifyDataSetChanged();
+            }
+        }
+    }
+
+    public void deleteRecipe(Recipe recipe){
+        Iterator<Recipe> iterator = recipes.iterator();
+        while(iterator.hasNext()){
+            Recipe r = iterator.next();
+            if(r.getRid().equals(recipe.getRid())){
+                iterator.remove();
+                notifyDataSetChanged();
+            }
+        }
     }
 
     @Override

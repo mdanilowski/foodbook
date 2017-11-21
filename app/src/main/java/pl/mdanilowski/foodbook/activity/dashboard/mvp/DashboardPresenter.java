@@ -29,7 +29,8 @@ public class DashboardPresenter extends BasePresenter {
 
     private DashboardView view;
     public DashboardModel model;
-    private FirebaseUser user;
+    public FirebaseUser user;
+    public User foodbookUser;
     private Drawer drawer;
     private String searchQuery = "";
 
@@ -50,6 +51,7 @@ public class DashboardPresenter extends BasePresenter {
     @Override
     public void onCreate() {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
+        foodbookUser = foodBookSimpleStorage.getUser();
         compositeSubscription.add(observeAvatarClick());
         compositeSubscription.add(observeFindUser());
         setViewPagerAndTabs();
@@ -119,7 +121,13 @@ public class DashboardPresenter extends BasePresenter {
 
     private Subscription observeAddingRecipe() {
         return foodBookService.addRecipeToUser(user.getUid(), recipeForUpload)
-                .subscribe(__ -> view.showSnackBarWithText(view.getResources().getString(R.string.added_recipe)),
+                .subscribe(docRef -> {
+                            recipeForUpload.setRid(docRef.getId());
+                            foodBookService.addRecipeToQueryTable(recipeForUpload)
+                                    .subscribe(aVoid ->
+                                            Log.d("ADDED_TO_QUERY", "Added recipe : " + recipeForUpload.getRid() + " to query table"));
+                            view.showSnackBarWithText(view.getResources().getString(R.string.added_recipe));
+                        },
                         throwable -> {
                             view.showSnackBarWithText(view.getResources().getString(R.string.failed_to_add_recipe));
                             throwable.printStackTrace();
@@ -161,19 +169,12 @@ public class DashboardPresenter extends BasePresenter {
 
     private Subscription observeUsersLikedRecipes() {
         return foodBookService.getUsersLikedRecipes(user.getUid())
-                .subscribe(documentChange -> {
-                    User user = foodBookSimpleStorage.getUser();
-                    Recipe r = documentChange.getDocument().toObject(Recipe.class);
-                    switch (documentChange.getType()) {
-                        case ADDED:
-                            foodBookSimpleStorage.addRecipeToLiked(r.getRid());
-                            user.getLikedRecipes().add(r.getRid());
-                            break;
-                        case REMOVED:
-                            foodBookSimpleStorage.removeLikedRecipe(r.getRid());
-                            user.getLikedRecipes().remove(r.getRid());
-                            break;
+                .subscribe(recipes -> {
+                    foodbookUser.getLikedRecipes().clear();
+                    for (Recipe r : recipes) {
+                        foodbookUser.getLikedRecipes().add(r.getRid());
                     }
+                    foodBookSimpleStorage.saveUser(foodbookUser);
                 });
     }
 

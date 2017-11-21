@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
 import pl.mdanilowski.foodbook.app.App;
+import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.model.User;
 import pl.mdanilowski.foodbook.utils.InformationDialog;
 import rx.Subscription;
@@ -25,8 +26,8 @@ public class UsersRecipesPresenter extends BasePresenter {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         user = model.getUserFromIntent();
         compositeSubscription.add(observeUserRecipes());
-        view.setListener(model::startRecipeDetailsActivity);
         view.setUserData(user);
+        view.setListener(recipe -> model.startRecipeDetailsActivity(user.getUid(), recipe.getRid()));
     }
 
     @Override
@@ -36,11 +37,26 @@ public class UsersRecipesPresenter extends BasePresenter {
 
     Subscription observeUserRecipes() {
         return foodBookService.getUsersRecipesRealtime(user.getUid())
-                .subscribe(view::addItemToAdapter, throwable -> {
-                    if (throwable instanceof UnknownHostException) {
-                        InformationDialog informationDialog = InformationDialog.newInstance("Failed loading data", "Check network connection and try again");
-                        informationDialog.show(model.activity.getSupportFragmentManager(), "fragment_alert");
-                    }
-                });
+                .subscribe(documentChange -> {
+                            Recipe recipe = documentChange.getDocument().toObject(Recipe.class);
+                            recipe.setRid(documentChange.getDocument().getId());
+                            switch (documentChange.getType()) {
+                                case ADDED:
+                                    view.addItemToAdapter(recipe);
+                                    break;
+                                case MODIFIED:
+                                    view.updateItemInAdapter(recipe);
+                                    break;
+                                case REMOVED:
+                                    view.deleteItemFromAdapter(recipe);
+                                    break;
+                            }
+                        }
+                        , throwable -> {
+                            if (throwable instanceof UnknownHostException) {
+                                InformationDialog informationDialog = InformationDialog.newInstance("Failed loading data", "Check network connection and try again");
+                                informationDialog.show(model.activity.getSupportFragmentManager(), "fragment_alert");
+                            }
+                        });
     }
 }

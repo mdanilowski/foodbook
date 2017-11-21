@@ -2,7 +2,6 @@ package pl.mdanilowski.foodbook.activity.recipeDetails.mvp;
 
 import android.annotation.SuppressLint;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -57,6 +56,9 @@ public class RecipeDetailsView extends FrameLayout {
 
     @BindView(R.id.ivLike)
     ImageView ivLike;
+
+    @BindView(R.id.ivUnlike)
+    ImageView ivUnlike;
 
     @BindView(R.id.ivComment)
     ImageView ivComment;
@@ -138,19 +140,24 @@ public class RecipeDetailsView extends FrameLayout {
     }
 
     public void setRecipeLiked() {
-        Drawable likeDrawable = getResources().getDrawable(R.mipmap.ic_like_fill);
-        likeDrawable.setColorFilter(getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
-        ivLike.setImageDrawable(likeDrawable);
+        ivLike.setVisibility(GONE);
+        ivUnlike.setVisibility(VISIBLE);
+        unlikeClick();
+        likeClick();
     }
 
     public void setRecipeNotLiked() {
-
-        Drawable likeDrawable = getResources().getDrawable(R.mipmap.ic_like_border);
-        likeDrawable.setColorFilter(getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
-        ivLike.setImageDrawable(likeDrawable);
+        ivUnlike.setVisibility(GONE);
+        ivLike.setVisibility(VISIBLE);
+        likeClick();
+        unlikeClick();
     }
 
     Observable<Void> likeClick() {
         return RxView.clicks(ivLike);
+    }
+
+    Observable<Void> unlikeClick() {
+        return RxView.clicks(ivUnlike);
     }
 }

@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -28,8 +30,47 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<UserUpdatesBase> userUpdatesList = new ArrayList<>();
 
     public void addUpdate(UserUpdatesBase update) {
-        userUpdatesList.add(0,update);
+        userUpdatesList.add(0, update);
         notifyItemInserted(0);
+        Collections.sort(userUpdatesList, (o1, o2) -> {
+            if (o1.getAddDate() > o2.getAddDate()) return -1;
+            else return 1;
+        });
+        notifyDataSetChanged();
+    }
+
+    public void removeFollowersLike(MyFollowerLikes like) {
+        Iterator<UserUpdatesBase> iterator = userUpdatesList.iterator();
+        while (iterator.hasNext()) {
+            UserUpdatesBase tempObject = iterator.next();
+            if (tempObject instanceof MyFollowerLikes) {
+                MyFollowerLikes tempLike = (MyFollowerLikes) tempObject;
+                if (like != null) {
+                    if (tempLike.getLiker().getUid().equals(like.getLiker().getUid()) &&
+                            tempLike.getRecipe().getRid().equals(like.getRecipe().getRid())) {
+                        iterator.remove();
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        }
+    }
+
+    public void removeMyRecipeLike(MyRecipeLike myRecipeLike) {
+        Iterator<UserUpdatesBase> iterator = userUpdatesList.iterator();
+        while (iterator.hasNext()) {
+            UserUpdatesBase tempObject = iterator.next();
+            if (tempObject instanceof MyRecipeLike) {
+                MyRecipeLike tempLike = (MyRecipeLike) tempObject;
+                if (myRecipeLike != null) {
+                    if (tempLike.getLiker().getUid().equals(myRecipeLike.getLiker().getUid()) &&
+                            tempLike.getRecipe().getRid().equals(myRecipeLike.getRecipe().getRid())) {
+                        iterator.remove();
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -51,7 +92,8 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     DefaultHolder defaultHolder = (DefaultHolder) holder;
                     Glide.with(defaultHolder.itemView).load(myRecipeLike.getLiker().getAvatarUrl()).into(defaultHolder.ivAvatar);
                     defaultHolder.tvMessageText.setText(String.format("%s %s", myRecipeLike.getLiker().getName(), " lubi twoj przepis"));
-                    Glide.with(defaultHolder.itemView).load(myRecipeLike.getRecipe().getPhotosUrls().get(0)).into(defaultHolder.ivFoodImage);
+                    if (!myRecipeLike.getRecipe().getPhotosUrls().isEmpty())
+                        Glide.with(defaultHolder.itemView).load(myRecipeLike.getRecipe().getPhotosUrls().get(0)).into(defaultHolder.ivFoodImage);
                     defaultHolder.tvFoodName.setText(myRecipeLike.getRecipe().getName());
                 }
                 if (userUpdate instanceof NewFollowersComment) {
@@ -67,7 +109,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     DefaultHolder defaultHolder = (DefaultHolder) holder;
                     Glide.with(defaultHolder.itemView).load(newFollowersRecipe.getUser().getAvatarUrl()).into(defaultHolder.ivAvatar);
                     defaultHolder.tvMessageText.setText(String.format("%s %s", newFollowersRecipe.getUser().getName(), " dodał nowy przepis"));
-                    if (newFollowersRecipe.getRecipe().getPhotosUrls() != null)
+                    if (newFollowersRecipe.getRecipe().getPhotosUrls() != null && !newFollowersRecipe.getRecipe().getPhotosUrls().isEmpty())
                         Glide.with(defaultHolder.itemView).load(newFollowersRecipe.getRecipe().getPhotosUrls().get(0)).into(defaultHolder.ivFoodImage);
                     defaultHolder.tvFoodName.setText(newFollowersRecipe.getRecipe().getName());
                 }
@@ -76,7 +118,8 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     DefaultHolder defaultHolder = (DefaultHolder) holder;
                     Glide.with(defaultHolder.itemView).load(myFollowerLikes.getLiker().getAvatarUrl()).into(defaultHolder.ivAvatar);
                     defaultHolder.tvMessageText.setText(String.format("%s %s", myFollowerLikes.getLiker().getName(), " polubił przepis"));
-                    Glide.with(defaultHolder.itemView).load(myFollowerLikes.getRecipe().getPhotosUrls().get(0)).into(defaultHolder.ivFoodImage);
+                    if (myFollowerLikes.getRecipe().getPhotosUrls() != null && !myFollowerLikes.getRecipe().getPhotosUrls().isEmpty())
+                        Glide.with(defaultHolder.itemView).load(myFollowerLikes.getRecipe().getPhotosUrls().get(0)).into(defaultHolder.ivFoodImage);
                     defaultHolder.tvFoodName.setText(myFollowerLikes.getRecipe().getName());
                 }
         }

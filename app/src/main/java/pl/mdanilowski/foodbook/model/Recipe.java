@@ -5,7 +5,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Recipe implements Serializable {
 
@@ -33,11 +35,13 @@ public class Recipe implements Serializable {
     private List<String> tags;
     @SerializedName("photos")
     private List<String> photosUrls;
+    @SerializedName("queryStrings")
+    private Map<String, Boolean> queryStrings = new HashMap<>();
 
     public Recipe() {
     }
 
-    public Recipe(String oid, String name, String description, int likes, boolean isMine, Date addDate, List<String> ingredients, List<Comment> comments, List<String> tags, List<String> photosUrls) {
+    public Recipe(String oid, String name, String description, int likes, boolean isMine, Date addDate, List<String> ingredients, List<Comment> comments, List<String> tags, List<String> photosUrls, Map<String,Boolean> queryStrings) {
         this.oid = oid;
         this.name = name;
         this.description = description;
@@ -48,6 +52,7 @@ public class Recipe implements Serializable {
         this.comments = comments;
         this.tags = tags;
         this.photosUrls = photosUrls;
+        this.queryStrings = queryStrings;
     }
 
     public String getName() {
@@ -144,5 +149,13 @@ public class Recipe implements Serializable {
 
     public void setOid(String oid) {
         this.oid = oid;
+    }
+
+    public Map<String, Boolean> getQueryStrings() {
+        return queryStrings;
+    }
+
+    public void setQueryStrings(Map<String, Boolean> queryStrings) {
+        this.queryStrings = queryStrings;
     }
 }

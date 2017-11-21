@@ -56,8 +56,8 @@ public class DashboardModel {
         ProfileActivity.start(activity, uid);
     }
 
-    public void startRecipeDetailsActivity(Recipe recipe){
-        RecipeDetailsActivity.start(activity, recipe);
+    public void startRecipeDetailsActivity(Recipe recipe, String uid){
+        RecipeDetailsActivity.start(activity, uid, recipe.getRid());
     }
 }
 

@@ -51,7 +51,7 @@ public class FoodBookSimpleStorage {
         if (set == null) {
             set = new HashSet<>();
         }
-        if (set != null) {
+        if (set != null && !set.contains(rid)) {
             set.add(rid);
             editor.putStringSet(_LIKED_RECIPES, set);
             editor.commit();

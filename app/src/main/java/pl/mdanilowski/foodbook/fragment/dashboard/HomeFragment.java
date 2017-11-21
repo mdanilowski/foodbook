@@ -20,6 +20,8 @@ import butterknife.ButterKnife;
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.adapter.recyclerAdapters.HomeAdapter;
 import pl.mdanilowski.foodbook.app.App;
+import pl.mdanilowski.foodbook.model.userUpdates.MyFollowerLikes;
+import pl.mdanilowski.foodbook.model.userUpdates.MyRecipeLike;
 import pl.mdanilowski.foodbook.service.FoodBookService;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -72,12 +74,30 @@ public class HomeFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         compositeSubscription.add(observeFollowersNewRecipes());
         compositeSubscription.add(observeFollowersComments());
+        compositeSubscription.add(observeFollowersLikes());
+        compositeSubscription.add(observeMyRecipesLikes());
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         compositeSubscription.clear();
+    }
+
+    private Subscription observeMyRecipesLikes() {
+        return foodBookService.getMyLikesRealtime(currentUser.getUid())
+                .subscribe(documentChange -> {
+                    MyRecipeLike myRecipeLike = documentChange.getDocument().toObject(MyRecipeLike.class);
+                    switch (documentChange.getType()) {
+                        case ADDED:
+                            homeAdapter.addUpdate(myRecipeLike);
+                            new Handler().postDelayed(() -> rvHomeRecyclerView.smoothScrollToPosition(0), 1);
+                            break;
+                        case REMOVED:
+                            homeAdapter.removeMyRecipeLike(myRecipeLike);
+                            break;
+                    }
+                });
     }
 
     private Subscription observeFollowersNewRecipes() {
@@ -88,11 +108,26 @@ public class HomeFragment extends Fragment {
                 });
     }
 
-    private Subscription observeFollowersComments(){
+    private Subscription observeFollowersComments() {
         return foodBookService.getNewFollowersCommentRealtime(currentUser.getUid())
                 .subscribe(newFollowersComment -> {
-                   homeAdapter.addUpdate(newFollowersComment);
-                   new Handler().postDelayed(() -> rvHomeRecyclerView.smoothScrollToPosition(0),1);
+                    homeAdapter.addUpdate(newFollowersComment);
+                    new Handler().postDelayed(() -> rvHomeRecyclerView.smoothScrollToPosition(0), 1);
+                });
+    }
+
+    private Subscription observeFollowersLikes() {
+        return foodBookService.getFollowersLikesRealtime(currentUser.getUid())
+                .subscribe(documentChange -> {
+                    switch (documentChange.getType()) {
+                        case ADDED:
+                            homeAdapter.addUpdate(documentChange.getDocument().toObject(MyFollowerLikes.class));
+                            new Handler().postDelayed(() -> rvHomeRecyclerView.smoothScrollToPosition(0), 1);
+                            break;
+                        case REMOVED:
+                            homeAdapter.removeFollowersLike(documentChange.getDocument().toObject(MyFollowerLikes.class));
+                            break;
+                    }
                 });
     }
 

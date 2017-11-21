@@ -67,6 +67,14 @@ public class UsersRecipesView extends FrameLayout {
         scrollAdapterUp();
     }
 
+    public void updateItemInAdapter(Recipe recipe) {
+        recipesAdapter.updateRecipe(recipe);
+    }
+
+    public void deleteItemFromAdapter(Recipe recipe) {
+        recipesAdapter.deleteRecipe(recipe);
+    }
+
     private void scrollAdapterUp() {
         new Handler().postDelayed(() -> rvRecipes.smoothScrollToPosition(0), 1);
     }
