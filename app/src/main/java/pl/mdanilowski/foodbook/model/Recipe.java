@@ -4,6 +4,7 @@ package pl.mdanilowski.foodbook.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +31,11 @@ public class Recipe implements Serializable {
     @SerializedName("ingredients")
     private List<String> ingredients;
     @SerializedName("comments")
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
     @SerializedName("tags")
-    private List<String> tags;
+    private List<String> tags = new ArrayList<>();
     @SerializedName("photos")
-    private List<String> photosUrls;
+    private List<String> photosUrls = new ArrayList<>();
     @SerializedName("queryStrings")
     private Map<String, Boolean> queryStrings = new HashMap<>();
 

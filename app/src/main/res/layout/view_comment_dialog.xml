@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/etComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white_100"
+        tools:targetApi="lollipop" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/accent_button"
+            android:text="Cancel"
+            android:textColor="@color/white_98" />
+
+        <Button
+            android:id="@+id/btnComment"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/accent_button"
+            android:text="comment"
+            android:textColor="@color/white_98" />
+    </LinearLayout>
+
+</LinearLayout>

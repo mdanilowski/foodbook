@@ -104,6 +104,19 @@ public class FoodBookService {
                 .addOnFailureListener(subscriber::onError));
     }
 
+    public Observable<DocumentReference> commentRecipe(Comment comment, Recipe recipe) {
+        return Observable.create(subscriber -> {
+            firestore.collection(FirestoreConstants.USER_RECIPES)
+                    .document(recipe.getOid())
+                    .collection(FirestoreConstants.RECIPES)
+                    .document(recipe.getRid())
+                    .collection(FirestoreConstants.COMMENTS)
+                    .add(comment)
+                    .addOnSuccessListener(subscriber::onNext)
+                    .addOnFailureListener(subscriber::onError);
+        });
+    }
+
     public Observable<Void> addRecipeToQueryTable(Recipe recipe) {
         return Observable.create(subscriber ->
                 firestore.collection("query-collection-recipes")
@@ -292,6 +305,7 @@ public class FoodBookService {
                     });
         });
     }
+
 
     public Observable<DocumentChange> getMyLikesRealtime(String uid) {
         return Observable.create(subscriber -> {

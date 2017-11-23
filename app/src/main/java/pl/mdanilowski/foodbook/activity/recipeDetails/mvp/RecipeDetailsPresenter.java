@@ -1,10 +1,14 @@
 package pl.mdanilowski.foodbook.activity.recipeDetails.mvp;
 
+import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Date;
 
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
@@ -13,12 +17,14 @@ import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.Comment;
 import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.model.User;
+import pl.mdanilowski.foodbook.utils.CommentDialog;
 import pl.mdanilowski.foodbook.utils.InformationDialog;
 import rx.Subscription;
 
 public class RecipeDetailsPresenter extends BasePresenter {
 
-    public static final String NO_USER = "no_user";
+    private static final String NO_USER = "no_user";
+    private static final String COMMENT_DIALOG = "comment_dialog";
 
     FirebaseUser user;
 
@@ -51,6 +57,7 @@ public class RecipeDetailsPresenter extends BasePresenter {
         compositeSubscription.add(observeRecipesComments(userId, recipeId));
         compositeSubscription.add(observeLikeClick());
         compositeSubscription.add(observeUnlikeClick());
+        compositeSubscription.add(observeCommentClick());
     }
 
     @Override
@@ -130,6 +137,36 @@ public class RecipeDetailsPresenter extends BasePresenter {
                         Toast.makeText(view.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                     });
                 });
+    }
+
+    private Subscription observeCommentClick() {
+        return view.commentClick().subscribe(aVoid -> {
+            InputMethodManager inputMethodManager = (InputMethodManager) model.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            CommentDialog commentDialog = CommentDialog.newInstance(new CommentDialog.ButtonDialogClickListener() {
+                @Override
+                public void onCommentClick(String commentText) {
+                    inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                    Comment comment = new Comment();
+                    comment.setAddDate(new Date());
+                    comment.setAvatarUrl(foodbookUser.getAvatarUrl());
+                    comment.setCommentText(commentText);
+                    comment.setName(foodbookUser.getName());
+                    comment.setUid(foodbookUser.getUid());
+                    foodBookService.commentRecipe(comment, recipe).subscribe(__ -> Toast.makeText(view.getContext(), "Comment added", Toast.LENGTH_SHORT).show(),
+                            e -> Toast.makeText(view.getContext(), "Comment not added. Try again later.", Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onCancelClick() {
+                    inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                }
+            });
+
+            if (inputMethodManager != null) {
+                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+            }
+            commentDialog.show(model.activity.getSupportFragmentManager(), COMMENT_DIALOG);
+        });
     }
 
     private Subscription observeRecipeLiked(FirebaseUser user, Recipe recipe) {

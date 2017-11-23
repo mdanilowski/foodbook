@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import javax.inject.Inject;
 
@@ -48,10 +47,6 @@ public class SearchFragment extends Fragment {
     String queryText = "";
 
     public SearchFragment() {
-    }
-
-    public FirebaseUser getFirebaseUser() {
-        return firebaseAuth.getCurrentUser();
     }
 
     public FoodBookService getFoodBookService() {

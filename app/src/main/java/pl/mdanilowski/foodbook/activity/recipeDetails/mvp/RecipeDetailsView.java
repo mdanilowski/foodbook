@@ -160,4 +160,8 @@ public class RecipeDetailsView extends FrameLayout {
     Observable<Void> unlikeClick() {
         return RxView.clicks(ivUnlike);
     }
+
+    Observable<Void> commentClick() {
+        return RxView.clicks(ivComment);
+    }
 }
