@@ -111,8 +111,8 @@ public class AddRecipeView extends FrameLayout {
         llTags.addView(view);
     }
 
-    public List<String> prepareTags(){
-        List<String> tags = new ArrayList<>();
+    public ArrayList<String> prepareTags(){
+        ArrayList<String> tags = new ArrayList<>();
         EditText et;
         for(int i=0; i<llTags.getChildCount(); i++){
             et = (EditText) llTags.getChildAt(i);

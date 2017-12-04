@@ -1,7 +1,5 @@
 package pl.mdanilowski.foodbook.fragment.dashboard;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -13,9 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
 
 import java.net.UnknownHostException;
 
@@ -41,6 +41,9 @@ public class RecipesFragment extends Fragment {
     @Inject
     FirebaseAuth firebaseAuth;
 
+    @Inject
+    FoodBookService foodBookService;
+
     FirebaseUser firebaseUser;
 
     @BindView(R.id.rvRecipesRecyclerView)
@@ -53,10 +56,7 @@ public class RecipesFragment extends Fragment {
     FloatingActionButton fabAddRecipe;
 
     RecipesAdapter recipesAdapter;
-    FoodBookService foodBookService = new FoodBookService();
     OnAdapterItemClickListener listener;
-
-    private OnFragmentInteractionListener onFragmentInteractionListener;
 
     public RecipesFragment() {
     }
@@ -75,7 +75,6 @@ public class RecipesFragment extends Fragment {
         compositeSubscription = new CompositeSubscription();
         recipesAdapter = new RecipesAdapter(this, recipe -> listener.onAdapterItemClick(recipe));
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,39 +97,36 @@ public class RecipesFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        compositeSubscription.remove(observeUserRecipes());
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            onFragmentInteractionListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
-        onFragmentInteractionListener = null;
         compositeSubscription.clear();
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 
     Subscription observeUserRecipes() {
         return getUsersRecipes(firebaseUser.getUid())
-                .subscribe(documentSnapshot -> {
-                    recipesAdapter.addRecipe(documentSnapshot);
-                    pbRecipes.setVisibility(View.GONE);
-                    new Handler().postDelayed(() -> recyclerView.smoothScrollToPosition(0), 1);
+                .subscribe(documentChange -> {
+                    Recipe recipe = documentChange.getDocument().toObject(Recipe.class);
+                    recipe.setRid(documentChange.getDocument().getId());
+                    switch (documentChange.getType()) {
+                        case ADDED:
+                            recipesAdapter.addRecipe(recipe);
+                            new Handler().postDelayed(() -> recyclerView.smoothScrollToPosition(0), 1);
+                            foodBookService.getCommentsForRecipe(firebaseUser.getUid(), recipe.getRid())
+                                    .subscribe(comments -> {
+                                        recipe.setComments(comments);
+                                        recipesAdapter.updateRecipe(recipe);
+                                        new Handler().postDelayed(() -> recyclerView.smoothScrollToPosition(0), 1);
+                                    }, e -> {
+                                        Toast.makeText(this.getContext(), "Could not load comments", Toast.LENGTH_SHORT).show();
+                                    });
+                            break;
+                        case MODIFIED:
+                            recipesAdapter.updateRecipe(recipe);
+                            break;
+                        case REMOVED:
+                            recipesAdapter.deleteRecipe(recipe);
+                            break;
+                    }
                 }, throwable -> {
                     if (throwable instanceof UnknownHostException) {
                         InformationDialog informationDialog = InformationDialog.newInstance("Failed loading data", "Check network connection and try again");
@@ -140,8 +136,7 @@ public class RecipesFragment extends Fragment {
                 });
     }
 
-    Observable<Recipe> getUsersRecipes(String uid) {
-        pbRecipes.setVisibility(View.VISIBLE);
+    Observable<DocumentChange> getUsersRecipes(String uid) {
         return foodBookService.getUsersRecipesRealtime(uid);
     }
 

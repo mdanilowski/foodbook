@@ -1,5 +1,6 @@
 package pl.mdanilowski.foodbook.activity.recipeDetails.mvp;
 
+import android.annotation.SuppressLint;
 import android.graphics.PorterDuff;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -7,7 +8,10 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.List;
 
@@ -16,6 +20,7 @@ import butterknife.ButterKnife;
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity;
 import pl.mdanilowski.foodbook.adapter.pagerAdapters.RecipePagerAdapter;
+import rx.Observable;
 
 public class RecipeDetailsView extends FrameLayout {
 
@@ -46,6 +51,27 @@ public class RecipeDetailsView extends FrameLayout {
     @BindView(R.id.rvComments)
     RecyclerView rvComments;
 
+    @BindView(R.id.ivShare)
+    ImageView ivShare;
+
+    @BindView(R.id.ivLike)
+    ImageView ivLike;
+
+    @BindView(R.id.ivUnlike)
+    ImageView ivUnlike;
+
+    @BindView(R.id.ivComment)
+    ImageView ivComment;
+
+    @BindView(R.id.tvSharesCount)
+    TextView tvSharesCount;
+
+    @BindView(R.id.tvLikesCount)
+    TextView tvLikesCount;
+
+    @BindView(R.id.tvCommentCount)
+    TextView tvCommentsCount;
+
     RecipePagerAdapter recipePagerAdapter;
 
     public RecipeDetailsView(@NonNull RecipeDetailsActivity recipeDetailsActivity) {
@@ -63,6 +89,9 @@ public class RecipeDetailsView extends FrameLayout {
         recipeDetailsActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
         tvToolbarTitle.setText(R.string.recipe);
         toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
+
+        rvComments.setFocusable(false);
+        tvRecipeName.requestFocus();
     }
 
     public void setPagerImages(List<String> images) {
@@ -93,5 +122,46 @@ public class RecipeDetailsView extends FrameLayout {
             formattedTags.append("\n");
         }
         this.tvTags.setText(formattedTags.toString());
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void setShareCount(int count) {
+        tvSharesCount.setText(String.format("%d %s", count, " shares"));
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void setLikesCount(int count) {
+        tvLikesCount.setText(String.format("%d %s", count, " likes"));
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void setCommentsCount(int count) {
+        tvCommentsCount.setText(String.format("%d %s", count, " comments"));
+    }
+
+    public void setRecipeLiked() {
+        ivLike.setVisibility(GONE);
+        ivUnlike.setVisibility(VISIBLE);
+        unlikeClick();
+        likeClick();
+    }
+
+    public void setRecipeNotLiked() {
+        ivUnlike.setVisibility(GONE);
+        ivLike.setVisibility(VISIBLE);
+        likeClick();
+        unlikeClick();
+    }
+
+    Observable<Void> likeClick() {
+        return RxView.clicks(ivLike);
+    }
+
+    Observable<Void> unlikeClick() {
+        return RxView.clicks(ivUnlike);
+    }
+
+    Observable<Void> commentClick() {
+        return RxView.clicks(ivComment);
     }
 }

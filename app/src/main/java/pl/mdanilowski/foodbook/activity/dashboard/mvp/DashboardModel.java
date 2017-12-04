@@ -8,9 +8,15 @@ import java.util.List;
 
 import pl.mdanilowski.foodbook.activity.addRecipe.AddRecipeActivity;
 import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
+import pl.mdanilowski.foodbook.activity.findFriends.FindFriendsActivity;
+import pl.mdanilowski.foodbook.activity.followers.FollowersActivity;
+import pl.mdanilowski.foodbook.activity.following.FollowingActivity;
+import pl.mdanilowski.foodbook.activity.likedRecipes.LikedRecipesActivity;
 import pl.mdanilowski.foodbook.activity.profile.ProfileActivity;
 import pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity;
+import pl.mdanilowski.foodbook.activity.settingsProfile.ProfileSettingsActivity;
 import pl.mdanilowski.foodbook.model.Recipe;
+import pl.mdanilowski.foodbook.model.User;
 
 public class DashboardModel {
 
@@ -24,40 +30,76 @@ public class DashboardModel {
         return activity;
     }
 
-    public FragmentManager getFragmentManager(){
+    FragmentManager getFragmentManager() {
         return activity.getSupportFragmentManager();
     }
 
-    public void startAddRecipeActivity(){
+    public void startAddRecipeActivity() {
         AddRecipeActivity.start(activity);
     }
 
-    public Intent getIntent(){
+    public Intent getIntent() {
         return activity.getIntent();
     }
 
-    public boolean getIsRecipeAddedExtra(){
+    boolean getIsRecipeAddedExtra() {
         return activity.getIntent().getBooleanExtra(DashboardActivity.IS_RECIPE_ADDED, false);
     }
 
-    public List<Uri> getRecipeUriListFromIntent(){
+    List<Uri> getRecipeUriListFromIntent() {
         return activity.getIntent().getParcelableArrayListExtra(DashboardActivity.IMAGES);
     }
 
-    public boolean getIsNewIntentSearch(){
+    boolean getIsNewIntentSearch() {
         return Intent.ACTION_SEARCH.equals(activity.getIntent().getAction());
     }
 
-    public Recipe getRecipeFromIntent(){
+    Recipe getRecipeFromIntent() {
         return (Recipe) activity.getIntent().getSerializableExtra(DashboardActivity.RECIPE);
     }
 
-    public void startProfileActivity(String uid){
+    boolean isUserUpdatedIntent() {
+        return activity.getIntent().getBooleanExtra(DashboardActivity.IS_USER_UPDATED, false);
+    }
+
+    Uri getAvatarUriFromIntent() {
+        return activity.getIntent().getParcelableExtra(DashboardActivity.AVATAR_URI);
+    }
+
+    Uri getBackgroundUriFromIntent() {
+        return activity.getIntent().getParcelableExtra(DashboardActivity.BACKGROUND_URI);
+    }
+
+    User getUpdatedUserFromIntent() {
+        return (User) activity.getIntent().getSerializableExtra(DashboardActivity.USER_UPDATED);
+    }
+
+    public void startProfileActivity(String uid) {
         ProfileActivity.start(activity, uid);
     }
 
-    public void startRecipeDetailsActivity(Recipe recipe){
-        RecipeDetailsActivity.start(activity, recipe);
+    public void startRecipeDetailsActivity(Recipe recipe, String uid) {
+        RecipeDetailsActivity.start(activity, uid, recipe.getRid());
+    }
+
+    void startUserSettingsActivity(User foodbookUser) {
+        ProfileSettingsActivity.start(activity, foodbookUser);
+    }
+
+    void startFollowingActivity() {
+        FollowingActivity.start(activity);
+    }
+
+    void startFindFriendsActibity() {
+        FindFriendsActivity.start(activity);
+    }
+
+    void startFollowersActivity(String uid) {
+        FollowersActivity.start(activity, uid);
+    }
+
+    void startLikedRecipesActivity(){
+        LikedRecipesActivity.start(activity);
     }
 }
 

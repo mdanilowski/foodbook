@@ -15,6 +15,7 @@ import com.mikepenz.materialdrawer.util.DrawerUIUtils;
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.app.dagger.DaggerFoodbookAppComponent;
 import pl.mdanilowski.foodbook.app.dagger.FoodbookAppComponent;
+import pl.mdanilowski.foodbook.app.dagger.module.ContextModule;
 import timber.log.Timber;
 
 public class App extends Application {
@@ -28,7 +29,7 @@ public class App extends Application {
         Timber.plant(new Timber.DebugTree());
 
         applicationInstance = this;
-        foodbookAppComponent = DaggerFoodbookAppComponent.builder().build();
+        foodbookAppComponent = DaggerFoodbookAppComponent.builder().contextModule(new ContextModule(this)).build();
 
         loadProfileImageIntoDrawerLogic();
     }

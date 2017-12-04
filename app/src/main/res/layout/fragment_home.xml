@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:fragment="pl.mdanilowski.foodbook.fragment.dashboard.HomeFragment">
+    android:background="@color/primary"
+    tools:context="pl.mdanilowski.foodbook.fragment.dashboard.HomeFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvHomeRecyclerView"

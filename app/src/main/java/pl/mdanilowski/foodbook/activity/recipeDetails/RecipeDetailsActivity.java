@@ -11,11 +11,11 @@ import pl.mdanilowski.foodbook.activity.recipeDetails.dagger.DaggerRecipeDetails
 import pl.mdanilowski.foodbook.activity.recipeDetails.dagger.RecipeDetailsModule;
 import pl.mdanilowski.foodbook.activity.recipeDetails.mvp.RecipeDetailsPresenter;
 import pl.mdanilowski.foodbook.activity.recipeDetails.mvp.RecipeDetailsView;
-import pl.mdanilowski.foodbook.model.Recipe;
 
 public class RecipeDetailsActivity extends AppCompatActivity {
 
-    public static final String RECIPE = "RECIPE";
+    public static final String RECIPE_ID = "RECIPE";
+    public static final String USER_ID = "USER";
 
     @Inject
     RecipeDetailsView view;
@@ -23,9 +23,10 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     @Inject
     RecipeDetailsPresenter presenter;
 
-    public static void start(Context context, Recipe recipe) {
+    public static void start(Context context, String uid, String rid) {
         Intent intent = new Intent(context, RecipeDetailsActivity.class);
-        intent.putExtra(RECIPE, recipe);
+        intent.putExtra(USER_ID, uid);
+        intent.putExtra(RECIPE_ID, rid);
         context.startActivity(intent);
     }
 

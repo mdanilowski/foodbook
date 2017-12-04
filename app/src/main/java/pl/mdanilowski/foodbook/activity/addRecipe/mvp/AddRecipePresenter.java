@@ -16,7 +16,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
@@ -72,15 +75,32 @@ public class AddRecipePresenter extends BasePresenter {
         return view.addRecipeClick().subscribe(__ -> {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Recipe recipe = new Recipe(String.valueOf(view.etName.getText()),
-                    String.valueOf(view.etDescription.getText()),
+
+            String name = String.valueOf(view.etName.getText());
+            String description = String.valueOf(view.etDescription.getText());
+            List<String> tags = view.prepareTags();
+
+            Map<String, Boolean> queryStringsMap = new HashMap<>();
+            String[] nameStrings = name.split(" ");
+            List<String> queryStringArray = new ArrayList<>();
+            Collections.addAll(queryStringArray, nameStrings);
+            queryStringArray.addAll(tags);
+
+            for(String s: queryStringArray){
+                queryStringsMap.put(s.toLowerCase(), true);
+            }
+
+            Recipe recipe = new Recipe(user.getUid(),
+                    name,
+                    description,
                     0,
                     true,
                     calendar.getTime(),
                     view.prepareIngredients(),
                     new ArrayList<Comment>(),
-                    view.prepareTags(),
-                    new ArrayList<String>());
+                    tags,
+                    new ArrayList<String>(),
+                    queryStringsMap);
             model.backToDashboard(imageList, recipe, true);
         });
     }

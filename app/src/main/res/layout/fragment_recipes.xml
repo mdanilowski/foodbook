@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:fragment="pl.mdanilowski.foodbook.fragment.dashboard.RecipesFragment">
+    tools:context="pl.mdanilowski.foodbook.fragment.dashboard.RecipesFragment">
 
     <RelativeLayout
         android:id="@+id/relative"
@@ -12,15 +12,18 @@
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
+            android:overScrollMode="ifContentScrolls"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:background="@color/colorPrimary"
             android:fillViewport="true">
 
             <android.support.v7.widget.RecyclerView
+                android:nestedScrollingEnabled="false"
                 android:id="@+id/rvRecipesRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                tools:targetApi="lollipop" />
         </android.support.v4.widget.NestedScrollView>
     </RelativeLayout>
 
