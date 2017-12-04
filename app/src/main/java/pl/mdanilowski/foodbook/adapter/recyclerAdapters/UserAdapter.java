@@ -21,24 +21,28 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import pl.mdanilowski.foodbook.R;
+import pl.mdanilowski.foodbook.activity.base.BaseActivity;
 import pl.mdanilowski.foodbook.app.App;
-import pl.mdanilowski.foodbook.fragment.dashboard.SearchFragment;
 import pl.mdanilowski.foodbook.model.User;
+import pl.mdanilowski.foodbook.service.FoodBookService;
 import pl.mdanilowski.foodbook.utils.Storage.FoodBookSimpleStorage;
 
-public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdapter.UserHolder> {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserHolder> {
 
     @Inject
     FoodBookSimpleStorage foodBookSimpleStorage;
 
+    @Inject
+    FoodBookService foodBookService;
+
     private List<User> users = new ArrayList<>();
-    private SearchFragment searchFragment;
+    private BaseActivity activity;
     OnResultClickListener listener;
 
-    public SearchResultsAdapter(SearchFragment fragment, OnResultClickListener listener) {
+    public UserAdapter(BaseActivity activity, OnResultClickListener listener) {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         this.listener = listener;
-        this.searchFragment = fragment;
+        this.activity = activity;
     }
 
     public void setUsers(List<User> users) {
@@ -47,7 +51,7 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
     }
 
     @Override
-    public SearchResultsAdapter.UserHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public UserAdapter.UserHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_user_query_result, parent, false);
         return new UserHolder(view);
     }
@@ -59,22 +63,22 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
         Glide.with(holder.itemView).load(user.getAvatarUrl()).into(holder.ivUser);
         holder.tvName.setText(user.getName());
         holder.tvEmail.setText(user.getEmail());
-        holder.ibAddFriend.setVisibility(View.VISIBLE);
+        holder.ibAddFollower.setVisibility(View.VISIBLE);
         holder.ivFriend.setVisibility(View.INVISIBLE);
         for (User follower : foodBookSimpleStorage.getUser().getFollowing()) {
             if (user.getUid().equals(follower.getUid())) {
-                holder.ibAddFriend.setVisibility(View.INVISIBLE);
+                holder.ibAddFollower.setVisibility(View.INVISIBLE);
                 holder.ivFriend.setVisibility(View.VISIBLE);
             }
         }
-        holder.ibAddFriend.setOnClickListener(__ ->
-                searchFragment.getFoodBookService().followUser(user, foodBookSimpleStorage.getUser())
+        holder.ibAddFollower.setOnClickListener(__ ->
+                foodBookService.followUser(user, foodBookSimpleStorage.getUser())
                         .subscribe(documentReference -> {
-                            holder.ibAddFriend.setVisibility(View.GONE);
+                            holder.ibAddFollower.setVisibility(View.GONE);
                             holder.ivFriend.setVisibility(View.VISIBLE);
-                            Toast.makeText(searchFragment.getContext(), "Added " + user.getName() + " to friends", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "Following " + user.getName(), Toast.LENGTH_SHORT).show();
                         }, throwable -> {
-                            Toast.makeText(searchFragment.getContext(), "Ups! An error occured", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "Ups! An error occured", Toast.LENGTH_SHORT).show();
                             throwable.printStackTrace();
                         })
         );
@@ -97,7 +101,7 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
         TextView tvEmail;
 
         @BindView(R.id.ibAddFriend)
-        ImageButton ibAddFriend;
+        ImageButton ibAddFollower;
 
         @BindView(R.id.ivFriend)
         ImageView ivFriend;

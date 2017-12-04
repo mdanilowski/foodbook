@@ -3,6 +3,7 @@ package pl.mdanilowski.foodbook.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class User implements Serializable {
 
@@ -12,15 +13,16 @@ public class User implements Serializable {
     private int gender;
     private String avatarUrl;
     private String backgroundImage;
-    private int totalLikes;
     private int recipesCount;
     private int followersCount;
     private int followingCount;
     private String aboutMe;
     private String country;
     private String city;
+    private List<String> likedRecipes = new ArrayList<>();
     private List<User> followers = new ArrayList<>();
     private List<User> following = new ArrayList<>();
+    private Map<String, Boolean> queryMap;
 
     public User() {
     }
@@ -31,13 +33,13 @@ public class User implements Serializable {
                 int gender,
                 String avatarUrl,
                 String backgroundImage,
-                int totalLikes,
                 int recipesCount,
                 int followersCount,
                 int followingCount,
                 String aboutMe,
                 String country,
                 String city,
+                List<String> likedRecipes,
                 List<User> followers,
                 List<User> following) {
         this.uid = uid;
@@ -46,13 +48,13 @@ public class User implements Serializable {
         this.gender = gender;
         this.avatarUrl = avatarUrl;
         this.backgroundImage = backgroundImage;
-        this.totalLikes = totalLikes;
         this.recipesCount = recipesCount;
         this.followersCount = followersCount;
         this.followingCount = followingCount;
         this.aboutMe = aboutMe;
         this.country = country;
         this.city = city;
+        this.likedRecipes = likedRecipes;
         this.followers = followers;
         this.following = following;
     }
@@ -96,14 +98,6 @@ public class User implements Serializable {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
-    }
-
-    public int getTotalLikes() {
-        return totalLikes;
-    }
-
-    public void setTotalLikes(int totalLikes) {
-        this.totalLikes = totalLikes;
     }
 
     public int getRecipesCount() {
@@ -176,5 +170,21 @@ public class User implements Serializable {
 
     public void setFollowingCount(int followingCount) {
         this.followingCount = followingCount;
+    }
+
+    public List<String> getLikedRecipes() {
+        return likedRecipes;
+    }
+
+    public void setLikedRecipes(List<String> likedRecipes) {
+        this.likedRecipes = likedRecipes;
+    }
+
+    public Map<String, Boolean> getQueryMap() {
+        return queryMap;
+    }
+
+    public void setQueryMap(Map<String, Boolean> queryMap) {
+        this.queryMap = queryMap;
     }
 }

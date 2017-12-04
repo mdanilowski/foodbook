@@ -17,7 +17,7 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            app:layout_scrollFlags="scroll|snap">
+            app:layout_scrollFlags="scroll">
 
             <ImageView
                 android:id="@+id/ivBackgroundImage"
@@ -70,6 +70,7 @@
             android:weightSum="3">
 
             <LinearLayout
+                android:id="@+id/llRecipes"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="2dp"
@@ -101,6 +102,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/llFollowers"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="2dp"
@@ -132,7 +134,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/llFriend"
+                android:id="@+id/stopFollowing"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="2dp"
@@ -154,7 +156,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/llAddFriend"
+                android:id="@+id/follow"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="2dp"

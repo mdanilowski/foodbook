@@ -1,14 +1,14 @@
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorPrimary"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:fragment="pl.mdanilowski.foodbook.fragment.dashboard.SearchFragment">
+    tools:context="pl.mdanilowski.foodbook.fragment.dashboard.SearchFragment">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvSearch"
+        android:id="@+id/rvRecipes"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</android.support.v4.widget.NestedScrollView>
+        android:layout_height="match_parent" />
+</RelativeLayout>

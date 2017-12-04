@@ -13,7 +13,7 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_scrollFlags="scroll|snap">
+            app:layout_scrollFlags="scroll">
 
             <include layout="@layout/view_toolbar_dafault" />
 
@@ -139,36 +139,36 @@
                 android:background="@color/primary_dark" />
 
             <LinearLayout
-                android:weightSum="3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:weightSum="3">
+
                 <TextView
+                    android:id="@+id/tvSharesCount"
                     android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="1232 Shares"
-                    android:textColor="@color/white_98"
-                    android:layout_height="wrap_content"
-                    />
+                    android:textColor="@color/white_98" />
+
                 <TextView
+                    android:id="@+id/tvLikesCount"
                     android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="1232 Likes"
-                    android:textColor="@color/white_98"
-                    android:layout_height="wrap_content"
-                    />
+                    android:textColor="@color/white_98" />
+
                 <TextView
+                    android:id="@+id/tvCommentCount"
                     android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="1232 Comments"
-                    android:textColor="@color/white_98"
-                    android:layout_height="wrap_content"
-                    />
+                    android:textColor="@color/white_98" />
             </LinearLayout>
 
 
@@ -198,6 +198,7 @@
                     android:src="@mipmap/ic_share"
                     android:tint="@color/accent"
                     tools:targetApi="lollipop" />
+
                 <ImageView
                     android:id="@+id/ivLike"
                     android:layout_width="0dp"
@@ -209,6 +210,20 @@
                     android:src="@mipmap/ic_like_border"
                     android:tint="@color/accent"
                     tools:targetApi="lollipop" />
+
+                <ImageView
+                    android:id="@+id/ivUnlike"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@mipmap/ic_like_fill"
+                    android:tint="@color/accent"
+                    android:visibility="gone"
+                    tools:targetApi="lollipop" />
+
                 <ImageView
                     android:id="@+id/ivComment"
                     android:layout_width="0dp"
@@ -232,7 +247,9 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rvComments"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:targetApi="lollipop" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

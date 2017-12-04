@@ -15,4 +15,5 @@
     <string name="failed_to_add_recipe">Failed to add recipe</string>
     <string name="recipe">Recipe</string>
     <string name="no_user">No such user</string>
+    <string name="recipes_owned_by">Recipes owned by</string>
 </resources>

@@ -2,7 +2,6 @@ package pl.mdanilowski.foodbook.activity.recipeDetails.mvp;
 
 import pl.mdanilowski.foodbook.activity.profile.ProfileActivity;
 import pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity;
-import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.model.User;
 
 public class RecipeDetailsModel {
@@ -13,8 +12,12 @@ public class RecipeDetailsModel {
         this.activity = activity;
     }
 
-    public Recipe getRecipeFromIntent() {
-        return (Recipe) activity.getIntent().getSerializableExtra(RecipeDetailsActivity.RECIPE);
+    public String getRidFromIntent() {
+        return activity.getIntent().getStringExtra(RecipeDetailsActivity.RECIPE_ID);
+    }
+
+    public String getUidFromIntent(){
+        return activity.getIntent().getStringExtra(RecipeDetailsActivity.USER_ID);
     }
 
     public void startProfileActivity(String uid){
@@ -22,6 +25,6 @@ public class RecipeDetailsModel {
     }
 
     public void startProfileActivity(User user){
-        ProfileActivity.start(activity, user);
+        ProfileActivity.start(activity, user.getUid());
     }
 }
