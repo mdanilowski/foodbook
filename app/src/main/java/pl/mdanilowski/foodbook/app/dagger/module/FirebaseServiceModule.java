@@ -19,6 +19,6 @@ public class FirebaseServiceModule {
     @Provides
     @FoodbookAppScope
     public FoodBookSimpleStorage foodBookSimpleStorage(){
-        return new FoodBookSimpleStorage();
+        return FoodBookSimpleStorage.getInstance();
     }
 }

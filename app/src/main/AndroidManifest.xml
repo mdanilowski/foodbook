@@ -29,7 +29,8 @@
         <activity
             android:name=".activity.dashboard.DashboardActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/CustomTheme">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -79,7 +80,23 @@
 
         <activity android:name=".activity.profile.ProfileActivity" />
         <activity android:name=".activity.recipeDetails.RecipeDetailsActivity" />
-        <activity android:name=".activity.usersRecipes.UsersRecipesActivity"></activity>
+        <activity android:name=".activity.usersRecipes.UsersRecipesActivity" />
+        <activity android:name=".activity.settingsProfile.ProfileSettingsActivity" />
+        <activity android:name=".activity.following.FollowingActivity" />
+        <activity
+            android:name=".activity.findFriends.FindFriendsActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable_friends" />
+        </activity>
+        <activity android:name=".activity.followers.FollowersActivity" />
+        <activity android:name=".activity.likedRecipes.LikedRecipesActivity"></activity>
     </application>
 
 </manifest>

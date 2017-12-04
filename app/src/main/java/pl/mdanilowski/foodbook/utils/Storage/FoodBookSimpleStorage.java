@@ -16,16 +16,24 @@ import pl.mdanilowski.foodbook.utils.Constants;
 
 public class FoodBookSimpleStorage {
 
+    private static FoodBookSimpleStorage foodBookSimpleStorage = null;
+
     private SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+    private SharedPreferences.Editor editor;
 
     private static final String _USER = "user";
     private static final String _LIKED_RECIPES = "liked_recipes";
 
     @SuppressLint("CommitPrefEdits")
-    public FoodBookSimpleStorage() {
+    private FoodBookSimpleStorage() {
         this.sharedPreferences = App.getApplicationInstance().getSharedPreferences(Constants.FOOD_BOOK_PREFERENCES, Context.MODE_PRIVATE);
         this.editor = sharedPreferences.edit();
+    }
+
+    public static FoodBookSimpleStorage getInstance() {
+        if (foodBookSimpleStorage == null) {
+            return new FoodBookSimpleStorage();
+        } else return foodBookSimpleStorage;
     }
 
     public void saveUser(User user) {

@@ -7,10 +7,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -52,25 +54,39 @@ public class FoodBookService {
                         .addOnFailureListener(subscriber::onError));
     }
 
-    public Observable<List<User>> getUsersByNameAndSurename(String input) {
+    public Observable<Void> setUserSettings(User user) {
         return Observable.create(subscriber -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", user.getName());
+            map.put("aboutMe", user.getAboutMe());
+            map.put("email", user.getEmail());
+            map.put("country", user.getCountry());
+            map.put("city", user.getCity());
             firestore.collection(FirestoreConstants.USERS)
-                    .whereEqualTo("name", input)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            List<User> users = new ArrayList<>();
-                            User user;
-                            for (DocumentSnapshot ds : task.getResult().getDocuments()) {
-                                user = ds.toObject(User.class);
-                                user.setUid(ds.getId());
-                                users.add(user);
-                            }
-                            subscriber.onNext(users);
-                        } else {
-                            subscriber.onError(task.getException());
-                        }
-                    });
+                    .document(user.getUid())
+                    .set(map, SetOptions.merge())
+                    .addOnSuccessListener(subscriber::onNext)
+                    .addOnFailureListener(subscriber::onError);
+        });
+    }
+
+    public Observable<Void> updateUsersAvatarPhoto(String uid, String photoUrl) {
+        return Observable.create(subscriber -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("avatarUrl", photoUrl);
+            firestore.collection(FirestoreConstants.USERS).document(uid).set(map, SetOptions.merge())
+                    .addOnSuccessListener(subscriber::onNext)
+                    .addOnFailureListener(subscriber::onError);
+        });
+    }
+
+    public Observable<Void> updateUsersBackgroundPhoto(String uid, String photoUrl) {
+        return Observable.create(subscriber -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("backgroundImage", photoUrl);
+            firestore.collection(FirestoreConstants.USERS).document(uid).set(map, SetOptions.merge())
+                    .addOnSuccessListener(subscriber::onNext)
+                    .addOnFailureListener(subscriber::onError);
         });
     }
 
@@ -79,10 +95,10 @@ public class FoodBookService {
             String[] splittedStrings = input.split(" ");
 
             CollectionReference collectionReference = firestore.collection("query-collection-recipes");
-            Query query = collectionReference.whereEqualTo("queryStrings." + splittedStrings[0], true);
+            Query query = collectionReference.whereEqualTo("queryStrings." + splittedStrings[0].toLowerCase(), true);
 
             for (int i = 1; i < splittedStrings.length; i++) {
-                collectionReference.whereEqualTo("queryStrings." + splittedStrings[i], true);
+                collectionReference.whereEqualTo("queryStrings." + splittedStrings[i].toLowerCase(), true);
             }
 
             query.get()
@@ -90,6 +106,29 @@ public class FoodBookService {
                         if (task.isSuccessful()) {
                             List<Recipe> recipes = task.getResult().toObjects(Recipe.class);
                             subscriber.onNext(recipes);
+                        } else {
+                            subscriber.onError(task.getException());
+                        }
+                    });
+        });
+    }
+
+    public Observable<List<User>> findUsers(String input) {
+        return Observable.create(subscriber -> {
+            String[] splittedStrings = input.split(" ");
+
+            CollectionReference collectionReference = firestore.collection(FirestoreConstants.USERS);
+            Query query = collectionReference.whereEqualTo("queryMap." + splittedStrings[0].toLowerCase(), true);
+
+            for (int i = 1; i < splittedStrings.length; i++) {
+                collectionReference.whereEqualTo("queryMap." + splittedStrings[i].toLowerCase(), true);
+            }
+
+            query.get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            List<User> queriedUsers = task.getResult().toObjects(User.class);
+                            subscriber.onNext(queriedUsers);
                         } else {
                             subscriber.onError(task.getException());
                         }
@@ -209,7 +248,7 @@ public class FoodBookService {
         return Observable.create(subscriber ->
                 firestore.collection(FirestoreConstants.USERS).document(uid)
                         .addSnapshotListener((documentSnapshot, e) -> {
-                            if (e != null || !documentSnapshot.exists()) {
+                            if (!documentSnapshot.exists()) {
                                 subscriber.onError(e);
                             }
                             if (documentSnapshot != null && documentSnapshot.exists()) {
@@ -220,7 +259,7 @@ public class FoodBookService {
                         }));
     }
 
-    public Observable<DocumentChange> getUsersFollowedByUser(String uid) {
+    public Observable<DocumentChange> getUsersFollowedByUserRealtime(String uid) {
         return Observable.create(subscriber -> firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.FOLLOWING)
                 .addSnapshotListener((snapshot, e) -> {
                     if (e != null) {
@@ -232,6 +271,20 @@ public class FoodBookService {
                         }
                     }
                 }));
+    }
+
+    public Observable<List<User>> getUsersFollowedByUser(String uid) {
+        return Observable.create(subscriber -> firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.FOLLOWING)
+                .get()
+                .addOnSuccessListener(snapshot -> subscriber.onNext(snapshot.toObjects(User.class)))
+                .addOnFailureListener(subscriber::onError));
+    }
+
+    public Observable<List<User>> getUsersFollowers(String uid) {
+        return Observable.create(subscriber -> firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.FOLLOWERS)
+                .get()
+                .addOnSuccessListener(snapshot -> subscriber.onNext(snapshot.toObjects(User.class)))
+                .addOnFailureListener(subscriber::onError));
     }
 
     public Observable<DocumentChange> getUsersFollowersRealtime(String uid) {

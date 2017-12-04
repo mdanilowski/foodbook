@@ -39,7 +39,9 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         this.listener = listener;
     }
 
+
     public void setRecipes(List<Recipe> recipes) {
+        this.recipes.clear();
         this.recipes = recipes;
         notifyDataSetChanged();
     }

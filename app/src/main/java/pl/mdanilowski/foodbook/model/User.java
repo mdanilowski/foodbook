@@ -3,6 +3,7 @@ package pl.mdanilowski.foodbook.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class User implements Serializable {
 
@@ -12,7 +13,6 @@ public class User implements Serializable {
     private int gender;
     private String avatarUrl;
     private String backgroundImage;
-    private int totalLikes;
     private int recipesCount;
     private int followersCount;
     private int followingCount;
@@ -22,6 +22,7 @@ public class User implements Serializable {
     private List<String> likedRecipes = new ArrayList<>();
     private List<User> followers = new ArrayList<>();
     private List<User> following = new ArrayList<>();
+    private Map<String, Boolean> queryMap;
 
     public User() {
     }
@@ -32,7 +33,6 @@ public class User implements Serializable {
                 int gender,
                 String avatarUrl,
                 String backgroundImage,
-                int totalLikes,
                 int recipesCount,
                 int followersCount,
                 int followingCount,
@@ -48,7 +48,6 @@ public class User implements Serializable {
         this.gender = gender;
         this.avatarUrl = avatarUrl;
         this.backgroundImage = backgroundImage;
-        this.totalLikes = totalLikes;
         this.recipesCount = recipesCount;
         this.followersCount = followersCount;
         this.followingCount = followingCount;
@@ -99,14 +98,6 @@ public class User implements Serializable {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
-    }
-
-    public int getTotalLikes() {
-        return totalLikes;
-    }
-
-    public void setTotalLikes(int totalLikes) {
-        this.totalLikes = totalLikes;
     }
 
     public int getRecipesCount() {
@@ -187,5 +178,13 @@ public class User implements Serializable {
 
     public void setLikedRecipes(List<String> likedRecipes) {
         this.likedRecipes = likedRecipes;
+    }
+
+    public Map<String, Boolean> getQueryMap() {
+        return queryMap;
+    }
+
+    public void setQueryMap(Map<String, Boolean> queryMap) {
+        this.queryMap = queryMap;
     }
 }

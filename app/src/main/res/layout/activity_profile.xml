@@ -134,7 +134,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/llFriend"
+                android:id="@+id/stopFollowing"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="2dp"
@@ -156,7 +156,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/llAddFriend"
+                android:id="@+id/follow"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="2dp"

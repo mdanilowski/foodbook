@@ -1,6 +1,7 @@
 package pl.mdanilowski.foodbook.activity.profile.mvp;
 
 
+import pl.mdanilowski.foodbook.activity.followers.FollowersActivity;
 import pl.mdanilowski.foodbook.activity.profile.ProfileActivity;
 import pl.mdanilowski.foodbook.activity.usersRecipes.UsersRecipesActivity;
 import pl.mdanilowski.foodbook.model.User;
@@ -23,5 +24,9 @@ public class ProfileModel {
 
     public void startUsersRecipesActivity(User user) {
         UsersRecipesActivity.start(activity, user);
+    }
+
+    public void startFollowersActivity(String uid) {
+        FollowersActivity.start(activity, uid);
     }
 }

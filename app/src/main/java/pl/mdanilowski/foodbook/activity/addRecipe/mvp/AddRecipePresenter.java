@@ -82,14 +82,12 @@ public class AddRecipePresenter extends BasePresenter {
 
             Map<String, Boolean> queryStringsMap = new HashMap<>();
             String[] nameStrings = name.split(" ");
-            String[] descriptionStrings = description.split(" ");
             List<String> queryStringArray = new ArrayList<>();
             Collections.addAll(queryStringArray, nameStrings);
-            Collections.addAll(queryStringArray, descriptionStrings);
             queryStringArray.addAll(tags);
 
             for(String s: queryStringArray){
-                queryStringsMap.put(s, true);
+                queryStringsMap.put(s.toLowerCase(), true);
             }
 
             Recipe recipe = new Recipe(user.getUid(),

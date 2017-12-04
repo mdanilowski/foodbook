@@ -21,4 +21,10 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return super.onSupportNavigateUp();
+    }
 }

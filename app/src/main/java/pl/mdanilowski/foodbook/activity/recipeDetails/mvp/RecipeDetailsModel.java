@@ -25,6 +25,6 @@ public class RecipeDetailsModel {
     }
 
     public void startProfileActivity(User user){
-        ProfileActivity.start(activity, user);
+        ProfileActivity.start(activity, user.getUid());
     }
 }

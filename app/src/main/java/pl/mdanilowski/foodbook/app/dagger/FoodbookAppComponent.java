@@ -6,8 +6,11 @@ import dagger.Component;
 import pl.mdanilowski.foodbook.activity.addRecipe.mvp.AddRecipePresenter;
 import pl.mdanilowski.foodbook.activity.base.BaseActivity;
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
+import pl.mdanilowski.foodbook.activity.dashboard.mvp.DashboardPresenter;
+import pl.mdanilowski.foodbook.activity.following.mvp.FollowingPresenter;
+import pl.mdanilowski.foodbook.activity.settingsProfile.mvp.ProfileSettingsPresenter;
 import pl.mdanilowski.foodbook.activity.usersRecipes.mvp.UsersRecipesPresenter;
-import pl.mdanilowski.foodbook.adapter.recyclerAdapters.SearchResultsAdapter;
+import pl.mdanilowski.foodbook.adapter.recyclerAdapters.UserAdapter;
 import pl.mdanilowski.foodbook.app.dagger.module.FirebaseAuthModule;
 import pl.mdanilowski.foodbook.app.dagger.module.FirebaseServiceModule;
 import pl.mdanilowski.foodbook.app.dagger.module.GlideModule;
@@ -39,7 +42,13 @@ public interface FoodbookAppComponent {
 
     void inject(AddRecipePresenter addRecipePresenter);
 
-    void inject(SearchResultsAdapter searchResultsAdapter);
+    void inject(FollowingPresenter followingPresenter);
+
+    void inject(ProfileSettingsPresenter profileSettingsPresenter);
+
+    void inject(DashboardPresenter dashboardPresenter);
+
+    void inject(UserAdapter userAdapter);
 
     void inject(UsersRecipesPresenter usersRecipesPresenter);
 }

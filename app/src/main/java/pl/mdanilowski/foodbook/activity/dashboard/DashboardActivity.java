@@ -18,17 +18,19 @@ import pl.mdanilowski.foodbook.activity.dashboard.dagger.DashboardModule;
 import pl.mdanilowski.foodbook.activity.dashboard.mvp.DashboardPresenter;
 import pl.mdanilowski.foodbook.activity.dashboard.mvp.DashboardView;
 import pl.mdanilowski.foodbook.app.App;
-import pl.mdanilowski.foodbook.fragment.dashboard.RecipeIdeasFragment;
-import pl.mdanilowski.foodbook.fragment.dashboard.SearchFragment;
 import pl.mdanilowski.foodbook.model.Recipe;
+import pl.mdanilowski.foodbook.model.User;
 
-public class DashboardActivity extends BaseActivity implements
-        SearchFragment.OnFragmentInteractionListener,
-        RecipeIdeasFragment.OnFragmentInteractionListener {
+public class DashboardActivity extends BaseActivity {
 
     public static final String IS_RECIPE_ADDED = "recipe_added";
     public static final String IMAGES = "images";
     public static final String RECIPE = "recipe";
+
+    public static final String IS_USER_UPDATED = "is_user_updated";
+    public static final String AVATAR_URI = "avatar_uri";
+    public static final String BACKGROUND_URI = "background_uri";
+    public static final String USER_UPDATED = "user_updated";
 
     @Inject
     DashboardView view;
@@ -39,6 +41,16 @@ public class DashboardActivity extends BaseActivity implements
     public static void start(Context context) {
         Intent intent = new Intent(context, DashboardActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+    }
+
+    public static void start(Context context, User foodbookUser, Uri avatar, Uri background){
+        Intent intent = new Intent(context, DashboardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra(IS_USER_UPDATED, true);
+        intent.putExtra(AVATAR_URI, avatar);
+        intent.putExtra(BACKGROUND_URI, background);
+        intent.putExtra(USER_UPDATED, foodbookUser);
         context.startActivity(intent);
     }
 
@@ -89,8 +101,4 @@ public class DashboardActivity extends BaseActivity implements
         return presenter;
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        presenter.onFragmentInteraction(uri);
-    }
 }

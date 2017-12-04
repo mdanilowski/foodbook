@@ -101,7 +101,8 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     DefaultHolder defaultHolder = (DefaultHolder) holder;
                     Glide.with(defaultHolder.itemView).load(newFollowersComment.getComment().getAvatarUrl()).into(defaultHolder.ivAvatar);
                     defaultHolder.tvMessageText.setText(String.format("%s %s %s", newFollowersComment.getComment().getName(), " skomentował przepis użytkownika ", newFollowersComment.getOwner().getName()));
-                    Glide.with(defaultHolder.itemView).load(newFollowersComment.getRecipe().getPhotosUrls().get(0)).into(defaultHolder.ivFoodImage);
+                    if (!newFollowersComment.getRecipe().getPhotosUrls().isEmpty())
+                        Glide.with(defaultHolder.itemView).load(newFollowersComment.getRecipe().getPhotosUrls().get(0)).into(defaultHolder.ivFoodImage);
                     defaultHolder.tvFoodName.setText(newFollowersComment.getRecipe().getName());
                 }
                 if (userUpdate instanceof NewFollowersRecipe) {

@@ -34,11 +34,11 @@ public class ProfileView extends FrameLayout {
     @BindView(R.id.tvFollowersCount)
     TextView tvFollowersCount;
 
-    @BindView(R.id.llFriend)
-    LinearLayout llFriend;
+    @BindView(R.id.stopFollowing)
+    LinearLayout stopFollowing;
 
-    @BindView(R.id.llAddFriend)
-    LinearLayout llAddFriend;
+    @BindView(R.id.follow)
+    LinearLayout follow;
 
     @BindView(R.id.tvName)
     TextView tvName;
@@ -80,17 +80,17 @@ public class ProfileView extends FrameLayout {
             Glide.with(this).load(userData.getAvatarUrl()).into(ivProfileImage);
         else ivProfileImage.setImageResource(R.color.accent);
         tvRecipesCount.setText(String.valueOf(userData.getRecipesCount()));
-        tvFollowersCount.setText(String.valueOf(userData.getFollowersCount()));
+        tvFollowersCount.setText(String.valueOf(userData.getFollowers().size()));
         boolean isBeingFollowed = false;
-        for (User f : currentUser.getFollowers()) {
-            if (f.getUid().equals(userData.getUid())) {
+        for (User f : currentUser.getFollowing()) {
+            if (f.getUid() != null && f.getUid().equals(userData.getUid())) {
                 isBeingFollowed = true;
             }
         }
 
         if (isBeingFollowed) {
-            llFriend.setVisibility(VISIBLE);
-        } else llAddFriend.setVisibility(VISIBLE);
+            stopFollowing.setVisibility(VISIBLE);
+        } else follow.setVisibility(VISIBLE);
         tvName.setText(userData.getName());
         tvEmail.setText(userData.getEmail());
         tvAbout.setText(userData.getAboutMe());
@@ -99,5 +99,27 @@ public class ProfileView extends FrameLayout {
 
     Observable<Void> clicksRecipes(){
         return RxView.clicks(llRecipes);
+    }
+
+    Observable<Void> clicksFollowers() {
+        return RxView.clicks(llFollowers);
+    }
+
+    Observable<Void> clicksFollow() {
+        return RxView.clicks(follow);
+    }
+
+    Observable<Void> clicksStopFollowing() {
+        return RxView.clicks(stopFollowing);
+    }
+
+    void hideFollow(){
+        follow.setVisibility(GONE);
+        stopFollowing.setVisibility(VISIBLE);
+    }
+
+    void showFollow(){
+        stopFollowing.setVisibility(GONE);
+        follow.setVisibility(VISIBLE);
     }
 }
