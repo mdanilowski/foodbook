@@ -62,6 +62,18 @@ public class DashboardModel {
         return activity.getIntent().getBooleanExtra(DashboardActivity.IS_USER_UPDATED, false);
     }
 
+    boolean isDeepLinkIntent() {
+        return activity.getIntent().getBooleanExtra(DashboardActivity.DEEP_LINK_INTENT, false);
+    }
+
+    String getUidFromIntent (){
+        return activity.getIntent().getStringExtra(DashboardActivity.UID_TAG);
+    }
+
+    String getRidFromIntent (){
+        return activity.getIntent().getStringExtra(DashboardActivity.RID_TAG);
+    }
+
     Uri getAvatarUriFromIntent() {
         return activity.getIntent().getParcelableExtra(DashboardActivity.AVATAR_URI);
     }
@@ -78,8 +90,8 @@ public class DashboardModel {
         ProfileActivity.start(activity, uid);
     }
 
-    public void startRecipeDetailsActivity(Recipe recipe, String uid) {
-        RecipeDetailsActivity.start(activity, uid, recipe.getRid());
+    public void startRecipeDetailsActivity(String uid, String rid) {
+        RecipeDetailsActivity.start(activity, uid, rid);
     }
 
     void startUserSettingsActivity(User foodbookUser) {

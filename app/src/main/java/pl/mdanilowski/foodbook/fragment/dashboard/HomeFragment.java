@@ -18,11 +18,13 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.mdanilowski.foodbook.R;
+import pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity;
 import pl.mdanilowski.foodbook.adapter.recyclerAdapters.HomeAdapter;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.userUpdates.MyFollowerLikes;
 import pl.mdanilowski.foodbook.model.userUpdates.MyRecipeLike;
 import pl.mdanilowski.foodbook.service.FoodBookService;
+import pl.mdanilowski.foodbook.utils.Storage.FoodBookSimpleStorage;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
@@ -36,12 +38,15 @@ public class HomeFragment extends Fragment {
     @Inject
     FoodBookService foodBookService;
 
+    @Inject
+    FoodBookSimpleStorage foodBookSimpleStorage;
+
     FirebaseUser currentUser;
 
     @BindView(R.id.rvHomeRecyclerView)
     RecyclerView rvHomeRecyclerView;
 
-    HomeAdapter homeAdapter = new HomeAdapter();
+    private HomeAdapter homeAdapter;
 
     public HomeFragment() {
     }
@@ -56,6 +61,7 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         currentUser = firebaseAuth.getCurrentUser();
+        homeAdapter = new HomeAdapter(update -> RecipeDetailsActivity.start(this.getContext(), update.getRecipe().getOid(), update.getRecipe().getRid()));
     }
 
     @Override
@@ -63,10 +69,15 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_home, container, false);
         ButterKnife.bind(this, rootView);
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
         rvHomeRecyclerView.setAdapter(homeAdapter);
         rvHomeRecyclerView.setLayoutManager(linearLayoutManager);
-        return rootView;
     }
 
     @Override

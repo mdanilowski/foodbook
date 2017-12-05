@@ -9,8 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.List;
@@ -72,6 +74,15 @@ public class RecipeDetailsView extends FrameLayout {
     @BindView(R.id.tvCommentCount)
     TextView tvCommentsCount;
 
+    @BindView(R.id.ivUser)
+    ImageView ivUser;
+
+    @BindView(R.id.tvName)
+    TextView tvName;
+
+    @BindView(R.id.llOwner)
+    LinearLayout llOwner;
+
     RecipePagerAdapter recipePagerAdapter;
 
     public RecipeDetailsView(@NonNull RecipeDetailsActivity recipeDetailsActivity) {
@@ -96,6 +107,20 @@ public class RecipeDetailsView extends FrameLayout {
 
     public void setPagerImages(List<String> images) {
         recipePagerAdapter.setImages(images);
+    }
+
+    public void setOwnerAvatar(String imageUrl){
+        if(imageUrl != null){
+            Glide.with(this).load(imageUrl).into(ivUser);
+        }
+    }
+
+    public void setOwnerName(String name){
+        tvName.setText(name);
+    }
+
+    public void setClickListenerOnOwner(OnClickListener listener){
+        llOwner.setOnClickListener(listener);
     }
 
     public void setTvRecipeName(String recipeName) {
@@ -127,6 +152,11 @@ public class RecipeDetailsView extends FrameLayout {
     @SuppressLint("DefaultLocale")
     public void setShareCount(int count) {
         tvSharesCount.setText(String.format("%d %s", count, " shares"));
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void updateSharesCount(Long newSharesCount) {
+        tvSharesCount.setText(String.format("%d %s", newSharesCount, " shares"));
     }
 
     @SuppressLint("DefaultLocale")
@@ -164,4 +194,10 @@ public class RecipeDetailsView extends FrameLayout {
     Observable<Void> commentClick() {
         return RxView.clicks(ivComment);
     }
+
+    Observable<Void> shareClick() {
+        return RxView.clicks(ivShare);
+    }
+
+
 }

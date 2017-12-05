@@ -203,7 +203,7 @@ public class FoodBookService {
         });
     }
 
-    public Observable<Void> likeRecipe(FirebaseUser currentUser, Recipe recipe) {
+    public Observable<Void> likeRecipeTransaction(FirebaseUser currentUser, Recipe recipe) {
         return Observable.create(subscriber -> {
 
             DocumentReference dRef = firestore.collection(FirestoreConstants.USER_RECIPES).document(recipe.getOid()).collection(FirestoreConstants.RECIPES).document(recipe.getRid());
@@ -222,7 +222,7 @@ public class FoodBookService {
         });
     }
 
-    public Observable<Void> unlikeRecipe(FirebaseUser currentUser, Recipe recipe) {
+    public Observable<Void> unlikeRecipeTransaction(FirebaseUser currentUser, Recipe recipe) {
         return Observable.create(subscriber -> {
 
             DocumentReference dRef = firestore.collection(FirestoreConstants.USER_RECIPES).document(recipe.getOid()).collection(FirestoreConstants.RECIPES).document(recipe.getRid());
@@ -239,6 +239,22 @@ public class FoodBookService {
                             .addOnSuccessListener(subscriber::onNext)
                             .addOnFailureListener(subscriber::onError)
             ).addOnFailureListener(subscriber::onError);
+        });
+    }
+
+    public Observable<Long> incrementShareCountTransaction(String oid, String rid) {
+        return Observable.create(subscriber -> {
+            DocumentReference dRef = firestore.collection(FirestoreConstants.USER_RECIPES)
+                    .document(oid)
+                    .collection(FirestoreConstants.RECIPES)
+                    .document(rid);
+            firestore.runTransaction(transaction -> {
+                DocumentSnapshot documentSnapshot = transaction.get(dRef);
+                long newSharesCount = documentSnapshot.getLong("shares") + 1;
+                transaction.update(dRef, "shares", newSharesCount);
+                return newSharesCount;
+            }).addOnSuccessListener(subscriber::onNext)
+                    .addOnFailureListener(subscriber::onError);
         });
     }
 
@@ -449,7 +465,7 @@ public class FoodBookService {
 
     //  ####################### HTTP CALLS ###########################
 
-    public Observable<Integer> likeRecipe(String uid, String oid, Recipe recipe) {
+    public Observable<Integer> likeRecipeTransaction(String uid, String oid, Recipe recipe) {
         return Observable.create(subscriber ->
                 foodBookApi.recipeLiked(uid, oid, recipe).enqueue(new Callback<String>() {
                     @Override

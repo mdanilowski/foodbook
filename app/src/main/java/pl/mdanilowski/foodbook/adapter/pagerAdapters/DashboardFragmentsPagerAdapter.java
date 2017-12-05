@@ -7,13 +7,12 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import pl.mdanilowski.foodbook.activity.dashboard.mvp.DashboardPresenter;
 import pl.mdanilowski.foodbook.fragment.dashboard.HomeFragment;
-import pl.mdanilowski.foodbook.fragment.dashboard.RecipeIdeasFragment;
 import pl.mdanilowski.foodbook.fragment.dashboard.RecipesFragment;
 import pl.mdanilowski.foodbook.fragment.dashboard.SearchFragment;
 
 public class DashboardFragmentsPagerAdapter extends FragmentStatePagerAdapter {
 
-    private final int FRAGMENT_COUNT = 4;
+    private final int FRAGMENT_COUNT = 3;
     private DashboardPresenter context;
 
     public DashboardFragmentsPagerAdapter(FragmentManager fm, DashboardPresenter context) {
@@ -27,11 +26,9 @@ public class DashboardFragmentsPagerAdapter extends FragmentStatePagerAdapter {
             case 0:
                 return HomeFragment.newInstance();
             case 1:
-                return RecipesFragment.newInstance(recipe -> context.model.startRecipeDetailsActivity(recipe, context.user.getUid()));
+                return RecipesFragment.newInstance(recipe -> context.model.startRecipeDetailsActivity(context.user.getUid(), recipe.getRid()));
             case 2:
                 return SearchFragment.newInstance(uid -> context.model.startProfileActivity(uid));
-            case 3:
-                return RecipeIdeasFragment.newInstance();
             default:
                 return HomeFragment.newInstance();
         }

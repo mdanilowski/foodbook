@@ -1,12 +1,16 @@
 package pl.mdanilowski.foodbook.activity.recipeDetails.mvp;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.dynamiclinks.DynamicLink;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 
 import java.util.Date;
 
@@ -34,7 +38,12 @@ public class RecipeDetailsPresenter extends BasePresenter {
     private Recipe recipe;
     private User foodbookUser;
 
-    CommentsAdapter commentsAdapter = new CommentsAdapter(uid ->
+    String ownerId = null;
+    String recipeId = null;
+
+    private Uri shareLinkUri = null;
+
+    private CommentsAdapter commentsAdapter = new CommentsAdapter(uid ->
             foodBookService.findUserByUid(uid).subscribe(retrievedUser -> model.startProfileActivity(retrievedUser),
                     __ -> InformationDialog.newInstance(view.getResources().getString(R.string.no_user), view.getResources().getString(R.string.no_user_message))
                             .show(model.activity.getSupportFragmentManager(), NO_USER))
@@ -48,21 +57,42 @@ public class RecipeDetailsPresenter extends BasePresenter {
     @Override
     public void onCreate() {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
-        String userId = model.getUidFromIntent();
-        String recipeId = model.getRidFromIntent();
+        ownerId = model.getOidFromIntent();
+        recipeId = model.getRidFromIntent();
         foodbookUser = foodBookSimpleStorage.getUser();
         setCommentsAdapter();
         user = firebaseAuth.getCurrentUser();
-        compositeSubscription.add(observeRecipe(userId, recipeId));
-        compositeSubscription.add(observeRecipesComments(userId, recipeId));
+        compositeSubscription.add(observeRecipe(ownerId, recipeId));
+        compositeSubscription.add(observeRecipesComments(ownerId, recipeId));
         compositeSubscription.add(observeLikeClick());
         compositeSubscription.add(observeUnlikeClick());
         compositeSubscription.add(observeCommentClick());
+        compositeSubscription.add(observeShareClick());
+        compositeSubscription.add(observeRecipeOwner(ownerId));
     }
 
     @Override
     public void onDestroy() {
         compositeSubscription.clear();
+    }
+
+    private void createDynamicLink(Recipe recipe) {
+        DynamicLink.SocialMetaTagParameters.Builder socialMediaParams = new DynamicLink.SocialMetaTagParameters.Builder();
+        socialMediaParams.setTitle("Check out this recipe in FOODBOOK!");
+        socialMediaParams.setDescription(recipe.getName());
+
+        if (recipeId != null || ownerId != null) {
+            DynamicLink recipeShareLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                    .setLink(Uri.parse(String.format("https://foodbook.com/%s/%s", ownerId, recipeId)))
+                    .setDynamicLinkDomain("bqbx5.app.goo.gl")
+                    .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
+                    .setSocialMetaTagParameters(socialMediaParams.build())
+                    .buildDynamicLink();
+
+            shareLinkUri = recipeShareLink.getUri();
+        } else {
+            shareLinkUri = null;
+        }
     }
 
     private void setRecipeContent() {
@@ -99,6 +129,7 @@ public class RecipeDetailsPresenter extends BasePresenter {
                         case ADDED:
                             commentsAdapter.commentAdded(comment);
                             recipe.getComments().add(comment);
+                            view.setCommentsCount(recipe.getComments().size());
                             setRecipeContent();
                             break;
                     }
@@ -109,6 +140,7 @@ public class RecipeDetailsPresenter extends BasePresenter {
         return foodBookService.getUsersRecipeRealtime(uid, rid)
                 .subscribe(recipeSnapshot -> {
                     recipe = recipeSnapshot;
+                    createDynamicLink(recipe);
                     setRecipeContent();
                 });
     }
@@ -131,7 +163,7 @@ public class RecipeDetailsPresenter extends BasePresenter {
                     view.setLikesCount(recipe.getLikes());
                     foodbookUser.getLikedRecipes().remove(recipe.getRid());
                     foodBookSimpleStorage.saveUser(foodbookUser);
-                    foodBookService.unlikeRecipe(user, recipe).subscribe(__ -> Log.i("RECIPE_UNLIKED", "RECIPE UNLIKED: " + recipe.getRid()), throwable -> {
+                    foodBookService.unlikeRecipeTransaction(user, recipe).subscribe(__ -> Log.i("RECIPE_UNLIKED", "RECIPE UNLIKED: " + recipe.getRid()), throwable -> {
                         view.setRecipeLiked();
                         view.setLikesCount(recipe.getLikes() + 1);
                         Toast.makeText(view.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
@@ -169,16 +201,37 @@ public class RecipeDetailsPresenter extends BasePresenter {
         });
     }
 
-    private Subscription observeRecipeLiked(FirebaseUser user, Recipe recipe) {
-        return foodBookService.likeRecipe(user, recipe)
-                .subscribe(__ -> {
+    private Subscription observeShareClick() {
+        return view.shareClick().subscribe(__ -> {
+            Intent sendIntent = new Intent();
+            String msg = "Check out this recipe on Foodbook ;)\n\n" + shareLinkUri;
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, msg);
+            sendIntent.setType("text/plain");
+            model.startShareIntent(sendIntent);
+            foodBookService.incrementShareCountTransaction(ownerId, recipeId)
+                    .subscribe(newSharesCount -> view.updateSharesCount(newSharesCount),
+                            throwable -> Toast.makeText(view.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
+                    );
+        });
+    }
 
-                            Log.i("RECIPE_LIKED", "RECIPE LIKED: " + recipe.getRid());
-                        }, throwable -> {
+    private Subscription observeRecipeLiked(FirebaseUser user, Recipe recipe) {
+        return foodBookService.likeRecipeTransaction(user, recipe)
+                .subscribe(__ -> Log.i("RECIPE_LIKED", "RECIPE LIKED: " + recipe.getRid()),
+                        throwable -> {
                             view.setRecipeNotLiked();
                             view.setLikesCount(recipe.getLikes());
                             Toast.makeText(view.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                         }
                 );
+    }
+
+    private Subscription observeRecipeOwner(String oid) {
+        return foodBookService.findUserByUid(oid).subscribe(user -> {
+            view.setOwnerAvatar(user.getAvatarUrl());
+            view.setOwnerName(user.getName());
+            view.setClickListenerOnOwner(__ -> model.startProfileActivity(user.getUid()));
+        });
     }
 }

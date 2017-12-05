@@ -12,21 +12,18 @@
     <android.support.design.widget.TabItem
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        style="@style/MyCustomTabTextAppearance"
-        android:icon="@mipmap/home_icon" />
+        style="@style/MyCustomTabTextAppearance" />
 
     <android.support.design.widget.TabItem
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:icon="@drawable/foodiconplaceholder" />
+        android:layout_height="match_parent" />
 
     <android.support.design.widget.TabItem
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:icon="@mipmap/search_icon" />
+        android:layout_height="match_parent" />
 
-    <android.support.design.widget.TabItem
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:icon="@drawable/foodiconplaceholder" />
+    <!--<android.support.design.widget.TabItem-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:icon="@drawable/foodiconplaceholder" />-->
 </android.support.design.widget.TabLayout>

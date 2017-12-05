@@ -26,6 +26,9 @@ public class DashboardActivity extends BaseActivity {
     public static final String IS_RECIPE_ADDED = "recipe_added";
     public static final String IMAGES = "images";
     public static final String RECIPE = "recipe";
+    public static final String UID_TAG = "uid";
+    public static final String RID_TAG = "rid";
+    public static final String DEEP_LINK_INTENT = "deep_link_intent";
 
     public static final String IS_USER_UPDATED = "is_user_updated";
     public static final String AVATAR_URI = "avatar_uri";
@@ -60,6 +63,15 @@ public class DashboardActivity extends BaseActivity {
         intent.putExtra(IS_RECIPE_ADDED, wasRecipaAdded);
         intent.putParcelableArrayListExtra(IMAGES, (ArrayList<? extends Parcelable>) images);
         intent.putExtra(RECIPE, recipe);
+        context.startActivity(intent);
+    }
+
+    public static void start(Context context, boolean isFromDeepLink, String uid, String rid){
+        Intent intent = new Intent(context, DashboardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra(UID_TAG, uid);
+        intent.putExtra(RID_TAG, rid);
+        intent.putExtra(DEEP_LINK_INTENT, isFromDeepLink);
         context.startActivity(intent);
     }
 

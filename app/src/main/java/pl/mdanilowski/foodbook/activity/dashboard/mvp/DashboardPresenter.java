@@ -70,6 +70,25 @@ public class DashboardPresenter extends BasePresenter {
         handleIntent();
     }
 
+    private void handleDynamicLink() {
+//        FirebaseDynamicLinks.getInstance()
+//                .getDynamicLink(model.getIntent())
+//                .addOnSuccessListener(runnable -> {
+//                    Uri deepLink;
+//                    if (runnable != null) {
+//                        deepLink = runnable.getLink();
+//                        String[] path = deepLink.getPath().split("/");
+//                        if (path.length >= 2) {
+//                            String uidFromLink = path[1];
+//                            String ridFromLink = path[2];
+//                            model.startRecipeDetailsActivity(uidFromLink, ridFromLink);
+//                        }
+//                    }
+//                })
+//                .addOnFailureListener(exception -> Log.e("DEEP_LINK_ERROR", exception.getMessage()));
+        model.startRecipeDetailsActivity(model.getUidFromIntent(), model.getRidFromIntent());
+    }
+
     public void onNewIntent(Intent intent) {
         model.getActivity().setIntent(intent);
         handleIntent();
@@ -86,13 +105,13 @@ public class DashboardPresenter extends BasePresenter {
                 compositeSubscription.add(observeAddingRecipe());
             }
             model.getActivity().getIntent().putExtra(DashboardActivity.IS_RECIPE_ADDED, false);
-        }
-        if (model.getIsNewIntentSearch()) {
+        } else if (model.getIsNewIntentSearch()) {
             searchQuery = model.getActivity().getIntent().getStringExtra(SearchManager.QUERY);
             view.dashboardViewPager.setCurrentItem(2);
-        }
-        if (model.isUserUpdatedIntent()) {
+        } else if (model.isUserUpdatedIntent()) {
             updateUser();
+        } else if(model.isDeepLinkIntent()) {
+            handleDynamicLink();
         }
     }
 
@@ -252,7 +271,10 @@ public class DashboardPresenter extends BasePresenter {
         return foodBookService.setUser(user.getUid(), newUser).subscribe(
                 __ -> {
                     Log.d("_USER", "User added");
+                    foodBookSimpleStorage.saveUser(newUser);
+                    foodbookUser = foodBookSimpleStorage.getUser();
                     compositeSubscription.add(observeFollowedByUser());
+                    compositeSubscription.add(observeUsersLikedRecipes());
                 },
                 Throwable::printStackTrace
         );
@@ -340,7 +362,7 @@ public class DashboardPresenter extends BasePresenter {
     private void setViewPagerAndTabs() {
         view.dashboardViewPager.setAdapter(new DashboardFragmentsPagerAdapter(model.getFragmentManager(), this));
         view.dashboardTabs.setupWithViewPager(view.dashboardViewPager);
-        view.dashboardViewPager.setOffscreenPageLimit(4);
+        view.dashboardViewPager.setOffscreenPageLimit(3);
         setTabIcons();
     }
 
@@ -348,6 +370,6 @@ public class DashboardPresenter extends BasePresenter {
         view.dashboardTabs.getTabAt(0).setIcon(R.mipmap.home_icon);
         view.dashboardTabs.getTabAt(1).setIcon(R.mipmap.home_icon);
         view.dashboardTabs.getTabAt(2).setIcon(R.mipmap.search_icon);
-        view.dashboardTabs.getTabAt(3).setIcon(R.mipmap.search_icon);
+//        view.dashboardTabs.getTabAt(3).setIcon(R.mipmap.search_icon);
     }
 }

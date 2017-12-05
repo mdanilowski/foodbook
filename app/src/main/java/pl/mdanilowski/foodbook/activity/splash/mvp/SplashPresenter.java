@@ -1,21 +1,24 @@
 package pl.mdanilowski.foodbook.activity.splash.mvp;
 
 
+import android.net.Uri;
+import android.util.Log;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
-import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
-import pl.mdanilowski.foodbook.activity.splash.SplashActivity;
-import pl.mdanilowski.foodbook.activity.welcome.WelcomeActivity;
 
 public class SplashPresenter extends BasePresenter {
 
-    SplashActivity splashActivity;
+    private final SplashView view;
+    private final SplashModel model;
     FirebaseAuth firebaseAuth;
 
-    public SplashPresenter(SplashActivity splashActivity ,FirebaseAuth firebaseAuth) {
-        this.splashActivity = splashActivity;
+    public SplashPresenter(SplashView view, SplashModel model, FirebaseAuth firebaseAuth) {
+        this.view = view;
+        this.model = model;
         this.firebaseAuth = firebaseAuth;
     }
 
@@ -24,11 +27,29 @@ public class SplashPresenter extends BasePresenter {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
 
         if (firebaseUser == null) {
-            WelcomeActivity.start(splashActivity);
-            splashActivity.finish();
+            model.startWelcomeActivity();
         } else {
-            DashboardActivity.start(splashActivity);
-            splashActivity.finish();
+            FirebaseDynamicLinks.getInstance()
+                    .getDynamicLink(model.getIntent())
+                    .addOnSuccessListener(runnable -> {
+                        Uri deepLink;
+                        if (runnable != null) {
+                            deepLink = runnable.getLink();
+                            String[] path = deepLink.getPath().split("/");
+                            if (path.length >= 2) {
+                                String uidFromLink = path[1];
+                                String ridFromLink = path[2];
+                                model.startDashboardWithDeepLink(uidFromLink, ridFromLink);
+                            }
+                        } else {
+                            model.startDashboardActivity();
+                        }
+                    })
+                    .addOnFailureListener(exception -> {
+                                model.startDashboardActivity();
+                                Log.e("DEEP_LINK_ERROR", exception.getMessage());
+                            }
+                    );
         }
     }
 

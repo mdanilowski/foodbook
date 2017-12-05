@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -34,6 +35,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     public void commentAdded(Comment comment) {
         comments.add(comment);
+        Collections.sort(comments, (comment1, t1) -> {
+            if(comment1.getAddDate().before(t1.getAddDate())) return -1;
+            else return 1;
+        });
         notifyItemInserted(comments.size() - 1);
     }
 

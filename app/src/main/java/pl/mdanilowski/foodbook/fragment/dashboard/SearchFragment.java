@@ -67,7 +67,7 @@ public class SearchFragment extends Fragment {
         View viewGroup = inflater.inflate(R.layout.fragment_search, container, false);
         ButterKnife.bind(this, viewGroup);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
-        recipesAdapter = new RecipesAdapter(this, recipe -> RecipeDetailsActivity.start(getActivity(), firebaseAuth.getUid(), recipe.getRid()));
+        recipesAdapter = new RecipesAdapter(this, recipe -> RecipeDetailsActivity.start(getActivity(), recipe.getOid(), recipe.getRid()));
         rvRecipes.setLayoutManager(linearLayoutManager);
         rvRecipes.setAdapter(recipesAdapter);
         return viewGroup;

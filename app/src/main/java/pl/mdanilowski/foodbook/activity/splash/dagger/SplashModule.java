@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import dagger.Module;
 import dagger.Provides;
 import pl.mdanilowski.foodbook.activity.splash.SplashActivity;
+import pl.mdanilowski.foodbook.activity.splash.mvp.SplashModel;
 import pl.mdanilowski.foodbook.activity.splash.mvp.SplashPresenter;
 import pl.mdanilowski.foodbook.activity.splash.mvp.SplashView;
 
@@ -31,9 +32,14 @@ public class SplashModule {
 
     @Provides
     @SplashScope
-    public SplashPresenter splashPresenter(FirebaseAuth firebaseAuth){
-        return new SplashPresenter(splashActivity, firebaseAuth);
+    public SplashPresenter splashPresenter(SplashView view, SplashModel model, FirebaseAuth firebaseAuth){
+        return new SplashPresenter(view, model, firebaseAuth);
     }
 
+    @Provides
+    @SplashScope
+    public SplashModel model(){
+        return new SplashModel(splashActivity);
+    }
 
 }
