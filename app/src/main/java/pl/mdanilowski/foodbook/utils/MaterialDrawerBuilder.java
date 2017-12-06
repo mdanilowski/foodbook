@@ -16,6 +16,23 @@ import pl.mdanilowski.foodbook.model.User;
 
 public class MaterialDrawerBuilder {
 
+    public static Drawer setDrawer(BaseActivity activity, Toolbar toolbar) {
+        return buildDrawerContent(activity, toolbar);
+    }
+
+    private static Drawer buildDrawerContent(BaseActivity activity, Toolbar toolbar) {
+        return new DrawerBuilder()
+                .withActivity(activity)
+                .withAccountHeader(buildDrawerAccountHeader(activity))
+                .build();
+    }
+
+    private static AccountHeader buildDrawerAccountHeader(BaseActivity activity) {
+        return new AccountHeaderBuilder()
+                .withActivity(activity)
+                .withHeaderBackground(R.color.primary_dark)
+                .build();
+    }
     public static Drawer setDrawer(BaseActivity activity, Toolbar toolbar, FirebaseUser firebaseUser) {
        return buildDrawerContent(activity, toolbar, firebaseUser);
     }

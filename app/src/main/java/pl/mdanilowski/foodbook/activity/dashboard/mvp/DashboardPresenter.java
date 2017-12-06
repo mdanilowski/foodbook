@@ -3,10 +3,12 @@ package pl.mdanilowski.foodbook.activity.dashboard.mvp;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.mikepenz.materialdrawer.Drawer;
@@ -25,6 +27,7 @@ import pl.mdanilowski.foodbook.adapter.pagerAdapters.DashboardFragmentsPagerAdap
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.model.User;
+import pl.mdanilowski.foodbook.utils.Constants;
 import pl.mdanilowski.foodbook.utils.MaterialDrawerBuilder;
 import rx.Subscription;
 
@@ -61,31 +64,33 @@ public class DashboardPresenter extends BasePresenter {
     public void onCreate() {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         foodbookUser = foodBookSimpleStorage.getUser();
-        compositeSubscription.add(observeAvatarClick());
-        compositeSubscription.add(observeFindUser());
+        if (user.getPhotoUrl() == null) {
+            UserProfileChangeRequest.Builder creator = new UserProfileChangeRequest.Builder();
+            creator.setPhotoUri(Uri.parse(Constants.DEFAULT_AVATAR));
+            user.updateProfile(creator.build()).addOnSuccessListener(__ -> {
+                setToolbarAndDrawer();
+                addItemsToDrawer();
+                setDrawerClickListeners();
+                compositeSubscription.add(observeAvatarClick());
+                compositeSubscription.add(observeFindUser());
+            }).addOnFailureListener(e -> {
+                drawer = MaterialDrawerBuilder.setDrawer(model.getActivity(), view.toolbar);
+                addItemsToDrawer();
+                setDrawerClickListeners();
+                compositeSubscription.add(observeFindUser());
+            });
+        } else {
+            compositeSubscription.add(observeAvatarClick());
+            compositeSubscription.add(observeFindUser());
+            setToolbarAndDrawer();
+            addItemsToDrawer();
+            setDrawerClickListeners();
+        }
         setViewPagerAndTabs();
-        setToolbarAndDrawer();
-        addItemsToDrawer();
-        setDrawerClickListeners();
         handleIntent();
     }
 
     private void handleDynamicLink() {
-//        FirebaseDynamicLinks.getInstance()
-//                .getDynamicLink(model.getIntent())
-//                .addOnSuccessListener(runnable -> {
-//                    Uri deepLink;
-//                    if (runnable != null) {
-//                        deepLink = runnable.getLink();
-//                        String[] path = deepLink.getPath().split("/");
-//                        if (path.length >= 2) {
-//                            String uidFromLink = path[1];
-//                            String ridFromLink = path[2];
-//                            model.startRecipeDetailsActivity(uidFromLink, ridFromLink);
-//                        }
-//                    }
-//                })
-//                .addOnFailureListener(exception -> Log.e("DEEP_LINK_ERROR", exception.getMessage()));
         model.startRecipeDetailsActivity(model.getUidFromIntent(), model.getRidFromIntent());
     }
 
@@ -110,7 +115,7 @@ public class DashboardPresenter extends BasePresenter {
             view.dashboardViewPager.setCurrentItem(2);
         } else if (model.isUserUpdatedIntent()) {
             updateUser();
-        } else if(model.isDeepLinkIntent()) {
+        } else if (model.isDeepLinkIntent()) {
             handleDynamicLink();
         }
     }
@@ -256,22 +261,42 @@ public class DashboardPresenter extends BasePresenter {
 
     private Subscription observeAddUser() {
         User newUser = new User();
-        newUser.setUid(user.getUid());
-        newUser.setName(user.getDisplayName());
-        newUser.setAvatarUrl(user.getPhotoUrl().toString());
-        newUser.setEmail(user.getEmail());
-        newUser.setRecipesCount(0);
-        newUser.setFollowersCount(0);
-        newUser.setFollowingCount(0);
-        newUser.setBackgroundImage(null);
-        newUser.setAboutMe("Hello, I haven't filled this yet... be patient ;)");
-        newUser.setCountry("");
-        newUser.setCity("");
-        newUser.setQueryMap(stringToMap(newUser.getName()));
+        if (model.isAfterRegister()) {
+            newUser = model.getRegisteredUser();
+            newUser.setQueryMap(stringToMap(newUser.getName()));
+            newUser.setRecipesCount(0);
+            newUser.setFollowersCount(0);
+            newUser.setFollowingCount(0);
+            newUser.setBackgroundImage(null);
+            if (newUser.getAvatarUrl() == null) {
+                newUser.setAvatarUrl(user.getPhotoUrl().toString());
+            }
+            if (newUser.getName() == null || TextUtils.isEmpty(newUser.getName())) {
+                newUser.setName(user.getDisplayName());
+            }
+            if (newUser.getAboutMe() == null || TextUtils.isEmpty(newUser.getAboutMe())) {
+                newUser.setAboutMe("Hello, I haven't filled this yet... be patient ;)");
+            }
+        } else {
+            newUser.setUid(user.getUid());
+            newUser.setName(user.getDisplayName());
+            newUser.setAvatarUrl(user.getPhotoUrl().toString());
+            newUser.setEmail(user.getEmail());
+            newUser.setRecipesCount(0);
+            newUser.setFollowersCount(0);
+            newUser.setFollowingCount(0);
+            newUser.setBackgroundImage(null);
+            newUser.setAboutMe("Hello, I haven't filled this yet... be patient ;)");
+            newUser.setCountry("");
+            newUser.setCity("");
+            newUser.setQueryMap(stringToMap(newUser.getName()));
+        }
+
+        User finalNewUser = newUser;
         return foodBookService.setUser(user.getUid(), newUser).subscribe(
                 __ -> {
                     Log.d("_USER", "User added");
-                    foodBookSimpleStorage.saveUser(newUser);
+                    foodBookSimpleStorage.saveUser(finalNewUser);
                     foodbookUser = foodBookSimpleStorage.getUser();
                     compositeSubscription.add(observeFollowedByUser());
                     compositeSubscription.add(observeUsersLikedRecipes());

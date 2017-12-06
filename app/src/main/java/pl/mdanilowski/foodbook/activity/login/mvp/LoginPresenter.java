@@ -4,6 +4,7 @@ package pl.mdanilowski.foodbook.activity.login.mvp;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,10 +22,15 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Arrays;
@@ -56,6 +62,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
     public void onCreate() {
         compositeSubscription.add(observeSignInGoogleClick());
         compositeSubscription.add(observeSignInFacebookAttachCallack());
+        compositeSubscription.add(observeLoginClicked());
 
         setUpGoogleSignInUtils();
         setUpFacebookSignInUtils();
@@ -66,7 +73,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
         compositeSubscription.clear();
     }
 
-    private void setUpGoogleSignInUtils(){
+    private void setUpGoogleSignInUtils() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(App.getApplicationInstance().getResources().getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -78,7 +85,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
                 .build();
     }
 
-    private void setUpFacebookSignInUtils(){
+    private void setUpFacebookSignInUtils() {
         callbackManager = CallbackManager.Factory.create();
 
         LoginManager.getInstance().registerCallback(callbackManager,
@@ -105,9 +112,60 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
         return view.googleLoginClick().subscribe(__ -> signInGoogle());
     }
 
-    private Subscription observeSignInFacebookAttachCallack(){
+    private Subscription observeSignInFacebookAttachCallack() {
         return view.setUpFacebookSignInButton().subscribe(__ ->
                 LoginManager.getInstance().logInWithReadPermissions(model.getActivity(), Arrays.asList("public_profile", "user_friends", "email")));
+    }
+
+    private Subscription observeLoginClicked() {
+        return view.loginClicked().subscribe(__ -> {
+            if (validateLoginForm()) {
+                String email = String.valueOf(view.etEmail.getText());
+                String password = String.valueOf(view.etPassword.getText());
+                firebaseAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(model.getActivity(), new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d("REGISTERED", "signInWithEmail:success");
+                                    FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                                    Log.d("REG_ID", firebaseUser.getUid());
+                                    model.startDashboardActivity();
+                                } else {
+                                    if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                        Toast.makeText(view.getContext(), "The email address is already in use by another account.", Toast.LENGTH_SHORT).show();
+                                    } else if (task.getException() instanceof FirebaseNetworkException) {
+                                        Toast.makeText(view.getContext(), "You are offline. Check connection and try again.", Toast.LENGTH_SHORT).show();
+                                    } else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                        Toast.makeText(view.getContext(), "Invalid password", Toast.LENGTH_SHORT).show();
+                                    } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+                                        Toast.makeText(view.getContext(), "Invalid email address. No such user.", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(view.getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    Log.w("ERROR_REG", "signInWithEmail:failure", task.getException());
+                                }
+                            }
+                        });
+            }
+        });
+    }
+
+    private boolean validateLoginForm() {
+        boolean isValid = true;
+        if (TextUtils.isEmpty(view.etEmail.getText())) {
+            isValid = false;
+            view.displayInputEmptyError(view.tilEmail);
+        } else {
+            view.hideInputEmptyError(view.tilEmail);
+        }
+        if (TextUtils.isEmpty(view.etPassword.getText())) {
+            isValid = false;
+            view.displayInputEmptyError(view.tilPassword);
+        } else {
+            view.hideInputEmptyError(view.tilPassword);
+        }
+        return isValid;
     }
 
     //Google login code
@@ -157,7 +215,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
     }
 
     //Facebook login code
-    public void onFacebookLoginActivityResult(int requestCode, int resultCode, Intent data){
+    public void onFacebookLoginActivityResult(int requestCode, int resultCode, Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 

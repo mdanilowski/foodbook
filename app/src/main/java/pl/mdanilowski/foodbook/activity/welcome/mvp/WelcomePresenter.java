@@ -17,6 +17,7 @@ public class WelcomePresenter extends BasePresenter {
     @Override
     public void onCreate() {
         compositeSubscription.add(observeLoginRequestButtonClick());
+        compositeSubscription.add(observeRegisterRequestButtonClick());
     }
 
     @Override
@@ -26,5 +27,9 @@ public class WelcomePresenter extends BasePresenter {
 
     private Subscription observeLoginRequestButtonClick(){
         return view.loginButtonClick().subscribe(__ -> model.startLoginActivity());
+    }
+
+    private Subscription observeRegisterRequestButtonClick(){
+        return view.registerButtonClick().subscribe(__ -> model.startRegisterActivity());
     }
 }

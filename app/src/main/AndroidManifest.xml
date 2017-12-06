@@ -22,11 +22,18 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:host="bqbx5.app.goo.gl" android:scheme="http"/>
-                <data android:host="bqbx5.app.goo.gl" android:scheme="https"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="bqbx5.app.goo.gl"
+                    android:scheme="http" />
+                <data
+                    android:host="bqbx5.app.goo.gl"
+                    android:scheme="https" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -100,7 +107,8 @@
                 android:resource="@xml/searchable_friends" />
         </activity>
         <activity android:name=".activity.followers.FollowersActivity" />
-        <activity android:name=".activity.likedRecipes.LikedRecipesActivity"></activity>
+        <activity android:name=".activity.likedRecipes.LikedRecipesActivity" />
+        <activity android:name=".activity.register.RegisterActivity"></activity>
     </application>
 
 </manifest>

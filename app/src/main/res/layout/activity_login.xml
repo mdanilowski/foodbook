@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/primary"
     tools:context="pl.mdanilowski.foodbook.activity.login.LoginActivity">
 
     <ImageView
@@ -10,6 +11,50 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/foodbackgroungplaceholder" />
+
+    <LinearLayout
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_margin="8dp"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:background="@drawable/background_sign_in_form"
+        android:layout_height="wrap_content">
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/tilEmail"
+            android:layout_width="match_parent"
+            android:hint="@string/email_address"
+            android:layout_height="wrap_content"
+            tools:targetApi="lollipop">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/tilPassword"
+            android:layout_width="match_parent"
+            android:hint="Password"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:inputType="textPassword"
+                android:layout_height="wrap_content" />
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/accent_button"
+            android:text="Login"
+            android:textColor="@color/white_100" />
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/llSignInOptions"
         android:layout_width="match_parent"
@@ -51,6 +96,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textSize="16sp"
+                    android:paddingRight="8dp"
                     android:gravity="center"
                     android:textStyle="bold"
                     android:textColor="@color/black_100"

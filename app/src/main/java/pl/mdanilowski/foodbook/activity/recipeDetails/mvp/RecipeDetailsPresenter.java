@@ -42,6 +42,7 @@ public class RecipeDetailsPresenter extends BasePresenter {
     String recipeId = null;
 
     private Uri shareLinkUri = null;
+    boolean areObsertversSet = false;
 
     private CommentsAdapter commentsAdapter = new CommentsAdapter(uid ->
             foodBookService.findUserByUid(uid).subscribe(retrievedUser -> model.startProfileActivity(retrievedUser),
@@ -63,12 +64,6 @@ public class RecipeDetailsPresenter extends BasePresenter {
         setCommentsAdapter();
         user = firebaseAuth.getCurrentUser();
         compositeSubscription.add(observeRecipe(ownerId, recipeId));
-        compositeSubscription.add(observeRecipesComments(ownerId, recipeId));
-        compositeSubscription.add(observeLikeClick());
-        compositeSubscription.add(observeUnlikeClick());
-        compositeSubscription.add(observeCommentClick());
-        compositeSubscription.add(observeShareClick());
-        compositeSubscription.add(observeRecipeOwner(ownerId));
     }
 
     @Override
@@ -140,9 +135,22 @@ public class RecipeDetailsPresenter extends BasePresenter {
         return foodBookService.getUsersRecipeRealtime(uid, rid)
                 .subscribe(recipeSnapshot -> {
                     recipe = recipeSnapshot;
+                    setObservers();
                     createDynamicLink(recipe);
                     setRecipeContent();
                 });
+    }
+
+    private void setObservers() {
+        if(!areObsertversSet){
+            compositeSubscription.add(observeRecipesComments(ownerId, recipeId));
+            compositeSubscription.add(observeLikeClick());
+            compositeSubscription.add(observeUnlikeClick());
+            compositeSubscription.add(observeCommentClick());
+            compositeSubscription.add(observeShareClick());
+            compositeSubscription.add(observeRecipeOwner(ownerId));
+            areObsertversSet = true;
+        }
     }
 
     private Subscription observeLikeClick() {

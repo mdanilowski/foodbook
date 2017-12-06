@@ -66,6 +66,14 @@ public class DashboardModel {
         return activity.getIntent().getBooleanExtra(DashboardActivity.DEEP_LINK_INTENT, false);
     }
 
+    boolean isAfterRegister() {
+        return activity.getIntent().getBooleanExtra(DashboardActivity.IS_AFTER_REGISTRATION, false);
+    }
+
+    User getRegisteredUser() {
+        return (User) activity.getIntent().getSerializableExtra(DashboardActivity.REGISTERED_USER);
+    }
+
     String getUidFromIntent (){
         return activity.getIntent().getStringExtra(DashboardActivity.UID_TAG);
     }

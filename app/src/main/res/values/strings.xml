@@ -46,5 +46,6 @@
     <string name="type_friends_name">Type friends name</string>
     <string name="following_you">People following you</string>
     <string name="recipes_you_liked">Recipes you liked</string>
+    <string name="registration">Registration</string>
 
 </resources>

@@ -35,6 +35,9 @@ public class WelcomeView extends FrameLayout {
     @BindView(R.id.btnLoginRequest)
     Button btnLoginRequest;
 
+    @BindView(R.id.btnRegistationRequest)
+    Button btnRegister;
+
     public WelcomeView(@NonNull Context context, FragmentManager fragmentManager) {
         super(context);
         inflate(context, R.layout.activity_welcome, this);
@@ -100,5 +103,9 @@ public class WelcomeView extends FrameLayout {
 
     Observable<Void> loginButtonClick(){
         return RxView.clicks(btnLoginRequest);
+    }
+
+    Observable<Void> registerButtonClick(){
+        return RxView.clicks(btnRegister);
     }
 }

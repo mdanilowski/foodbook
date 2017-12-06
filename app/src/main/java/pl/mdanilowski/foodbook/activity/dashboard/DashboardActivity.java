@@ -35,6 +35,9 @@ public class DashboardActivity extends BaseActivity {
     public static final String BACKGROUND_URI = "background_uri";
     public static final String USER_UPDATED = "user_updated";
 
+    public static final String IS_AFTER_REGISTRATION = "is_after_registration";
+    public static final String REGISTERED_USER = "registered_user";
+
     @Inject
     DashboardView view;
 
@@ -44,6 +47,14 @@ public class DashboardActivity extends BaseActivity {
     public static void start(Context context) {
         Intent intent = new Intent(context, DashboardActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+    }
+
+    public static void start(Context context, boolean isAfterRegistration, User user){
+        Intent intent = new Intent(context, DashboardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra(IS_AFTER_REGISTRATION, isAfterRegistration);
+        intent.putExtra(REGISTERED_USER, user);
         context.startActivity(intent);
     }
 
