@@ -72,7 +72,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserHolder> {
             }
         }
         holder.ibAddFollower.setOnClickListener(__ ->
-                foodBookService.followUser(user, foodBookSimpleStorage.getUser())
+                foodBookService.followUserBatch(user, foodBookSimpleStorage.getUser())
                         .subscribe(documentReference -> {
                             holder.ibAddFollower.setVisibility(View.GONE);
                             holder.ivFriend.setVisibility(View.VISIBLE);

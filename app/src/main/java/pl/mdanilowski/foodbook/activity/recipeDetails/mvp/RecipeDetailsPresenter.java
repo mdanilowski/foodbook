@@ -45,7 +45,7 @@ public class RecipeDetailsPresenter extends BasePresenter {
     boolean areObsertversSet = false;
 
     private CommentsAdapter commentsAdapter = new CommentsAdapter(uid ->
-            foodBookService.findUserByUid(uid).subscribe(retrievedUser -> model.startProfileActivity(retrievedUser),
+            foodBookService.getUser(uid).subscribe(retrievedUser -> model.startProfileActivity(retrievedUser),
                     __ -> InformationDialog.newInstance(view.getResources().getString(R.string.no_user), view.getResources().getString(R.string.no_user_message))
                             .show(model.activity.getSupportFragmentManager(), NO_USER))
     );
@@ -225,7 +225,7 @@ public class RecipeDetailsPresenter extends BasePresenter {
     }
 
     private Subscription observeRecipeLiked(FirebaseUser user, Recipe recipe) {
-        return foodBookService.likeRecipeTransaction(user, recipe)
+        return foodBookService.likeRecipeTransactionBatch(user, recipe)
                 .subscribe(__ -> Log.i("RECIPE_LIKED", "RECIPE LIKED: " + recipe.getRid()),
                         throwable -> {
                             view.setRecipeNotLiked();
@@ -236,7 +236,7 @@ public class RecipeDetailsPresenter extends BasePresenter {
     }
 
     private Subscription observeRecipeOwner(String oid) {
-        return foodBookService.findUserByUid(oid).subscribe(user -> {
+        return foodBookService.getUser(oid).subscribe(user -> {
             view.setOwnerAvatar(user.getAvatarUrl());
             view.setOwnerName(user.getName());
             view.setClickListenerOnOwner(__ -> model.startProfileActivity(user.getUid()));

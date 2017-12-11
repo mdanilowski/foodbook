@@ -32,6 +32,7 @@ public class App extends Application {
         foodbookAppComponent = DaggerFoodbookAppComponent.builder().contextModule(new ContextModule(this)).build();
 
         loadProfileImageIntoDrawerLogic();
+        //NotificationChannelHolder.createNotificationChannel(this);
     }
 
     public static App getApplicationInstance() {

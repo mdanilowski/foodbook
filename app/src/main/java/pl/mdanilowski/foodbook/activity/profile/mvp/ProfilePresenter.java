@@ -36,7 +36,7 @@ public class ProfilePresenter extends BasePresenter {
     }
 
     private Subscription observeGetUser() {
-        return foodBookService.findUserByUid(model.getUserUid())
+        return foodBookService.getUserRealtime(model.getUserUid())
                 .subscribe(retrievedUser -> {
                     user = retrievedUser;
                     view.setUserData(foodBookSimpleStorage.getUser(), user);
@@ -58,7 +58,7 @@ public class ProfilePresenter extends BasePresenter {
         return view.clicksFollow()
                 .doOnNext(__ -> view.hideFollow())
                 .subscribe(__ ->
-                        foodBookService.followUser(user, foodBookSimpleStorage.getUser())
+                        foodBookService.followUserBatch(user, foodBookSimpleStorage.getUser())
                                 .subscribe(aVoid ->
                                                 Toast.makeText(view.getContext(), "Following new user", Toast.LENGTH_SHORT).show(),
                                         e -> {

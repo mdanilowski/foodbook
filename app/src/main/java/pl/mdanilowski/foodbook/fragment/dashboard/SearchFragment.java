@@ -86,7 +86,7 @@ public class SearchFragment extends Fragment {
 //                            }
 //                            searchResultsAdapter.setUsers(users);
 //                        }, Throwable::printStackTrace);
-                foodBookService.getRecipesByWords(queryText).subscribe(recipes -> {
+                foodBookService.findRecipesByWords(queryText).subscribe(recipes -> {
                    recipesAdapter.setRecipes(recipes);
                 });
         }

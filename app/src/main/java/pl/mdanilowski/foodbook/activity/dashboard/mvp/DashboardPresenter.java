@@ -218,7 +218,7 @@ public class DashboardPresenter extends BasePresenter {
     }
 
     private Subscription observeFindUser() {
-        return foodBookService.findUserByUid(user.getUid()).subscribe(retrievedUser -> {
+        return foodBookService.getUserRealtime(user.getUid()).subscribe(retrievedUser -> {
             foodBookSimpleStorage.saveUser(retrievedUser);
             foodbookUser = retrievedUser;
             compositeSubscription.add(observeFollowedByUser());
