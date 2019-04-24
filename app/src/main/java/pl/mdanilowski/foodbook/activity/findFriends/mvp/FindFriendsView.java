@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -41,12 +42,12 @@ public class FindFriendsView extends FrameLayout {
 
     public void onCreateOptionsMenu(Menu menu, FindFriendsActivity activity){
         activity.getMenuInflater().inflate(R.menu.main_menu, menu);
-
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchItem.expandActionView();
 
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.onActionViewExpanded();
+        searchView.setMaxWidth(10000);
         SearchManager searchManager = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);
         ComponentName componentName = new ComponentName(this.getContext(), FindFriendsActivity.class);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
@@ -55,9 +56,10 @@ public class FindFriendsView extends FrameLayout {
     void setupRecyclerView(FindFriendsActivity activity){
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false);
         rvFoundPeople.setLayoutManager(linearLayoutManager);
+        rvFoundPeople.addItemDecoration(new DividerItemDecoration(this.getContext(), DividerItemDecoration.VERTICAL));
     }
 
-    void setAdapterForRecyclerView(RecyclerView.Adapter adapterForRecyclerView){
+    void setAdapterForRecyclerView(RecyclerView.Adapter adapterForRecyclerView) {
         rvFoundPeople.setAdapter(adapterForRecyclerView);
     }
 }

@@ -3,6 +3,7 @@ package pl.mdanilowski.foodbook.activity.followers.mvp;
 
 import android.widget.Toast;
 
+import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
 import pl.mdanilowski.foodbook.adapter.recyclerAdapters.FollowAdapter;
 import pl.mdanilowski.foodbook.app.App;
@@ -30,7 +31,7 @@ public class FollowersPresenter extends BasePresenter {
         view.setAdapterForRecyclerView(followersAdapter);
         if (uid != null) {
             foodBookService.getUsersFollowers(uid).subscribe(followersAdapter::setFollowingUsers,
-                    e -> Toast.makeText(view.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show());
+                    e -> Toast.makeText(view.getContext(), R.string.something_went_wrong, Toast.LENGTH_SHORT).show());
         }
     }
 

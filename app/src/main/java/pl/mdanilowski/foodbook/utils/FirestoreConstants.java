@@ -15,6 +15,6 @@ public class FirestoreConstants {
     public static final String FOLLOWERS_LIKES = "followers-likes";
     public static final String FOLLOWERS_COMMENTS = "followers-comments";
     public static final String MY_RECIPE_LIKES = "my-recipes-likes";
-    public static final String MY_RECIPE_COMMENT = "my-recipe-comment";
+    public static final String MY_RECIPE_COMMENT = "my-recipes-comment";
     public static final String LIKED_RECIPES = "liked-recipes";
 }

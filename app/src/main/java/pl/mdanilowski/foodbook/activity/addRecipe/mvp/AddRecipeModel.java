@@ -19,6 +19,7 @@ import pl.mdanilowski.foodbook.activity.addRecipe.AddRecipeActivity;
 import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.Recipe;
+import pl.mdanilowski.foodbook.model.RecipeQuery;
 
 public class AddRecipeModel {
 
@@ -57,8 +58,8 @@ public class AddRecipeModel {
         return true;
     }
 
-    public void backToDashboard(List<Uri> images, Recipe recipe, boolean wasRecipeAdded) {
-        DashboardActivity.start(activity, images, recipe, wasRecipeAdded);
+    public void backToDashboard(List<Uri> images, Recipe recipe, RecipeQuery recipeQuery, boolean wasRecipeAdded) {
+        DashboardActivity.start(activity, images, recipe, recipeQuery, wasRecipeAdded);
     }
 
     private File createImageFile() throws IOException {

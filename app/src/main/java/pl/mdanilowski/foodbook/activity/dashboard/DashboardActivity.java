@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import pl.mdanilowski.foodbook.activity.dashboard.mvp.DashboardPresenter;
 import pl.mdanilowski.foodbook.activity.dashboard.mvp.DashboardView;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.Recipe;
+import pl.mdanilowski.foodbook.model.RecipeQuery;
 import pl.mdanilowski.foodbook.model.User;
 
 public class DashboardActivity extends BaseActivity {
@@ -29,6 +31,7 @@ public class DashboardActivity extends BaseActivity {
     public static final String UID_TAG = "uid";
     public static final String RID_TAG = "rid";
     public static final String DEEP_LINK_INTENT = "deep_link_intent";
+    public static final String RECIPE_QUERY = "recipe_query";
 
     public static final String IS_USER_UPDATED = "is_user_updated";
     public static final String AVATAR_URI = "avatar_uri";
@@ -43,6 +46,9 @@ public class DashboardActivity extends BaseActivity {
 
     @Inject
     DashboardPresenter presenter;
+
+    public MenuItem searchIcon;
+    public Menu persistedMenu;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, DashboardActivity.class);
@@ -68,10 +74,11 @@ public class DashboardActivity extends BaseActivity {
         context.startActivity(intent);
     }
 
-    public static void start(Context context, List<Uri> images, Recipe recipe, boolean wasRecipaAdded) {
+    public static void start(Context context, List<Uri> images, Recipe recipe, RecipeQuery recipeQuery, boolean wasRecipaAdded) {
         Intent intent = new Intent(context, DashboardActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra(IS_RECIPE_ADDED, wasRecipaAdded);
+        intent.putExtra(RECIPE_QUERY, recipeQuery);
         intent.putParcelableArrayListExtra(IMAGES, (ArrayList<? extends Parcelable>) images);
         intent.putExtra(RECIPE, recipe);
         context.startActivity(intent);
@@ -100,7 +107,9 @@ public class DashboardActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        persistedMenu = menu;
         view.onCreateOptionsMenu(menu, this);
+        presenter.setSearchListeners();
         return true;
     }
 

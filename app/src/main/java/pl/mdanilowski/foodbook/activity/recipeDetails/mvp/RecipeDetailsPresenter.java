@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -12,6 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.dynamiclinks.DynamicLink;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import pl.mdanilowski.foodbook.R;
@@ -22,6 +26,7 @@ import pl.mdanilowski.foodbook.model.Comment;
 import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.model.User;
 import pl.mdanilowski.foodbook.utils.CommentDialog;
+import pl.mdanilowski.foodbook.utils.ConfirmationDialog;
 import pl.mdanilowski.foodbook.utils.InformationDialog;
 import rx.Subscription;
 
@@ -78,7 +83,7 @@ public class RecipeDetailsPresenter extends BasePresenter {
 
         if (recipeId != null || ownerId != null) {
             DynamicLink recipeShareLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                    .setLink(Uri.parse(String.format("https://foodbook.com/%s/%s", ownerId, recipeId)))
+                    .setLink(Uri.parse(String.format("https://app_icon.com/%s/%s", ownerId, recipeId)))
                     .setDynamicLinkDomain("bqbx5.app.goo.gl")
                     .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
                     .setSocialMetaTagParameters(socialMediaParams.build())
@@ -93,18 +98,15 @@ public class RecipeDetailsPresenter extends BasePresenter {
     private void setRecipeContent() {
         if (recipe.getPhotosUrls() != null) {
             view.setPagerImages(recipe.getPhotosUrls());
+        } else {
+            view.setPagerImages(Arrays.asList());
         }
         view.setTvRecipeName(recipe.getName());
         view.setTvDescription(recipe.getDescription());
         view.setTvIngredients(recipe.getIngredients());
         view.setTvTags(recipe.getTags());
-        view.setShareCount(recipe.getShares());
         view.setLikesCount(recipe.getLikes());
-        if (recipe.getComments() == null) {
-            view.setCommentsCount(0);
-        } else {
-            view.setCommentsCount(recipe.getComments().size());
-        }
+        view.setCommentsCount(recipe.getCommentCount());
         if (foodbookUser.getLikedRecipes().contains(recipe.getRid())) {
             view.setRecipeLiked();
         } else view.setRecipeNotLiked();
@@ -119,16 +121,15 @@ public class RecipeDetailsPresenter extends BasePresenter {
     private Subscription observeRecipesComments(String uid, String rid) {
         return foodBookService.getRecipesCommentsRealtime(uid, rid)
                 .subscribe(documentChange -> {
-                    Comment comment = documentChange.getDocument().toObject(Comment.class);
-                    switch (documentChange.getType()) {
-                        case ADDED:
-                            commentsAdapter.commentAdded(comment);
-                            recipe.getComments().add(comment);
-                            view.setCommentsCount(recipe.getComments().size());
-                            setRecipeContent();
-                            break;
-                    }
-                });
+                            Comment comment = documentChange.getDocument().toObject(Comment.class);
+                            switch (documentChange.getType()) {
+                                case ADDED:
+                                    commentsAdapter.commentAdded(comment);
+                                    recipe.getComments().add(comment);
+                                    break;
+                            }
+                        }
+                );
     }
 
     private Subscription observeRecipe(String uid, String rid) {
@@ -138,11 +139,15 @@ public class RecipeDetailsPresenter extends BasePresenter {
                     setObservers();
                     createDynamicLink(recipe);
                     setRecipeContent();
-                });
+                }, throwable ->
+                        InformationDialog.newInstance(view.getResources().getString(R.string.recipe_been_deleted),
+                                view.getResources().getString(R.string.recipe_not_exists),
+                                () -> model.activity.onBackPressed())
+                                .show(model.activity.getSupportFragmentManager(), "NO_RECIPE"));
     }
 
     private void setObservers() {
-        if(!areObsertversSet){
+        if (!areObsertversSet) {
             compositeSubscription.add(observeRecipesComments(ownerId, recipeId));
             compositeSubscription.add(observeLikeClick());
             compositeSubscription.add(observeUnlikeClick());
@@ -192,8 +197,11 @@ public class RecipeDetailsPresenter extends BasePresenter {
                     comment.setCommentText(commentText);
                     comment.setName(foodbookUser.getName());
                     comment.setUid(foodbookUser.getUid());
-                    foodBookService.commentRecipe(comment, recipe).subscribe(__ -> Toast.makeText(view.getContext(), "Comment added", Toast.LENGTH_SHORT).show(),
-                            e -> Toast.makeText(view.getContext(), "Comment not added. Try again later.", Toast.LENGTH_SHORT).show());
+                    foodBookService.commentRecipe(comment, recipe).subscribe(__ -> {
+                                Toast.makeText(view.getContext(), R.string.comment_added, Toast.LENGTH_SHORT).show();
+                                foodBookService.incrementCommentCountTransaction(recipe).subscribe(count -> view.setCommentsCount(count));
+                            },
+                            e -> Toast.makeText(view.getContext(), R.string.comment_not_added, Toast.LENGTH_SHORT).show());
                 }
 
                 @Override
@@ -217,20 +225,19 @@ public class RecipeDetailsPresenter extends BasePresenter {
             sendIntent.putExtra(Intent.EXTRA_TEXT, msg);
             sendIntent.setType("text/plain");
             model.startShareIntent(sendIntent);
-            foodBookService.incrementShareCountTransaction(ownerId, recipeId)
-                    .subscribe(newSharesCount -> view.updateSharesCount(newSharesCount),
-                            throwable -> Toast.makeText(view.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
-                    );
         });
     }
 
     private Subscription observeRecipeLiked(FirebaseUser user, Recipe recipe) {
-        return foodBookService.likeRecipeTransactionBatch(user, recipe)
-                .subscribe(__ -> Log.i("RECIPE_LIKED", "RECIPE LIKED: " + recipe.getRid()),
+        return foodBookService.likeRecipeTransaction(user, recipe)
+                .subscribe(__ -> {
+                            Log.i("RECIPE_LIKED", "RECIPE LIKED: " + recipe.getRid());
+                        }
+                        ,
                         throwable -> {
                             view.setRecipeNotLiked();
                             view.setLikesCount(recipe.getLikes());
-                            Toast.makeText(view.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(view.getContext(), R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
                         }
                 );
     }
@@ -241,5 +248,59 @@ public class RecipeDetailsPresenter extends BasePresenter {
             view.setOwnerName(user.getName());
             view.setClickListenerOnOwner(__ -> model.startProfileActivity(user.getUid()));
         });
+    }
+
+    public boolean onMenuItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.miDelete:
+                deleteRecipe();
+                return true;
+            case R.id.miEdit:
+                startEditingRecipe();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void deleteRecipe() {
+        ConfirmationDialog.newInstance(view.getResources().getString(R.string.delete_recipe), view.getResources().getString(R.string.sure_delete), new ConfirmationDialog.OnClickResult() {
+            @Override
+            public void onPositiveClick() {
+                compositeSubscription.clear();
+                foodBookService.deleteRecipe(ownerId, recipeId).subscribe(__ -> {
+                            model.onBackPressed();
+                            if (recipe.getPhotosUrls() != null && recipe.getPhotosUrls().size() > 0) {
+                                for (String storageRef : recipe.getPhotosUrls()) {
+                                    storage.getReferenceFromUrl(storageRef)
+                                            .delete()
+                                            .addOnSuccessListener(s -> Log.i("DELETED_IMAGE", "DELETED IMAGE " + storageRef + "FROM STORAGE"))
+                                            .addOnFailureListener(s -> Log.e("ERROR_DELETING_IMAGE", "Cant delete image: " + storageRef + " form storage"));
+                                }
+                            }
+                            foodBookService.removeRecipeFromQueryTable(recipeId).subscribe(aVoid -> {
+                                Log.i("Removed query", "Removed recipe from query table");
+                            });
+                        },
+                        throwable -> {
+                            InformationDialog.newInstance(view.getResources().getString(R.string.not_removed_recipe), view.getResources().getString(R.string.cant_remove_recipe), null);
+                        });
+            }
+
+            @Override
+            public void onNegativeClick() {
+            }
+        }).show(model.activity.getSupportFragmentManager(), "DELETE_DIALOG");
+    }
+
+    private void startEditingRecipe() {
+        model.startEditRecipeActivity(recipe);
+    }
+
+    public boolean inflateMenu(Menu menu, MenuInflater menuInflater) {
+        if (firebaseAuth.getCurrentUser().getUid().equals(ownerId)) {
+            menuInflater.inflate(R.menu.recipe_menu, menu);
+        }
+        return true;
     }
 }

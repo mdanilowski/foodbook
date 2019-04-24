@@ -2,6 +2,7 @@ package pl.mdanilowski.foodbook.activity.usersRecipes.mvp;
 
 import java.net.UnknownHostException;
 
+import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.Recipe;
@@ -54,7 +55,8 @@ public class UsersRecipesPresenter extends BasePresenter {
                         }
                         , throwable -> {
                             if (throwable instanceof UnknownHostException) {
-                                InformationDialog informationDialog = InformationDialog.newInstance("Failed loading data", "Check network connection and try again");
+                                InformationDialog informationDialog = InformationDialog.newInstance(view.getResources().getString(R.string.failed_loading),
+                                        view.getResources().getString(R.string.check_connection_try_later));
                                 informationDialog.show(model.activity.getSupportFragmentManager(), "fragment_alert");
                             }
                         });

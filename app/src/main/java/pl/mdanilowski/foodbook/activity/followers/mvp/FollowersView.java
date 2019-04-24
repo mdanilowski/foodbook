@@ -1,6 +1,7 @@
 package pl.mdanilowski.foodbook.activity.followers.mvp;
 
 
+import android.graphics.PorterDuff;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,6 +48,7 @@ public class FollowersView extends FrameLayout {
         activity.getSupportActionBar().setDisplayShowHomeEnabled(true);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
         toolbarTitle.setText(R.string.following_you);
     }
 }

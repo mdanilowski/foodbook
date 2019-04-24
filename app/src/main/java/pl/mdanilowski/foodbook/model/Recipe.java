@@ -6,9 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Recipe implements Serializable {
 
@@ -22,8 +20,10 @@ public class Recipe implements Serializable {
     private String description;
     @SerializedName("likes")
     private int likes;
-    @SerializedName("shares")
-    private int shares;
+    @SerializedName("commentCount")
+    private int commentCount;
+    @SerializedName("ownerName")
+    private String ownerName;
     @SerializedName("isMine")
     private boolean isMine;
     @SerializedName("addDate")
@@ -36,24 +36,30 @@ public class Recipe implements Serializable {
     private List<String> tags = new ArrayList<>();
     @SerializedName("photos")
     private List<String> photosUrls = new ArrayList<>();
-    @SerializedName("queryStrings")
-    private Map<String, Boolean> queryStrings = new HashMap<>();
 
     public Recipe() {
     }
 
-    public Recipe(String oid, String name, String description, int likes, boolean isMine, Date addDate, List<String> ingredients, List<Comment> comments, List<String> tags, List<String> photosUrls, Map<String,Boolean> queryStrings) {
+    public Recipe(String oid,
+                  String name,
+                  String description,
+                  int likes,
+                  String ownerName,
+                  boolean isMine,
+                  Date addDate,
+                  List<String> ingredients,
+                  List<String> tags,
+                  List<String> photosUrls) {
         this.oid = oid;
         this.name = name;
         this.description = description;
         this.likes = likes;
+        this.ownerName = ownerName;
         this.isMine = isMine;
         this.addDate = addDate;
         this.ingredients = ingredients;
-        this.comments = comments;
         this.tags = tags;
         this.photosUrls = photosUrls;
-        this.queryStrings = queryStrings;
     }
 
     public String getName() {
@@ -136,14 +142,6 @@ public class Recipe implements Serializable {
         this.rid = rid;
     }
 
-    public int getShares() {
-        return shares;
-    }
-
-    public void setShares(int shares) {
-        this.shares = shares;
-    }
-
     public String getOid() {
         return oid;
     }
@@ -152,11 +150,19 @@ public class Recipe implements Serializable {
         this.oid = oid;
     }
 
-    public Map<String, Boolean> getQueryStrings() {
-        return queryStrings;
+    public String getOwnerName() {
+        return ownerName;
     }
 
-    public void setQueryStrings(Map<String, Boolean> queryStrings) {
-        this.queryStrings = queryStrings;
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
     }
 }

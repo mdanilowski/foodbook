@@ -2,6 +2,7 @@ package pl.mdanilowski.foodbook.activity.profile.mvp;
 
 import android.widget.Toast;
 
+import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.User;
@@ -28,6 +29,7 @@ public class ProfilePresenter extends BasePresenter {
         compositeSubscription.add(observeRecipesClick());
         compositeSubscription.add(observeFollowersClick());
         compositeSubscription.add(observeFollow());
+        compositeSubscription.add(observeStopFollowing());
     }
 
     @Override
@@ -40,10 +42,7 @@ public class ProfilePresenter extends BasePresenter {
                 .subscribe(retrievedUser -> {
                     user = retrievedUser;
                     view.setUserData(foodBookSimpleStorage.getUser(), user);
-                }, throwable -> {
-                    Toast.makeText(view.getContext(), "Can't get user", Toast.LENGTH_SHORT).show();
-                    throwable.printStackTrace();
-                });
+                }, Throwable::printStackTrace);
     }
 
     private Subscription observeRecipesClick() {
@@ -60,16 +59,21 @@ public class ProfilePresenter extends BasePresenter {
                 .subscribe(__ ->
                         foodBookService.followUserBatch(user, foodBookSimpleStorage.getUser())
                                 .subscribe(aVoid ->
-                                                Toast.makeText(view.getContext(), "Following new user", Toast.LENGTH_SHORT).show(),
+                                                Toast.makeText(view.getContext(), R.string.following_new_user, Toast.LENGTH_SHORT).show(),
                                         e -> {
                                             view.showFollow();
-                                            Toast.makeText(view.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(view.getContext(), R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
                                         }));
     }
 
-//    private Subscription observeStopFollowing() {
-//        return view.clicksStopFollowing()
-//                .doOnNext(__ -> view.showFollow())
-//                .subscribe(__ -> foodBookService)
-//    }
+    private Subscription observeStopFollowing() {
+        return view.clicksStopFollowing()
+                .doOnNext(__ -> view.showFollow())
+                .subscribe(__ -> foodBookService.unfollowUserBatch(user.getUid(), foodBookSimpleStorage.getUser().getUid()).subscribe(aVoid ->
+                                Toast.makeText(view.getContext(), R.string.stopped_following_user, Toast.LENGTH_SHORT).show(),
+                        e -> {
+                            view.showFollow();
+                            Toast.makeText(view.getContext(), R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
+                        }));
+    }
 }

@@ -2,7 +2,10 @@ package pl.mdanilowski.foodbook.activity.dashboard.mvp;
 
 import android.app.SearchManager;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -26,10 +29,14 @@ import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
 import pl.mdanilowski.foodbook.adapter.pagerAdapters.DashboardFragmentsPagerAdapter;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.Recipe;
+import pl.mdanilowski.foodbook.model.RecipeQuery;
 import pl.mdanilowski.foodbook.model.User;
 import pl.mdanilowski.foodbook.utils.Constants;
 import pl.mdanilowski.foodbook.utils.MaterialDrawerBuilder;
 import rx.Subscription;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class DashboardPresenter extends BasePresenter {
 
@@ -38,6 +45,8 @@ public class DashboardPresenter extends BasePresenter {
     private static final int DRAWER_THIRD_POSITION = 3;
     private static final int DRAWER_FOURTH_POSITION = 4;
     private static final int DRAWER_FIFTH_POSITION = 5;
+    private static final int DRAWER_SIXT_POSITION = 6;
+    private static final int DRAWER_SEVENTH_POSITION = 7;
 
     private DashboardView view;
     public DashboardModel model;
@@ -49,6 +58,7 @@ public class DashboardPresenter extends BasePresenter {
     private List<Uri> addedRecipeUris = new ArrayList<>();
     private List<Uri> images = new ArrayList<>();
     private Recipe recipeForUpload = null;
+    private RecipeQuery recipeQuery = null;
 
     public String getSearchQuery() {
         return searchQuery;
@@ -103,6 +113,7 @@ public class DashboardPresenter extends BasePresenter {
         if (model.getIsRecipeAddedExtra()) {
             images = model.getRecipeUriListFromIntent();
             recipeForUpload = model.getRecipeFromIntent();
+            recipeQuery = model.getRecipeQueryFromIntent();
             for (Uri uri : images) {
                 uploadImage(uri);
             }
@@ -117,6 +128,15 @@ public class DashboardPresenter extends BasePresenter {
             updateUser();
         } else if (model.isDeepLinkIntent()) {
             handleDynamicLink();
+        } else if (foodBookSimpleStorage.getPendingDeepLink() != null) {
+            Uri deepLink = foodBookSimpleStorage.getPendingDeepLink();
+            String[] path = deepLink.getPath().split("/");
+            if (path.length >= 2) {
+                String uidFromLink = path[1];
+                String ridFromLink = path[2];
+                model.startRecipeDetailsActivity(uidFromLink, ridFromLink);
+                foodBookSimpleStorage.saveDeepLink(null);
+            }
         }
     }
 
@@ -125,12 +145,12 @@ public class DashboardPresenter extends BasePresenter {
             StorageReference storageReference = storage.getReference().child(user.getUid() + "/avatar");
             UploadTask uploadTask = storageReference.putFile(model.getAvatarUriFromIntent());
             uploadTask.addOnSuccessListener(taskSnapshot -> {
-                foodbookUser.setAvatarUrl(taskSnapshot.getDownloadUrl().toString());
+                foodbookUser.setAvatarUrl(taskSnapshot.getUploadSessionUri().toString());
                 foodBookSimpleStorage.saveUser(foodbookUser);
                 setToolbarAndDrawer();
                 addItemsToDrawer();
                 setDrawerClickListeners();
-                foodBookService.updateUsersAvatarPhoto(foodbookUser.getUid(), taskSnapshot.getDownloadUrl().toString()).subscribe(aVoid -> {
+                foodBookService.updateUsersAvatarPhoto(foodbookUser.getUid(), taskSnapshot.getUploadSessionUri().toString()).subscribe(aVoid -> {
                     Log.i("UPDATED AVATAR", foodbookUser.getAvatarUrl());
                 }, throwable -> {
                     Log.e("ERROR UPLOADING", throwable.getMessage());
@@ -142,9 +162,9 @@ public class DashboardPresenter extends BasePresenter {
             StorageReference storageReference = storage.getReference().child(user.getUid() + "/background");
             UploadTask uploadTask = storageReference.putFile(model.getBackgroundUriFromIntent());
             uploadTask.addOnSuccessListener(taskSnapshot -> {
-                foodbookUser.setBackgroundImage(taskSnapshot.getDownloadUrl().toString());
+                foodbookUser.setBackgroundImage(taskSnapshot.getUploadSessionUri().toString());
                 foodBookSimpleStorage.saveUser(foodbookUser);
-                foodBookService.updateUsersBackgroundPhoto(foodbookUser.getUid(), taskSnapshot.getDownloadUrl().toString()).subscribe(aVoid -> {
+                foodBookService.updateUsersBackgroundPhoto(foodbookUser.getUid(), taskSnapshot.getUploadSessionUri().toString()).subscribe(aVoid -> {
                     Log.i("UPDATED BACK PHOTO", foodbookUser.getAvatarUrl());
                 }, throwable -> {
                     Log.e("ERROR UPLOADING", throwable.getMessage());
@@ -173,13 +193,13 @@ public class DashboardPresenter extends BasePresenter {
         uploadTask
                 .addOnFailureListener(command -> {
                     addedRecipeUris.add(null);
-                    Toast.makeText(view.getContext(), "Failed to upload photo", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(view.getContext(), R.string.photo_upload_failed, Toast.LENGTH_SHORT).show();
                     command.printStackTrace();
                 })
                 .addOnSuccessListener(command -> {
-                    addedRecipeUris.add(command.getDownloadUrl());
-                    model.getActivity().getContentResolver().delete(uri, null, null);
-                    Toast.makeText(model.getActivity(), "Uploaded image", Toast.LENGTH_SHORT).show();
+                    addedRecipeUris.add(command.getUploadSessionUri());
+                    //model.getActivity().getContentResolver().delete(uri, null, null);
+                    Toast.makeText(model.getActivity(), R.string.uploaded_image, Toast.LENGTH_SHORT).show();
                 })
                 .addOnCompleteListener(task -> {
                             if (images.size() == addedRecipeUris.size()) {
@@ -188,11 +208,16 @@ public class DashboardPresenter extends BasePresenter {
                                     if (iterator.next() == null) iterator.remove();
                                 }
 
-                                for (Uri addedRecipeUri : addedRecipeUris) {
-                                    recipeForUpload.getPhotosUrls().add(addedRecipeUri.toString());
+                                if (addedRecipeUris.size() == 0) {
+                                    Snackbar.make(view, R.string.recipe_add_failed, Snackbar.LENGTH_LONG);
+                                } else {
+                                    for (Uri addedRecipeUri : addedRecipeUris) {
+                                        recipeForUpload.getPhotosUrls().add(addedRecipeUri.toString());
+                                    }
+                                    compositeSubscription.add(observeAddingRecipe());
                                 }
+
                                 view.hideImageUploadingProgress();
-                                compositeSubscription.add(observeAddingRecipe());
                             }
                         }
                 );
@@ -202,7 +227,10 @@ public class DashboardPresenter extends BasePresenter {
         return foodBookService.addRecipeToUser(user.getUid(), recipeForUpload)
                 .subscribe(docRef -> {
                             recipeForUpload.setRid(docRef.getId());
-                            foodBookService.addRecipeToQueryTable(recipeForUpload)
+                            recipeQuery.setRid(recipeForUpload.getRid());
+                            if (recipeForUpload.getPhotosUrls() != null && recipeForUpload.getPhotosUrls().size() > 0)
+                                recipeQuery.setImageUrl(recipeForUpload.getPhotosUrls().get(0));
+                            foodBookService.addRecipeToQueryTable(recipeQuery)
                                     .subscribe(aVoid ->
                                             Log.d("ADDED_TO_QUERY", "Added recipe : " + recipeForUpload.getRid() + " to query table"));
                             view.showSnackBarWithText(view.getResources().getString(R.string.added_recipe));
@@ -275,7 +303,7 @@ public class DashboardPresenter extends BasePresenter {
                 newUser.setName(user.getDisplayName());
             }
             if (newUser.getAboutMe() == null || TextUtils.isEmpty(newUser.getAboutMe())) {
-                newUser.setAboutMe("Hello, I haven't filled this yet... be patient ;)");
+                newUser.setAboutMe(view.getResources().getString(R.string.about_not_filled));
             }
         } else {
             newUser.setUid(user.getUid());
@@ -286,7 +314,7 @@ public class DashboardPresenter extends BasePresenter {
             newUser.setFollowersCount(0);
             newUser.setFollowingCount(0);
             newUser.setBackgroundImage(null);
-            newUser.setAboutMe("Hello, I haven't filled this yet... be patient ;)");
+            newUser.setAboutMe(view.getResources().getString(R.string.about_not_filled));
             newUser.setCountry("");
             newUser.setCity("");
             newUser.setQueryMap(stringToMap(newUser.getName()));
@@ -330,27 +358,35 @@ public class DashboardPresenter extends BasePresenter {
 
         drawerItems = new ArrayList<>();
 
-        PrimaryDrawerItem accountSettings = new PrimaryDrawerItem()
+        PrimaryDrawerItem profile = new PrimaryDrawerItem()
                 .withIdentifier(0)
-                .withName("Account Settings");
-        PrimaryDrawerItem youFollow = new PrimaryDrawerItem()
+                .withName(R.string.your_profile);
+        PrimaryDrawerItem accountSettings = new PrimaryDrawerItem()
                 .withIdentifier(1)
-                .withName("People you follow");
-        PrimaryDrawerItem followers = new PrimaryDrawerItem()
+                .withName(R.string.ustawienia_konta);
+        PrimaryDrawerItem youFollow = new PrimaryDrawerItem()
                 .withIdentifier(2)
-                .withName("Followers");
-        PrimaryDrawerItem likedRecipes = new PrimaryDrawerItem()
+                .withName(R.string.people_you_follow);
+        PrimaryDrawerItem followers = new PrimaryDrawerItem()
                 .withIdentifier(3)
-                .withName("Liked recipes");
-        PrimaryDrawerItem findFriends = new PrimaryDrawerItem()
+                .withName(R.string.followers);
+        PrimaryDrawerItem likedRecipes = new PrimaryDrawerItem()
                 .withIdentifier(4)
-                .withName("Find friends");
+                .withName(R.string.liked_recipes);
+        PrimaryDrawerItem findFriends = new PrimaryDrawerItem()
+                .withIdentifier(5)
+                .withName(R.string.find_friends);
+        PrimaryDrawerItem logout = new PrimaryDrawerItem()
+                .withIdentifier(6)
+                .withName(R.string.logout);
 
-        drawer.setItemAtPosition(accountSettings, DRAWER_FIRST_POSITION);
-        drawer.setItemAtPosition(youFollow, DRAWER_SECOND_POSITION);
-        drawer.setItemAtPosition(followers, DRAWER_THIRD_POSITION);
-        drawer.setItemAtPosition(likedRecipes, DRAWER_FOURTH_POSITION);
-        drawer.setItemAtPosition(findFriends, DRAWER_FIFTH_POSITION);
+        drawer.setItemAtPosition(profile, DRAWER_FIRST_POSITION);
+        drawer.setItemAtPosition(accountSettings, DRAWER_SECOND_POSITION);
+        drawer.setItemAtPosition(youFollow, DRAWER_THIRD_POSITION);
+        drawer.setItemAtPosition(followers, DRAWER_FOURTH_POSITION);
+        drawer.setItemAtPosition(likedRecipes, DRAWER_FIFTH_POSITION);
+        drawer.setItemAtPosition(findFriends, DRAWER_SIXT_POSITION);
+        drawer.setItemAtPosition(logout, DRAWER_SEVENTH_POSITION);
     }
 
     private void setDrawerClickListeners() {
@@ -358,27 +394,36 @@ public class DashboardPresenter extends BasePresenter {
             switch (position) {
                 case DRAWER_FIRST_POSITION:
                     drawer.closeDrawer();
-                    model.startUserSettingsActivity(foodbookUser);
+                    model.startProfileActivity(foodBookSimpleStorage.getUser().getUid());
                     return true;
                 case DRAWER_SECOND_POSITION:
                     drawer.closeDrawer();
-                    model.startFollowingActivity();
+                    model.startUserSettingsActivity(foodbookUser);
                     return true;
                 case DRAWER_THIRD_POSITION:
                     drawer.closeDrawer();
-                    model.startFollowersActivity(foodbookUser.getUid());
+                    model.startFollowingActivity();
                     return true;
                 case DRAWER_FOURTH_POSITION:
                     drawer.closeDrawer();
-                    model.startLikedRecipesActivity();
+                    model.startFollowersActivity(foodbookUser.getUid());
                     return true;
                 case DRAWER_FIFTH_POSITION:
                     drawer.closeDrawer();
+                    model.startLikedRecipesActivity();
+                    return true;
+                case DRAWER_SIXT_POSITION:
+                    drawer.closeDrawer();
                     model.startFindFriendsActibity();
+                    return true;
+                case DRAWER_SEVENTH_POSITION:
+                    drawer.closeDrawer();
+                    compositeSubscription.clear();
+                    firebaseAuth.signOut();
+                    model.startWelcomeActivity();
                     return true;
                 default:
                     drawer.closeDrawer();
-                    Toast.makeText(view.getContext(), "DEFAULT", Toast.LENGTH_SHORT).show();
                     return true;
             }
         });
@@ -388,13 +433,70 @@ public class DashboardPresenter extends BasePresenter {
         view.dashboardViewPager.setAdapter(new DashboardFragmentsPagerAdapter(model.getFragmentManager(), this));
         view.dashboardTabs.setupWithViewPager(view.dashboardViewPager);
         view.dashboardViewPager.setOffscreenPageLimit(3);
+
+        view.dashboardViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        view.collapseSearchView();
+                        view.dashboardTabs.getTabAt(0).getIcon().setColorFilter(view.getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
+                        view.dashboardTabs.getTabAt(1).getIcon().setColorFilter(view.getResources().getColor(R.color.white_100), PorterDuff.Mode.SRC_ATOP);
+                        view.dashboardTabs.getTabAt(2).getIcon().setColorFilter(view.getResources().getColor(R.color.white_100), PorterDuff.Mode.SRC_ATOP);
+                        break;
+                    case 1:
+                        view.collapseSearchView();
+                        view.dashboardTabs.getTabAt(0).getIcon().setColorFilter(view.getResources().getColor(R.color.white_100), PorterDuff.Mode.SRC_ATOP);
+                        view.dashboardTabs.getTabAt(1).getIcon().setColorFilter(view.getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
+                        view.dashboardTabs.getTabAt(2).getIcon().setColorFilter(view.getResources().getColor(R.color.white_100), PorterDuff.Mode.SRC_ATOP);
+                        break;
+                    case 2:
+                        view.expandSearchView();
+                        view.dashboardTabs.getTabAt(0).getIcon().setColorFilter(view.getResources().getColor(R.color.white_100), PorterDuff.Mode.SRC_ATOP);
+                        view.dashboardTabs.getTabAt(1).getIcon().setColorFilter(view.getResources().getColor(R.color.white_100), PorterDuff.Mode.SRC_ATOP);
+                        view.dashboardTabs.getTabAt(2).getIcon().setColorFilter(view.getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         setTabIcons();
     }
 
     private void setTabIcons() {
         view.dashboardTabs.getTabAt(0).setIcon(R.mipmap.home_icon);
-        view.dashboardTabs.getTabAt(1).setIcon(R.mipmap.home_icon);
-        view.dashboardTabs.getTabAt(2).setIcon(R.mipmap.search_icon);
-//        view.dashboardTabs.getTabAt(3).setIcon(R.mipmap.search_icon);
+        view.dashboardTabs.getTabAt(1).setIcon(R.drawable.ic_my_recipes);
+        view.dashboardTabs.getTabAt(2).setIcon(R.mipmap.ic_search_results);
+
+        view.dashboardTabs.getTabAt(0).getIcon().setColorFilter(view.getResources().getColor(R.color.accent), PorterDuff.Mode.SRC_ATOP);
+        view.dashboardTabs.getTabAt(1).getIcon().setColorFilter(view.getResources().getColor(R.color.white_100), PorterDuff.Mode.SRC_ATOP);
+        view.dashboardTabs.getTabAt(2).getIcon().setColorFilter(view.getResources().getColor(R.color.white_100), PorterDuff.Mode.SRC_ATOP);
+    }
+
+    public void gotoSearchTab() {
+        view.dashboardViewPager.setCurrentItem(2, true);
+    }
+
+    public void setSearchListeners() {
+        view.setOnSearchListener(view1 -> {
+            view.toolbarTitle.setVisibility(GONE);
+            view.ivAvatar.setVisibility(GONE);
+            gotoSearchTab();
+        });
+        view.setOnSearchCloseListener(() -> {
+            view.toolbarTitle.setVisibility(VISIBLE);
+            view.ivAvatar.setVisibility(VISIBLE);
+            view.searchView.onActionViewCollapsed();
+            return true;
+        });
     }
 }

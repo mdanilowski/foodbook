@@ -22,7 +22,7 @@ public class FindFriendsPresenter extends BasePresenter {
     @Override
     public void onCreate() {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
-        userAdapter = new UserAdapter(model.getActivity(), user -> model.startProfileActivity(user.getUid()));
+        userAdapter = new UserAdapter(user -> model.startProfileActivity(user.getUid()));
         view.setAdapterForRecyclerView(userAdapter);
     }
 

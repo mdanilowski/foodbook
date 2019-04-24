@@ -13,6 +13,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 
+import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.User;
@@ -69,11 +70,11 @@ public class RegisterPresenter extends BasePresenter {
                                     model.startDashboardAfterRegister(user);
                                 } else {
                                     if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                        Toast.makeText(view.getContext(), "The email address is already in use by another account.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(view.getContext(), R.string.email_in_use, Toast.LENGTH_SHORT).show();
                                     } else if (task.getException() instanceof FirebaseNetworkException) {
-                                        Toast.makeText(view.getContext(), "You are offline. Check connection and try again.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(view.getContext(), R.string.user_offline, Toast.LENGTH_SHORT).show();
                                     } else {
-                                        Toast.makeText(view.getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(view.getContext(), R.string.auth_failed, Toast.LENGTH_SHORT).show();
                                     }
                                     Log.w("ERROR_REG", "signInWithEmail:failure", task.getException());
                                 }

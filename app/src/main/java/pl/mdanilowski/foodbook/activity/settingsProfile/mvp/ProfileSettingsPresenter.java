@@ -11,6 +11,7 @@ import android.widget.Toast;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.User;
@@ -37,7 +38,6 @@ public class ProfileSettingsPresenter extends BasePresenter {
     public void onCreate() {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         foodbookUser = model.getUserFromIntent();
-        Toast.makeText(view.getContext(), foodbookUser.getAboutMe(), Toast.LENGTH_SHORT).show();
         compositeSubscription.add(observeChangeBackgroundImageClick());
         compositeSubscription.add(observeChangeAvatarClick());
         compositeSubscription.add(observeSaveSettingsClick());
@@ -49,34 +49,35 @@ public class ProfileSettingsPresenter extends BasePresenter {
         compositeSubscription.clear();
     }
 
-    Subscription observeChangeBackgroundImageClick() {
+    private Subscription observeChangeBackgroundImageClick() {
         return view.changeBackgroundClicks().subscribe(__ -> {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            model.getActivity().startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_BACKGROUND_IMAGE_REQUEST_CODE);
+            model.getActivity().startActivityForResult(Intent.createChooser(intent, view.getResources().getString(R.string.select_picture)), PICK_BACKGROUND_IMAGE_REQUEST_CODE);
         });
     }
 
-    Subscription observeChangeAvatarClick() {
+    private Subscription observeChangeAvatarClick() {
         return view.changeAvatarImageClick().subscribe(__ -> {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            model.getActivity().startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_AVATAR_IMAGE_REQUEST_CODE);
+            model.getActivity().startActivityForResult(Intent.createChooser(intent, view.getResources().getString(R.string.select_picture)), PICK_AVATAR_IMAGE_REQUEST_CODE);
         });
     }
 
-    Subscription observeSaveSettingsClick() {
+    private Subscription observeSaveSettingsClick() {
         return view.saveSettingsClick().subscribe(__ -> {
             foodbookUser.setName(String.valueOf(view.etName.getText()));
             foodbookUser.setAboutMe(String.valueOf(view.etAboutMe.getText()));
             foodbookUser.setEmail(String.valueOf(view.etEmail.getText()));
             foodbookUser.setCountry(String.valueOf(view.etCountry.getText()));
+            foodbookUser.setCity(String.valueOf(view.etCity.getText()));
             foodBookSimpleStorage.saveUser(foodbookUser);
 
             model.finishActivity(uriForAvatar, uriForBackground, foodbookUser);
-            Toast.makeText(App.getApplicationInstance(), "Your settings have been saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(App.getApplicationInstance(), R.string.settings_saved, Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -93,7 +94,7 @@ public class ProfileSettingsPresenter extends BasePresenter {
                 view.ivBackgroundImage.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                Toast.makeText(view.getContext(), "Ups, something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), R.string.ups_something_wrong, Toast.LENGTH_SHORT).show();
             }
         } else if (requestCode == PICK_AVATAR_IMAGE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             try {
@@ -105,7 +106,7 @@ public class ProfileSettingsPresenter extends BasePresenter {
                 view.ivAvatarImage.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                Toast.makeText(view.getContext(), "Ups, something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), R.string.ups_something_wrong, Toast.LENGTH_SHORT).show();
             }
         }
     }

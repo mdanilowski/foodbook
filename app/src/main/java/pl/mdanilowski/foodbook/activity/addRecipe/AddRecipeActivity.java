@@ -3,7 +3,6 @@ package pl.mdanilowski.foodbook.activity.addRecipe;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 import javax.inject.Inject;
 
@@ -11,9 +10,10 @@ import pl.mdanilowski.foodbook.activity.addRecipe.dagger.AddRecipeModule;
 import pl.mdanilowski.foodbook.activity.addRecipe.dagger.DaggerAddRecipeComponent;
 import pl.mdanilowski.foodbook.activity.addRecipe.mvp.AddRecipePresenter;
 import pl.mdanilowski.foodbook.activity.addRecipe.mvp.AddRecipeView;
+import pl.mdanilowski.foodbook.activity.base.BaseActivity;
 import pl.mdanilowski.foodbook.app.App;
 
-public class AddRecipeActivity extends AppCompatActivity {
+public class AddRecipeActivity extends BaseActivity {
 
     @Inject
     AddRecipeView view;
@@ -47,5 +47,9 @@ public class AddRecipeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         presenter.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void deleteImage(int deletedImagePosition) {
+        presenter.deleteImage(deletedImagePosition);
     }
 }

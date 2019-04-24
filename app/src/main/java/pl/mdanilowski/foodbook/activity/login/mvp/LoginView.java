@@ -45,7 +45,7 @@ public class LoginView extends FrameLayout {
     }
 
     void displayInputEmptyError(TextInputLayout til) {
-        til.setError("That field is required!");
+        til.setError(getContext().getString(R.string.this_field_required));
     }
 
     void hideInputEmptyError(TextInputLayout til) {

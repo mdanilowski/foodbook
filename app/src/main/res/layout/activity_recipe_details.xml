@@ -41,7 +41,6 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -59,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@color/primary"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/ivUser"
@@ -72,7 +71,7 @@
                     android:id="@+id/tvName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:layout_gravity="center_vertical"
                     android:textColor="@color/white_100"
                     android:textSize="20sp"
                     tools:ignore="NestedWeights" />
@@ -86,7 +85,6 @@
                 android:layout_marginRight="16sp"
                 android:gravity="center"
                 android:padding="8dp"
-                android:text="Naleśniki w sosie słodko kwaśnym"
                 android:textColor="@color/white_100"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -97,9 +95,9 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:padding="8dp"
-                android:text="Składniki:"
+                android:text="@string/ingredients"
                 android:textColor="@color/white_98"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:textStyle="italic" />
 
             <TextView
@@ -109,9 +107,9 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:padding="8dp"
-                android:text="Składniki"
-                android:textColor="@color/white_100"
-                android:textSize="14sp" />
+                android:textSize="16sp"
+                android:text="Papryka\nZiemniaki"
+                android:textColor="@color/white_100" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -119,9 +117,8 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:padding="8dp"
-                android:text="Opis:"
+                android:text="@string/description"
                 android:textColor="@color/white_98"
-                android:textSize="12sp"
                 android:textStyle="italic" />
 
             <TextView
@@ -131,9 +128,9 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:padding="8dp"
-                android:text="Opis"
+                android:text="Papryka\nZiemniaki"
                 android:textColor="@color/white_100"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -141,9 +138,8 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:padding="8dp"
-                android:text="Tagi:"
+                android:text="@string/tags"
                 android:textColor="@color/white_98"
-                android:textSize="12sp"
                 android:textStyle="italic" />
 
             <TextView
@@ -153,16 +149,16 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:padding="8dp"
-                android:text="Tags"
+                android:text="Papryka\nZiemniaki"
                 android:textColor="@color/white_100"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:background="@color/primary_dark" />
+                android:background="@color/accent" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -170,15 +166,7 @@
                 android:layout_margin="16dp"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:weightSum="3">
-
-                <TextView
-                    android:id="@+id/tvSharesCount"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:textColor="@color/white_98" />
+                android:weightSum="2">
 
                 <TextView
                     android:id="@+id/tvLikesCount"
@@ -203,7 +191,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:background="@color/primary_dark" />
+                android:background="@color/accent" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -218,7 +206,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@color/transparent"
+                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:src="@mipmap/ic_share"
@@ -230,7 +218,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@color/transparent"
+                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:src="@mipmap/ic_like_border"
@@ -242,7 +230,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@color/transparent"
+                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:src="@mipmap/ic_like_fill"
@@ -255,7 +243,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@color/transparent"
+                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:src="@mipmap/ic_comment"
@@ -268,7 +256,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:background="@color/primary_dark" />
+                android:background="@color/accent" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rvComments"

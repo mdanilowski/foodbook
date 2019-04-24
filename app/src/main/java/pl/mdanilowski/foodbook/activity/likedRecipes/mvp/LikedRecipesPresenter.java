@@ -26,7 +26,7 @@ public class LikedRecipesPresenter extends BasePresenter {
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         foodbookUser = foodBookSimpleStorage.getUser();
         likedRecipesAdapter = new RecipesAdapter(model.getActivity(), recipe -> model.startRecipeDetailsActivity(
-                foodbookUser.getUid(),
+                recipe.getOid(),
                 recipe.getRid()
         ));
         view.setAdapterForRecyclerView(likedRecipesAdapter);

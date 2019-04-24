@@ -17,7 +17,7 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="6"
+        android:layout_weight="8"
         android:orientation="vertical"
         android:weightSum="5">
 
@@ -41,34 +41,4 @@
             android:textSize="12sp"
             android:textStyle="italic" />
     </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="2">
-
-        <ImageButton
-            android:id="@+id/ibAddFriend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center"
-            android:background="#00000000"
-            android:contentDescription="@string/add_friend"
-            android:src="@mipmap/ic_add_friend"
-            android:visibility="gone" />
-
-        <ImageView
-            android:id="@+id/ivFriend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center"
-            android:background="#00000000"
-            android:contentDescription="@string/add_friend"
-            android:src="@mipmap/ic_friends"
-            android:visibility="gone" />
-    </RelativeLayout>
 </LinearLayout>

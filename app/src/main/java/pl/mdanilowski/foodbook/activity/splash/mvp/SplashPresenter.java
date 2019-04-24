@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 
 import pl.mdanilowski.foodbook.activity.base.BasePresenter;
+import pl.mdanilowski.foodbook.app.App;
 
 public class SplashPresenter extends BasePresenter {
 
@@ -24,33 +25,43 @@ public class SplashPresenter extends BasePresenter {
 
     @Override
     public void onCreate() {
+        App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
 
-        if (firebaseUser == null) {
-            model.startWelcomeActivity();
-        } else {
-            FirebaseDynamicLinks.getInstance()
-                    .getDynamicLink(model.getIntent())
-                    .addOnSuccessListener(runnable -> {
-                        Uri deepLink;
-                        if (runnable != null) {
-                            deepLink = runnable.getLink();
-                            String[] path = deepLink.getPath().split("/");
+//        if (firebaseUser == null) {
+//            model.startWelcomeActivity();
+//        } else {
+        FirebaseDynamicLinks.getInstance()
+                .getDynamicLink(model.getIntent())
+                .addOnSuccessListener(runnable -> {
+                    Uri deepLink;
+                    if (runnable != null) {
+                        deepLink = runnable.getLink();
+                        String[] path = deepLink.getPath().split("/");
+                        if(firebaseUser != null) {
                             if (path.length >= 2) {
                                 String uidFromLink = path[1];
                                 String ridFromLink = path[2];
                                 model.startDashboardWithDeepLink(uidFromLink, ridFromLink);
                             }
                         } else {
-                            model.startDashboardActivity();
+                            foodBookSimpleStorage.saveDeepLink(deepLink);
+                            model.startWelcomeActivity();
                         }
-                    })
-                    .addOnFailureListener(exception -> {
-                                model.startDashboardActivity();
-                                Log.e("DEEP_LINK_ERROR", exception.getMessage());
-                            }
-                    );
-        }
+                    } else {
+                        if (firebaseUser != null) {
+                            model.startDashboardActivity();
+                        } else {
+                            model.startWelcomeActivity();
+                        }
+                    }
+                })
+                .addOnFailureListener(exception -> {
+                            model.startDashboardActivity();
+                            Log.e("DEEP_LINK_ERROR", exception.getMessage());
+                        }
+                );
+//        }
     }
 
     @Override

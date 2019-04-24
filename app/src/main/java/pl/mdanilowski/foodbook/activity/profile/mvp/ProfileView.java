@@ -31,9 +31,6 @@ public class ProfileView extends FrameLayout {
     @BindView(R.id.tvRecipesCount)
     TextView tvRecipesCount;
 
-    @BindView(R.id.tvFollowersCount)
-    TextView tvFollowersCount;
-
     @BindView(R.id.stopFollowing)
     LinearLayout stopFollowing;
 
@@ -80,7 +77,6 @@ public class ProfileView extends FrameLayout {
             Glide.with(this).load(userData.getAvatarUrl()).into(ivProfileImage);
         else ivProfileImage.setImageResource(R.color.accent);
         tvRecipesCount.setText(String.valueOf(userData.getRecipesCount()));
-        tvFollowersCount.setText(String.valueOf(userData.getFollowers().size()));
         boolean isBeingFollowed = false;
         for (User f : currentUser.getFollowing()) {
             if (f.getUid() != null && f.getUid().equals(userData.getUid())) {

@@ -56,7 +56,7 @@ public class RegisterView extends FrameLayout {
     }
 
     void displayInputEmptyError(TextInputLayout til) {
-        til.setError("That field is required!");
+        til.setError(getContext().getString(R.string.field_required));
     }
 
     void hideInputEmptyError(TextInputLayout til) {
@@ -64,6 +64,6 @@ public class RegisterView extends FrameLayout {
     }
 
     void showPasswordDoNotMatch() {
-        tilPasswordConfirm.setError("Passwords must match!");
+        tilPasswordConfirm.setError(getContext().getString(R.string.passwords_must_match));
     }
 }
