@@ -4,6 +4,7 @@ package pl.mdanilowski.foodbook.utils.Storage;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 
 import com.google.gson.Gson;
 
@@ -23,6 +24,7 @@ public class FoodBookSimpleStorage {
 
     private static final String _USER = "user";
     private static final String _LIKED_RECIPES = "liked_recipes";
+    private static final String _DEEP_LINK = "deep_link";
 
     @SuppressLint("CommitPrefEdits")
     private FoodBookSimpleStorage() {
@@ -47,6 +49,22 @@ public class FoodBookSimpleStorage {
         Gson gson = new Gson();
         String json = sharedPreferences.getString(_USER, null);
         return gson.fromJson(json, User.class);
+    }
+
+    public void saveDeepLink(Uri link) {
+        if (link != null) {
+            editor.putString(_DEEP_LINK, link.toString());
+        } else editor.putString(_DEEP_LINK, null);
+        editor.commit();
+    }
+
+    public Uri getPendingDeepLink() {
+        String deepLink = sharedPreferences.getString(_DEEP_LINK, null);
+        if (deepLink != null) {
+            return Uri.parse(deepLink);
+        } else {
+            return null;
+        }
     }
 
     public void saveLikedRecipes(Set<String> likedRecipes) {

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,11 +22,8 @@ import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity;
 import pl.mdanilowski.foodbook.adapter.recyclerAdapters.HomeAdapter;
 import pl.mdanilowski.foodbook.app.App;
-import pl.mdanilowski.foodbook.model.userUpdates.MyFollowerLikes;
-import pl.mdanilowski.foodbook.model.userUpdates.MyRecipeLike;
-import pl.mdanilowski.foodbook.model.userUpdates.MyRecipeNewComment;
-import pl.mdanilowski.foodbook.model.userUpdates.NewFollowersComment;
-import pl.mdanilowski.foodbook.model.userUpdates.NewFollowersRecipe;
+import pl.mdanilowski.foodbook.model.userUpdates.UpdateType;
+import pl.mdanilowski.foodbook.model.userUpdates.UserUpdate;
 import pl.mdanilowski.foodbook.service.FoodBookService;
 import pl.mdanilowski.foodbook.utils.Storage.FoodBookSimpleStorage;
 import rx.Subscription;
@@ -66,7 +64,7 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         App.getApplicationInstance().getFoodbookAppComponent().inject(this);
         currentUser = firebaseAuth.getCurrentUser();
-        homeAdapter = new HomeAdapter(update -> RecipeDetailsActivity.start(this.getContext(), update.getRecipe().getOid(), update.getRecipe().getRid()));
+        homeAdapter = new HomeAdapter(this.getContext(), update -> RecipeDetailsActivity.start(this.getContext(), update.getOid(), update.getRid()));
     }
 
     @Override
@@ -83,6 +81,7 @@ public class HomeFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
         rvHomeRecyclerView.setAdapter(homeAdapter);
         rvHomeRecyclerView.setLayoutManager(linearLayoutManager);
+        rvHomeRecyclerView.addItemDecoration(new DividerItemDecoration(this.getContext(), DividerItemDecoration.VERTICAL));
     }
 
     @Override
@@ -104,14 +103,15 @@ public class HomeFragment extends Fragment {
     private Subscription observeMyRecipesLikes() {
         return foodBookService.getMyLikesRealtime(currentUser.getUid())
                 .subscribe(documentChange -> {
-                    MyRecipeLike myRecipeLike = documentChange.getDocument().toObject(MyRecipeLike.class);
+                    UserUpdate myRecipeLike = documentChange.getDocument().toObject(UserUpdate.class);
+                    myRecipeLike.setUpdateType(UpdateType.MY_RECIPE_LIKE);
                     switch (documentChange.getType()) {
                         case ADDED:
                             homeAdapter.addUpdate(myRecipeLike);
                             new Handler().postDelayed(() -> rvHomeRecyclerView.smoothScrollToPosition(0), 1);
                             break;
                         case REMOVED:
-                            homeAdapter.removeMyRecipeLike(myRecipeLike);
+                            homeAdapter.removeUpdate(myRecipeLike);
                             break;
                         case MODIFIED:
                             break;
@@ -124,42 +124,36 @@ public class HomeFragment extends Fragment {
     private Subscription observeFollowersNewRecipes() {
         return foodBookService.getNewFollowersRecipesRealtime(currentUser.getUid())
                 .subscribe(documentChange -> {
-                    NewFollowersRecipe newFollowersRecipe = documentChange.getDocument().toObject(NewFollowersRecipe.class);
+                    UserUpdate newFollowersRecipe = documentChange.getDocument().toObject(UserUpdate.class);
+                    newFollowersRecipe.setUpdateType(UpdateType.FOLLOWERS_NEW_RECIPE);
                     switch (documentChange.getType()) {
                         case ADDED:
                             homeAdapter.addUpdate(newFollowersRecipe);
                             new Handler().postDelayed(() -> rvHomeRecyclerView.smoothScrollToPosition(0), 1);
                             break;
                         case REMOVED:
-                            homeAdapter.removeNewFollowersRecipe(newFollowersRecipe);
+                            homeAdapter.removeUpdate(newFollowersRecipe);
                             break;
                         case MODIFIED:
                             break;
                         default:
                             break;
                     }
-
-//                    NotificationCreator.createRecipeNotification(getActivity(),
-//                            newFollowersRecipe.getUser().getUid(),
-//                            newFollowersRecipe.getRecipe().getRid(),
-//                            "See new recipe",
-//                            String.format("%s added a new recipe", newFollowersRecipe.getUser().getName()),
-//                            notificationIdCounter++);
-
                 });
     }
 
     private Subscription observeFollowersComments() {
         return foodBookService.getNewFollowersCommentRealtime(currentUser.getUid())
                 .subscribe(documentChange -> {
-                    NewFollowersComment newFollowersComment = documentChange.getDocument().toObject(NewFollowersComment.class);
+                    UserUpdate newFollowersComment = documentChange.getDocument().toObject(UserUpdate.class);
+                    newFollowersComment.setUpdateType(UpdateType.FOLLOWERS_NEW_COMMENT);
                     switch (documentChange.getType()) {
                         case ADDED:
                             homeAdapter.addUpdate(newFollowersComment);
                             new Handler().postDelayed(() -> rvHomeRecyclerView.smoothScrollToPosition(0), 1);
                             break;
                         case REMOVED:
-                            homeAdapter.removeFollowersComment(newFollowersComment);
+                            homeAdapter.removeUpdate(newFollowersComment);
                             break;
                         case MODIFIED:
                             break;
@@ -172,15 +166,18 @@ public class HomeFragment extends Fragment {
     private Subscription observeFollowersLikes() {
         return foodBookService.getFollowersLikesRealtime(currentUser.getUid())
                 .subscribe(documentChange -> {
+                    UserUpdate followersLike = documentChange.getDocument().toObject(UserUpdate.class);
+                    followersLike.setUpdateType(UpdateType.FOLLOWERS_NEW_LIKE);
                     switch (documentChange.getType()) {
                         case ADDED:
-                            homeAdapter.addUpdate(documentChange.getDocument().toObject(MyFollowerLikes.class));
+                            homeAdapter.addUpdate(followersLike);
                             new Handler().postDelayed(() -> rvHomeRecyclerView.smoothScrollToPosition(0), 1);
                             break;
                         case REMOVED:
-                            homeAdapter.removeFollowersLike(documentChange.getDocument().toObject(MyFollowerLikes.class));
+                            homeAdapter.removeUpdate(followersLike);
                             break;
                         case MODIFIED:
+                            homeAdapter.modifyUpdate(followersLike);
                             break;
                         default:
                             break;
@@ -191,13 +188,15 @@ public class HomeFragment extends Fragment {
     private Subscription observeMyRecipesComments() {
         return foodBookService.getMyRecipesCommentsRealtime(currentUser.getUid())
                 .subscribe(documentChange -> {
+                    UserUpdate myRecipeComment = documentChange.getDocument().toObject(UserUpdate.class);
+                    myRecipeComment.setUpdateType(UpdateType.MY_RECIPE_NEW_COMMENT);
                     switch (documentChange.getType()) {
                         case ADDED:
-                            homeAdapter.addUpdate(documentChange.getDocument().toObject(MyRecipeNewComment.class));
+                            homeAdapter.addUpdate(myRecipeComment);
                             new Handler().postDelayed(() -> rvHomeRecyclerView.smoothScrollToPosition(0), 1);
                             break;
                         case REMOVED:
-                            homeAdapter.removeMyRecipeComment(documentChange.getDocument().toObject(MyRecipeNewComment.class));
+                            homeAdapter.removeUpdate(myRecipeComment);
                             break;
                         case MODIFIED:
                             break;

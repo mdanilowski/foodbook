@@ -3,16 +3,17 @@ package pl.mdanilowski.foodbook.activity.following;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 import javax.inject.Inject;
 
+import pl.mdanilowski.foodbook.activity.base.BaseActivity;
 import pl.mdanilowski.foodbook.activity.following.dagger.DaggerFollowingComponent;
 import pl.mdanilowski.foodbook.activity.following.dagger.FollowingModule;
 import pl.mdanilowski.foodbook.activity.following.mvp.FollowingPresenter;
 import pl.mdanilowski.foodbook.activity.following.mvp.FollowingView;
+import pl.mdanilowski.foodbook.app.App;
 
-public class FollowingActivity extends AppCompatActivity {
+public class FollowingActivity extends BaseActivity {
 
     @Inject
     FollowingPresenter presenter;
@@ -29,6 +30,7 @@ public class FollowingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         DaggerFollowingComponent.builder()
                 .followingModule(new FollowingModule(this))
+                .foodbookAppComponent(App.getApplicationInstance().getFoodbookAppComponent())
                 .build().inject(this);
         setContentView(view);
 

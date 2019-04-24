@@ -133,15 +133,15 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
                                     model.startDashboardActivity();
                                 } else {
                                     if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                        Toast.makeText(view.getContext(), "The email address is already in use by another account.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(view.getContext(), R.string.email_in_use, Toast.LENGTH_SHORT).show();
                                     } else if (task.getException() instanceof FirebaseNetworkException) {
-                                        Toast.makeText(view.getContext(), "You are offline. Check connection and try again.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(view.getContext(), R.string.user_offline, Toast.LENGTH_SHORT).show();
                                     } else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                        Toast.makeText(view.getContext(), "Invalid password", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(view.getContext(), R.string.invalid_password, Toast.LENGTH_SHORT).show();
                                     } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
-                                        Toast.makeText(view.getContext(), "Invalid email address. No such user.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(view.getContext(), R.string.invalid_email, Toast.LENGTH_SHORT).show();
                                     } else {
-                                        Toast.makeText(view.getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(view.getContext(), R.string.auth_failed, Toast.LENGTH_SHORT).show();
                                     }
                                     Log.w("ERROR_REG", "signInWithEmail:failure", task.getException());
                                 }
@@ -182,7 +182,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
                 firebaseAuthWithGoogle(account);
             } else {
                 Log.d("ERROR", result.getStatus().toString());
-                Toast.makeText(model.getActivity(), "Authentication failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(model.getActivity(), R.string.auth_failed, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -191,7 +191,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
         ProgressDialog progressDialog = new ProgressDialog(model.getActivity());
-        progressDialog.setMessage("Logowanie przez Google");
+        progressDialog.setMessage(view.getResources().getString(R.string.logging_via_google));
         progressDialog.show();
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -202,7 +202,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
                         model.startDashboardActivity();
                     } else {
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        Toast.makeText(model.getActivity(), "Autoryzacja nie powiodła się",
+                        Toast.makeText(model.getActivity(), R.string.auth_failed,
                                 Toast.LENGTH_SHORT).show();
                     }
                     progressDialog.hide();
@@ -211,7 +211,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(model.getActivity(), "Google Play Services error.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(model.getActivity(), R.string.play_services_error, Toast.LENGTH_SHORT).show();
     }
 
     //Facebook login code
@@ -222,7 +222,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d(TAG, "handleFacebookAccessToken:" + token);
         ProgressDialog progressDialog = new ProgressDialog(model.getActivity());
-        progressDialog.setMessage("Logowanie przez Facebook");
+        progressDialog.setMessage(view.getResources().getString(R.string.logging_via_facebook));
         progressDialog.show();
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
@@ -235,7 +235,7 @@ public class LoginPresenter extends BasePresenter implements GoogleApiClient.OnC
                             model.startDashboardActivity();
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Toast.makeText(model.getActivity(), "Authentication failed.",
+                            Toast.makeText(model.getActivity(), R.string.auth_failed,
                                     Toast.LENGTH_SHORT).show();
                         }
                         progressDialog.hide();

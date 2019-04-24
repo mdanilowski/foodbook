@@ -50,6 +50,8 @@ public class DashboardView extends FrameLayout {
     @BindView(R.id.pbUploadingImages)
     ProgressBar pbUploadingImages;
 
+    protected SearchView searchView;
+
     public DashboardView(@NonNull DashboardActivity dashboardActivity) {
         super(dashboardActivity);
 
@@ -64,13 +66,23 @@ public class DashboardView extends FrameLayout {
         toolbarTitle.setText(R.string.home_page);
     }
 
-    public void onCreateOptionsMenu(Menu menu, DashboardActivity activity){
+    public void onCreateOptionsMenu(Menu menu, DashboardActivity activity) {
         activity.getMenuInflater().inflate(R.menu.main_menu, menu);
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setIconifiedByDefault(true);
+        searchView.setMaxWidth(10000);
 
         SearchManager searchManager = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);
         ComponentName componentName = new ComponentName(this.getContext(), DashboardActivity.class);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
+    }
+
+    void setOnSearchListener(OnClickListener listener) {
+        searchView.setOnSearchClickListener(listener);
+    }
+
+    void setOnSearchCloseListener(SearchView.OnCloseListener listener) {
+        searchView.setOnCloseListener(listener);
     }
 
     public void setToolbarProfileImage(String uri) {
@@ -81,15 +93,32 @@ public class DashboardView extends FrameLayout {
         return RxView.clicks(ivAvatar);
     }
 
-    public void showImageUploadingProgress(){
+    public void showImageUploadingProgress() {
         llUploading.setVisibility(VISIBLE);
     }
 
-    public void hideImageUploadingProgress(){
+    public void hideImageUploadingProgress() {
         llUploading.setVisibility(GONE);
     }
 
-    public void showSnackBarWithText(String text){
+    public void showSnackBarWithText(String text) {
         Snackbar.make(this, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    public void expandSearchView() {
+        toolbarTitle.setVisibility(GONE);
+        ivAvatar.setVisibility(GONE);
+        if (searchView != null) {
+            searchView.setIconified(false);
+        }
+    }
+
+    public void collapseSearchView() {
+        toolbarTitle.setVisibility(VISIBLE);
+        ivAvatar.setVisibility(VISIBLE);
+        if (searchView != null) {
+            searchView.setIconified(true);
+            searchView.onActionViewCollapsed();
+        }
     }
 }

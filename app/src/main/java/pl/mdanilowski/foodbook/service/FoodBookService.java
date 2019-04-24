@@ -10,6 +10,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import javax.inject.Inject;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.model.Comment;
 import pl.mdanilowski.foodbook.model.Recipe;
+import pl.mdanilowski.foodbook.model.RecipeQuery;
 import pl.mdanilowski.foodbook.model.User;
 import pl.mdanilowski.foodbook.utils.FirestoreConstants;
 import retrofit2.Call;
@@ -97,11 +99,35 @@ public class FoodBookService {
         });
     }
 
+    public Observable<Void> updateRecipe(String uid, String rid, Map<String, Object> updateMap) {
+        return Observable.create(subscriber ->
+                firestore.collection(FirestoreConstants.USER_RECIPES)
+                        .document(uid)
+                        .collection(FirestoreConstants.RECIPES)
+                        .document(rid)
+                        .set(updateMap, SetOptions.merge())
+                        .addOnSuccessListener(subscriber::onNext)
+                        .addOnFailureListener(subscriber::onError)
+        );
+    }
+
     public Observable<DocumentReference> addRecipeToUser(String uid, Recipe recipe) {
         return Observable.create(subscriber -> getUsersRecipesEndpoint(uid)
                 .add(recipe)
                 .addOnSuccessListener(subscriber::onNext)
                 .addOnFailureListener(subscriber::onError));
+    }
+
+    public Observable<Void> deleteRecipe(String uid, String rid) {
+        return Observable.create(subscriber ->
+                firestore.collection(FirestoreConstants.USER_RECIPES)
+                        .document(uid)
+                        .collection(FirestoreConstants.RECIPES)
+                        .document(rid)
+                        .delete()
+                        .addOnSuccessListener(subscriber::onNext)
+                        .addOnFailureListener(subscriber::onError)
+        );
     }
 
     public Observable<DocumentReference> commentRecipe(Comment comment, Recipe recipe) {
@@ -117,11 +143,20 @@ public class FoodBookService {
         });
     }
 
-    public Observable<Void> addRecipeToQueryTable(Recipe recipe) {
+    public Observable<Void> addRecipeToQueryTable(RecipeQuery recipeQuery) {
         return Observable.create(subscriber ->
                 firestore.collection("query-collection-recipes")
-                        .document(recipe.getRid())
-                        .set(recipe)
+                        .document(recipeQuery.getRid())
+                        .set(recipeQuery)
+                        .addOnSuccessListener(subscriber::onNext)
+                        .addOnFailureListener(subscriber::onError));
+    }
+
+    public Observable<Void> removeRecipeFromQueryTable(String rid) {
+        return Observable.create(subscriber ->
+                firestore.collection("query-collection-recipes")
+                        .document(rid)
+                        .delete()
                         .addOnSuccessListener(subscriber::onNext)
                         .addOnFailureListener(subscriber::onError));
     }
@@ -186,7 +221,24 @@ public class FoodBookService {
         });
     }
 
-    public Observable<Void> likeRecipeTransactionBatch(FirebaseUser currentUser, Recipe recipe) {
+    public Observable<Void> unfollowUserBatch(String uid, String currentUid) {
+        return Observable.create(subscriber -> {
+            WriteBatch batch = firestore.batch();
+
+            DocumentReference dRef1 = firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.FOLLOWERS).document(currentUid);
+            DocumentReference dRef2 = firestore.collection(FirestoreConstants.USERS).document(currentUid).collection(FirestoreConstants.FOLLOWING).document(uid);
+            batch.delete(dRef1);
+            batch.delete(dRef2);
+            batch.commit()
+                    .addOnSuccessListener(subscriber::onNext)
+                    .addOnFailureListener(subscriber::onError);
+        });
+    }
+
+
+    // ********************* TRANSACTIONS **************************
+
+    public Observable<Void> likeRecipeTransaction(FirebaseUser currentUser, Recipe recipe) {
         return Observable.create(subscriber -> {
 
             DocumentReference dRef = firestore.collection(FirestoreConstants.USER_RECIPES).document(recipe.getOid()).collection(FirestoreConstants.RECIPES).document(recipe.getRid());
@@ -197,15 +249,31 @@ public class FoodBookService {
                 long newLikesCount = snapshot.getLong("likes") + 1;
                 transaction.update(dRef, "likes", newLikesCount);
                 return null;
-            }).addOnSuccessListener(command ->
-                    cRef.document(recipe.getRid()).set(recipe)
-                            .addOnSuccessListener(subscriber::onNext)
-                            .addOnFailureListener(subscriber::onError)
+            }).addOnSuccessListener(command -> {
+                        recipe.setLikes(recipe.getLikes() + 1);
+                        cRef.document(recipe.getRid()).set(recipe)
+                                .addOnSuccessListener(subscriber::onNext)
+                                .addOnFailureListener(subscriber::onError);
+                    }
             ).addOnFailureListener(subscriber::onError);
         });
     }
 
-    // ********************* TRANSACTIONS **************************
+    public Observable<Long> incrementCommentCountTransaction(Recipe recipe) {
+        return Observable.create(subscriber -> {
+
+            DocumentReference documentReference = firestore.collection(FirestoreConstants.USER_RECIPES).document(recipe.getOid()).collection(FirestoreConstants.RECIPES).document(recipe.getRid());
+
+            firestore.runTransaction(transaction -> {
+                DocumentSnapshot snapshot = transaction.get(documentReference);
+                long newCommentCount = snapshot.getLong("commentCount") + 1;
+                transaction.update(documentReference, "commentCount", newCommentCount);
+                return newCommentCount;
+            }).addOnSuccessListener(subscriber::onNext)
+                    .addOnFailureListener(subscriber::onError);
+
+        });
+    }
 
     public Observable<Void> unlikeRecipeTransaction(FirebaseUser currentUser, Recipe recipe) {
         return Observable.create(subscriber -> {
@@ -249,10 +317,10 @@ public class FoodBookService {
         return Observable.create(subscriber ->
                 firestore.collection(FirestoreConstants.USERS).document(uid)
                         .addSnapshotListener((documentSnapshot, e) -> {
-                            if (!documentSnapshot.exists()) {
+                            if (documentSnapshot != null && !documentSnapshot.exists() && !subscriber.isUnsubscribed()) {
                                 subscriber.onError(e);
                             }
-                            if (documentSnapshot != null && documentSnapshot.exists()) {
+                            if (documentSnapshot != null && documentSnapshot.exists() && !subscriber.isUnsubscribed()) {
                                 User user = documentSnapshot.toObject(User.class);
                                 user.setUid(documentSnapshot.getId());
                                 subscriber.onNext(user);
@@ -263,10 +331,10 @@ public class FoodBookService {
     public Observable<DocumentChange> getUsersFollowedByUserRealtime(String uid) {
         return Observable.create(subscriber -> firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.FOLLOWING)
                 .addSnapshotListener((snapshot, e) -> {
-                    if (e != null) {
+                    if (e != null && !subscriber.isUnsubscribed()) {
                         subscriber.onError(e);
                     }
-                    if (snapshot != null && !snapshot.isEmpty()) {
+                    if (snapshot != null && !snapshot.isEmpty() && !subscriber.isUnsubscribed()) {
                         for (DocumentChange dc : snapshot.getDocumentChanges()) {
                             subscriber.onNext(dc);
                         }
@@ -277,7 +345,7 @@ public class FoodBookService {
     public Observable<DocumentChange> getUsersFollowersRealtime(String uid) {
         return Observable.create(subscriber -> firestore.collection(FirestoreConstants.USERS).document(uid).collection(FirestoreConstants.FOLLOWERS)
                 .addSnapshotListener((snapshot, e) -> {
-                    if (e != null) {
+                    if (e != null && !subscriber.isUnsubscribed()) {
                         subscriber.onError(e);
                     }
                     if (snapshot != null && !snapshot.isEmpty()) {
@@ -293,10 +361,10 @@ public class FoodBookService {
                 getUsersRecipesEndpoint(uid)
                         .orderBy("addDate", Query.Direction.DESCENDING)
                         .addSnapshotListener((snapshot, e) -> {
-                            if (e != null) {
+                            if (e != null && !subscriber.isUnsubscribed()) {
                                 subscriber.onError(e);
                             }
-                            if (snapshot != null && !snapshot.isEmpty()) {
+                            if (snapshot != null && !snapshot.isEmpty() && !subscriber.isUnsubscribed()) {
                                 for (DocumentChange dc : snapshot.getDocumentChanges()) {
                                     subscriber.onNext(dc);
                                 }
@@ -309,10 +377,10 @@ public class FoodBookService {
                 getUsersRecipesEndpoint(uid)
                         .document(rid)
                         .addSnapshotListener((snapshot, e) -> {
-                            if (e != null) {
+                            if ((e != null || !snapshot.exists()) && !subscriber.isUnsubscribed()) {
                                 subscriber.onError(e);
                             }
-                            if (snapshot.exists()) {
+                            if (!subscriber.isUnsubscribed() && snapshot != null && snapshot.exists()) {
                                 Recipe recipe = snapshot.toObject(Recipe.class);
                                 recipe.setRid(snapshot.getId());
                                 subscriber.onNext(recipe);
@@ -326,10 +394,10 @@ public class FoodBookService {
                     .document(rid)
                     .collection(FirestoreConstants.COMMENTS)
                     .addSnapshotListener((snapshot, e) -> {
-                        if (e != null) {
+                        if (e != null && !subscriber.isUnsubscribed()) {
                             subscriber.onError(e);
                         }
-                        if (snapshot != null && !snapshot.isEmpty()) {
+                        if (snapshot != null && !snapshot.isEmpty() && !subscriber.isUnsubscribed()) {
                             for (DocumentChange dc : snapshot.getDocumentChanges()) {
                                 subscriber.onNext(dc);
                             }
@@ -347,10 +415,10 @@ public class FoodBookService {
                         .collection(FirestoreConstants.MY_RECIPE_LIKES)
                         .orderBy("addDate", Query.Direction.DESCENDING)
                         .addSnapshotListener((snapshot, e) -> {
-                            if (e != null) {
+                            if (e != null && !subscriber.isUnsubscribed()) {
                                 subscriber.onError(e);
                             }
-                            if (snapshot != null && !snapshot.isEmpty()) {
+                            if (snapshot != null && !snapshot.isEmpty() && !subscriber.isUnsubscribed()) {
                                 for (DocumentChange dc : snapshot.getDocumentChanges()) {
                                     subscriber.onNext(dc);
                                 }
@@ -366,10 +434,10 @@ public class FoodBookService {
                         .collection(FirestoreConstants.FOLLOWERS_RECIPES)
                         .orderBy("addDate", Query.Direction.DESCENDING)
                         .addSnapshotListener((snapshot, e) -> {
-                            if (e != null) {
+                            if (e != null && !subscriber.isUnsubscribed()) {
                                 subscriber.onError(e);
                             }
-                            if (snapshot != null && !snapshot.isEmpty()) {
+                            if (snapshot != null && !snapshot.isEmpty() && !subscriber.isUnsubscribed()) {
                                 for (DocumentChange dc : snapshot.getDocumentChanges()) {
                                     subscriber.onNext(dc);
                                 }
@@ -385,10 +453,10 @@ public class FoodBookService {
                         .collection(FirestoreConstants.FOLLOWERS_COMMENTS)
                         .orderBy("addDate", Query.Direction.DESCENDING)
                         .addSnapshotListener((snapshot, e) -> {
-                            if (e != null) {
+                            if (e != null && !subscriber.isUnsubscribed()) {
                                 subscriber.onError(e);
                             }
-                            if (snapshot != null && !snapshot.isEmpty()) {
+                            if (snapshot != null && !snapshot.isEmpty() && !subscriber.isUnsubscribed()) {
                                 for (DocumentChange dc : snapshot.getDocumentChanges()) {
                                     subscriber.onNext(dc);
                                 }
@@ -403,10 +471,10 @@ public class FoodBookService {
                         .collection(FirestoreConstants.FOLLOWERS_LIKES)
                         .orderBy("addDate", Query.Direction.DESCENDING)
                         .addSnapshotListener((snapshot, e) -> {
-                            if (e != null) {
+                            if (e != null && !subscriber.isUnsubscribed()) {
                                 subscriber.onError(e);
                             }
-                            if (snapshot != null && !snapshot.isEmpty()) {
+                            if (snapshot != null && !snapshot.isEmpty() && !subscriber.isUnsubscribed()) {
                                 for (DocumentChange dc : snapshot.getDocumentChanges()) {
                                     subscriber.onNext(dc);
                                 }
@@ -422,10 +490,10 @@ public class FoodBookService {
                         .collection(FirestoreConstants.MY_RECIPE_COMMENT)
                         .orderBy("addDate", Query.Direction.DESCENDING)
                         .addSnapshotListener((snapshot, e) -> {
-                            if (e != null) {
+                            if (e != null && !subscriber.isUnsubscribed()) {
                                 subscriber.onError(e);
                             }
-                            if (snapshot != null && !snapshot.isEmpty()) {
+                            if (snapshot != null && !snapshot.isEmpty() && !subscriber.isUnsubscribed()) {
                                 for (DocumentChange dc : snapshot.getDocumentChanges()) {
                                     subscriber.onNext(dc);
                                 }
@@ -443,7 +511,7 @@ public class FoodBookService {
 
     //  ####################### HTTP CALLS ###########################
 
-    public Observable<Integer> likeRecipeTransactionBatch(String uid, String oid, Recipe recipe) {
+    public Observable<Integer> likeRecipeTransaction(String uid, String oid, Recipe recipe) {
         return Observable.create(subscriber ->
                 foodBookApi.recipeLiked(uid, oid, recipe).enqueue(new Callback<String>() {
                     @Override
@@ -460,21 +528,34 @@ public class FoodBookService {
 
     // ************************ SEARCH QUERIES ***************************************
 
-    public Observable<List<Recipe>> findRecipesByWords(String input) {
+    public Observable<List<RecipeQuery>> findRecipesByWords(String input) {
         return Observable.create(subscriber -> {
             String[] splittedStrings = input.split(" ");
 
             CollectionReference collectionReference = firestore.collection("query-collection-recipes");
-            Query query = collectionReference.whereEqualTo("queryStrings." + splittedStrings[0].toLowerCase(), true);
+
+            Query query = collectionReference.whereEqualTo("queryStrings." + splittedStrings[0].toLowerCase().replace(" ", ""), true);
 
             for (int i = 1; i < splittedStrings.length; i++) {
-                collectionReference.whereEqualTo("queryStrings." + splittedStrings[i].toLowerCase(), true);
+                collectionReference.whereEqualTo("queryStrings." + splittedStrings[i].toLowerCase().replace(" ", ""), true);
             }
 
             query.get()
                     .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            List<Recipe> recipes = task.getResult().toObjects(Recipe.class);
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                            List<RecipeQuery> recipes = new ArrayList<>();
+                            RecipeQuery recipeQuery;
+                            for (DocumentSnapshot d : documents) {
+                                recipeQuery = new RecipeQuery(null,
+                                        d.get("rid").toString(),
+                                        d.get("name").toString(),
+                                        d.get("imageUrl").toString(),
+                                        d.get("oid").toString(),
+                                        d.get("ownerAvatarUrl").toString(),
+                                        d.get("ownerName").toString());
+                                recipes.add(recipeQuery);
+                            }
                             subscriber.onNext(recipes);
                         } else {
                             subscriber.onError(task.getException());

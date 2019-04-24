@@ -17,10 +17,18 @@ import pl.mdanilowski.foodbook.R;
 public class AddRecipePhotosAdapter extends RecyclerView.Adapter<AddRecipePhotosAdapter.PhotoHolder> {
 
     private ArrayList<Bitmap> takenImages = new ArrayList<>();
+    private OnLongClickListener listener;
 
     public void setTakenImages(ArrayList<Bitmap> takenImages) {
         this.takenImages = takenImages;
         notifyDataSetChanged();
+    }
+
+    public int removeImage(Bitmap bitmap){
+        int position = takenImages.indexOf(bitmap);
+        takenImages.remove(bitmap);
+        notifyDataSetChanged();
+        return position;
     }
 
     public void addImage(Bitmap image) {
@@ -36,12 +44,18 @@ public class AddRecipePhotosAdapter extends RecyclerView.Adapter<AddRecipePhotos
 
     @Override
     public void onBindViewHolder(PhotoHolder holder, int position) {
+        holder.bind(takenImages.get(position), listener);
         holder.ivSmallFoodImage.setImageBitmap(takenImages.get(position));
     }
 
     @Override
     public int getItemCount() {
         return takenImages.size();
+    }
+
+    public boolean setListener(OnLongClickListener listener) {
+        this.listener = listener;
+        return true;
     }
 
     class PhotoHolder extends RecyclerView.ViewHolder {
@@ -53,5 +67,19 @@ public class AddRecipePhotosAdapter extends RecyclerView.Adapter<AddRecipePhotos
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+
+        public void bind(Bitmap image, OnLongClickListener listener) {
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    listener.onLongClick(image);
+                    return true;
+                }
+            });
+        }
+    }
+
+    public interface OnLongClickListener {
+        void onLongClick(Bitmap image);
     }
 }

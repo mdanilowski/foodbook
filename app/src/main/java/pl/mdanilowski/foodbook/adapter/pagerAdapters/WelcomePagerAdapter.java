@@ -1,6 +1,7 @@
 package pl.mdanilowski.foodbook.adapter.pagerAdapters;
 
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -16,14 +17,14 @@ public class WelcomePagerAdapter extends FragmentStatePagerAdapter {
     List<Integer> imgs = new ArrayList<>();
     List<String> strings = new ArrayList<>();
 
-    public WelcomePagerAdapter(FragmentManager fm) {
+    public WelcomePagerAdapter(Context context, FragmentManager fm) {
         super(fm);
-        for(int i=1; i<4; i++){
-            imgs.add(R.drawable.foodiconplaceholder);
-        }
-        strings.add("Pierwsza strona view pagera.");
-        strings.add("Druga strona view pagera.");
-        strings.add("Trzecia strona view pagera.");
+        imgs.add(R.drawable.ic_zapisuj_przepisy);
+        imgs.add(R.drawable.ic_szukaj_inspiracji);
+        imgs.add(R.drawable.ic_dziel_sie_pomyslami);
+        strings.add(context.getResources().getString(R.string.save_recipes));
+        strings.add(context.getString(R.string.look_for_ispirations));
+        strings.add(context.getString(R.string.share_recipes));
     }
 
     @Override
@@ -35,5 +36,4 @@ public class WelcomePagerAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return imgs.size();
     }
-
 }

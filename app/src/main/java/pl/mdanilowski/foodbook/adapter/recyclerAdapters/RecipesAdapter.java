@@ -49,26 +49,26 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
     public void addRecipe(Recipe recipe) {
         recipes.add(0, recipe);
         Collections.sort(recipes, (o1, o2) -> {
-            if(o1.getAddDate().before(o2.getAddDate())) return 1;
+            if (o1.getAddDate().before(o2.getAddDate())) return 1;
             else return -1;
         });
         notifyItemInserted(0);
     }
 
-    public void updateRecipe(Recipe recipe){
-        for(Recipe r: recipes){
-            if(r.getRid().equals(recipe.getRid())){
+    public void updateRecipe(Recipe recipe) {
+        for (Recipe r : recipes) {
+            if (r.getRid().equals(recipe.getRid())) {
                 recipes.set(recipes.indexOf(r), recipe);
                 notifyDataSetChanged();
             }
         }
     }
 
-    public void deleteRecipe(Recipe recipe){
+    public void deleteRecipe(Recipe recipe) {
         Iterator<Recipe> iterator = recipes.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Recipe r = iterator.next();
-            if(r.getRid().equals(recipe.getRid())){
+            if (r.getRid().equals(recipe.getRid())) {
                 iterator.remove();
                 notifyDataSetChanged();
             }
@@ -87,9 +87,21 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         holder.bind(recipe, listener);
         holder.tvFoodName.setText(recipe.getName());
         holder.tvLikesCount.setText(String.valueOf(recipe.getLikes()));
-        holder.tvCommentCount.setText(String.valueOf(recipe.getComments().size()));
+        holder.tvCommentCount.setText(String.valueOf(recipe.getCommentCount()));
+
+        StringBuilder tagsBuilder = new StringBuilder();
+        if (recipe.getTags() != null && !recipe.getTags().isEmpty()) {
+            tagsBuilder.append(recipe.getTags().get(0));
+        }
+        for (int i = 1; i < recipe.getTags().size(); i++) {
+            tagsBuilder.append(String.format(", %s", recipe.getTags().get(i)));
+        }
+        holder.tvRecipeTags.setText(tagsBuilder.toString());
+
         if (recipe.getPhotosUrls() != null && !recipe.getPhotosUrls().isEmpty())
             Glide.with(context).load(recipe.getPhotosUrls().get(0)).into(holder.ivFoodImage);
+        else
+            Glide.with(context).load(context.getResources().getDrawable(R.drawable.foodbackgroungplaceholder)).into(holder.ivFoodImage);
     }
 
     @Override
@@ -109,6 +121,9 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
         @BindView(R.id.tvCommentCount)
         TextView tvCommentCount;
+
+        @BindView(R.id.tvRecipeTags)
+        TextView tvRecipeTags;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);

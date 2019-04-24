@@ -2,8 +2,10 @@ package pl.mdanilowski.foodbook.activity.recipeDetails.mvp;
 
 import android.content.Intent;
 
+import pl.mdanilowski.foodbook.activity.editRecipe.EditRecipeActivity;
 import pl.mdanilowski.foodbook.activity.profile.ProfileActivity;
 import pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity;
+import pl.mdanilowski.foodbook.model.Recipe;
 import pl.mdanilowski.foodbook.model.User;
 
 public class RecipeDetailsModel {
@@ -30,7 +32,15 @@ public class RecipeDetailsModel {
         ProfileActivity.start(activity, user.getUid());
     }
 
+    void startEditRecipeActivity(Recipe recipe) {
+        EditRecipeActivity.start(activity, recipe);
+    }
+
     void startShareIntent(Intent intent) {
         activity.startActivity(intent);
+    }
+
+    void onBackPressed() {
+        activity.onBackPressed();
     }
 }

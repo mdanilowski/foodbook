@@ -38,7 +38,7 @@
                 android:id="@+id/tilPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Password">
+                android:hint="@string/password">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etPassword"
@@ -51,7 +51,7 @@
                 android:id="@+id/tilPasswordConfirm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Confirm Password">
+                android:hint="@string/confirm_password">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etPasswordConfirm"
@@ -64,7 +64,7 @@
                 android:id="@+id/tilName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Name">
+                android:hint="@string/name">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etName"
@@ -76,7 +76,7 @@
                 android:id="@+id/tilCountry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Country">
+                android:hint="@string/country">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etCountry"
@@ -88,7 +88,7 @@
                 android:id="@+id/tilCity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Name">
+                android:hint="@string/city">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etCity"
@@ -100,7 +100,7 @@
                 android:id="@+id/tilAboutMe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="About me">
+                android:hint="@string/about_me">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etAboutMe"
@@ -114,7 +114,7 @@
                 android:layout_height="35dp"
                 android:layout_margin="16dp"
                 android:background="@drawable/accent_button"
-                android:text="register"
+                android:text="@string/register_action"
                 android:textColor="@color/white_100" />
         </LinearLayout>
     </ScrollView>

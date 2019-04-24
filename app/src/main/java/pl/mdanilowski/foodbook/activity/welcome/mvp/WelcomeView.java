@@ -1,6 +1,5 @@
 package pl.mdanilowski.foodbook.activity.welcome.mvp;
 
-
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -43,7 +42,7 @@ public class WelcomeView extends FrameLayout {
         inflate(context, R.layout.activity_welcome, this);
         ButterKnife.bind(this);
 
-        welcomePager.setAdapter(new WelcomePagerAdapter(fragmentManager));
+        welcomePager.setAdapter(new WelcomePagerAdapter(context, fragmentManager));
         welcomePager.setPageTransformer(true, new ZoomOutPageTransformer());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             welcomePager.setOnScrollChangeListener(new OnScrollListener());
@@ -56,7 +55,7 @@ public class WelcomeView extends FrameLayout {
         @Override
         public void onScrollChange(View view, int i, int i1, int i2, int i3) {
                hsvWelcome.setSmoothScrollingEnabled(true);
-               hsvWelcome.smoothScrollTo(i2/4,i3/4);
+               hsvWelcome.smoothScrollTo(i2/5,i3/5);
         }
     }
 

@@ -1,5 +1,6 @@
 package pl.mdanilowski.foodbook.fragment;
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -42,7 +43,10 @@ public class WelcomeSliderPageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.view_welcome_icon_with_text, container,false);
-        ((ImageView) rootView.findViewById(R.id.ivWelcomePager)).setImageResource(imgId);
+        ImageView imageView = rootView.findViewById(R.id.ivWelcomePager);
+        imageView.setImageResource(imgId);
+        imageView.setColorFilter(container.getContext().getResources().getColor(R.color.white_100), PorterDuff.Mode.SRC_ATOP);
+
         ((TextView) rootView.findViewById(R.id.tvWelcomePagerText)).setText(pagerText);
         return rootView;
     }

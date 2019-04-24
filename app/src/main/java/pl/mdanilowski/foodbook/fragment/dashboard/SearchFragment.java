@@ -2,8 +2,10 @@ package pl.mdanilowski.foodbook.fragment.dashboard;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +19,7 @@ import butterknife.ButterKnife;
 import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.dashboard.DashboardActivity;
 import pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity;
-import pl.mdanilowski.foodbook.adapter.recyclerAdapters.RecipesAdapter;
+import pl.mdanilowski.foodbook.adapter.recyclerAdapters.RecipeSearchAdapter;
 import pl.mdanilowski.foodbook.app.App;
 import pl.mdanilowski.foodbook.service.FoodBookService;
 import pl.mdanilowski.foodbook.utils.Storage.FoodBookSimpleStorage;
@@ -36,14 +38,12 @@ public class SearchFragment extends Fragment {
     @Inject
     FoodBookSimpleStorage foodBookSimpleStorage;
 
-    @BindView(R.id.rvRecipes)
-    RecyclerView rvRecipes;
+    @BindView(R.id.rvRecipes) RecyclerView rvRecipes;
 
-    RecipesAdapter recipesAdapter;
+    RecipeSearchAdapter recipeSearchAdapter;
     String queryText = "";
 
-    public SearchFragment() {
-    }
+    public SearchFragment() {}
 
     public FoodBookService getFoodBookService() {
         return foodBookService;
@@ -66,10 +66,12 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View viewGroup = inflater.inflate(R.layout.fragment_search, container, false);
         ButterKnife.bind(this, viewGroup);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
-        recipesAdapter = new RecipesAdapter(this, recipe -> RecipeDetailsActivity.start(getActivity(), recipe.getOid(), recipe.getRid()));
-        rvRecipes.setLayoutManager(linearLayoutManager);
-        rvRecipes.setAdapter(recipesAdapter);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+        LinearLayoutManager gridLayoutManager = new GridLayoutManager(this.getContext(), 2, LinearLayoutManager.VERTICAL, false);
+        recipeSearchAdapter = new RecipeSearchAdapter(this.getContext(), recipeQuery -> RecipeDetailsActivity.start(getActivity(), recipeQuery.getOid(), recipeQuery.getRid()));
+        rvRecipes.setLayoutManager(staggeredGridLayoutManager);
+        rvRecipes.setAdapter(recipeSearchAdapter);
         return viewGroup;
     }
 
@@ -79,16 +81,7 @@ public class SearchFragment extends Fragment {
         queryText = ((DashboardActivity) getActivity()).getPresenter().getSearchQuery();
         if (!queryText.isEmpty()) {
             if (foodBookSimpleStorage.getUser() != null)
-//                foodBookService.getUsersByNameAndSurename(queryText)
-//                        .subscribe(users -> {
-//                            for (User u : users) {
-//                                System.out.println(u.getName());
-//                            }
-//                            searchResultsAdapter.setUsers(users);
-//                        }, Throwable::printStackTrace);
-                foodBookService.findRecipesByWords(queryText).subscribe(recipes -> {
-                   recipesAdapter.setRecipes(recipes);
-                });
+                foodBookService.findRecipesByWords(queryText).subscribe(recipes -> recipeSearchAdapter.setQueriedRecipes(recipes));
         }
     }
 

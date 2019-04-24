@@ -15,7 +15,9 @@ import pl.mdanilowski.foodbook.activity.likedRecipes.LikedRecipesActivity;
 import pl.mdanilowski.foodbook.activity.profile.ProfileActivity;
 import pl.mdanilowski.foodbook.activity.recipeDetails.RecipeDetailsActivity;
 import pl.mdanilowski.foodbook.activity.settingsProfile.ProfileSettingsActivity;
+import pl.mdanilowski.foodbook.activity.welcome.WelcomeActivity;
 import pl.mdanilowski.foodbook.model.Recipe;
+import pl.mdanilowski.foodbook.model.RecipeQuery;
 import pl.mdanilowski.foodbook.model.User;
 
 public class DashboardModel {
@@ -56,6 +58,10 @@ public class DashboardModel {
 
     Recipe getRecipeFromIntent() {
         return (Recipe) activity.getIntent().getSerializableExtra(DashboardActivity.RECIPE);
+    }
+
+    RecipeQuery getRecipeQueryFromIntent() {
+        return (RecipeQuery) activity.getIntent().getSerializableExtra(DashboardActivity.RECIPE_QUERY);
     }
 
     boolean isUserUpdatedIntent() {
@@ -120,6 +126,10 @@ public class DashboardModel {
 
     void startLikedRecipesActivity(){
         LikedRecipesActivity.start(activity);
+    }
+
+    public void startWelcomeActivity() {
+        WelcomeActivity.start(activity);
     }
 }
 

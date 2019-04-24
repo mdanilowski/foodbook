@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import javax.inject.Inject;
 
+import pl.mdanilowski.foodbook.R;
 import pl.mdanilowski.foodbook.activity.recipeDetails.dagger.DaggerRecipeDetailsComponent;
 import pl.mdanilowski.foodbook.activity.recipeDetails.dagger.RecipeDetailsModule;
 import pl.mdanilowski.foodbook.activity.recipeDetails.mvp.RecipeDetailsPresenter;
@@ -49,5 +52,15 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return presenter.inflateMenu(menu, getMenuInflater());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return presenter.onMenuItemSelected(item);
     }
 }

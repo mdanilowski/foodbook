@@ -65,9 +65,6 @@ public class RecipeDetailsView extends FrameLayout {
     @BindView(R.id.ivComment)
     ImageView ivComment;
 
-    @BindView(R.id.tvSharesCount)
-    TextView tvSharesCount;
-
     @BindView(R.id.tvLikesCount)
     TextView tvLikesCount;
 
@@ -109,17 +106,17 @@ public class RecipeDetailsView extends FrameLayout {
         recipePagerAdapter.setImages(images);
     }
 
-    public void setOwnerAvatar(String imageUrl){
-        if(imageUrl != null){
+    public void setOwnerAvatar(String imageUrl) {
+        if (imageUrl != null) {
             Glide.with(this).load(imageUrl).into(ivUser);
         }
     }
 
-    public void setOwnerName(String name){
+    public void setOwnerName(String name) {
         tvName.setText(name);
     }
 
-    public void setClickListenerOnOwner(OnClickListener listener){
+    public void setClickListenerOnOwner(OnClickListener listener) {
         llOwner.setOnClickListener(listener);
     }
 
@@ -129,9 +126,10 @@ public class RecipeDetailsView extends FrameLayout {
 
     public void setTvIngredients(List<String> ingredients) {
         StringBuilder formattedIngredients = new StringBuilder();
-        for (String s : ingredients) {
-            formattedIngredients.append(s);
-            formattedIngredients.append("\n");
+        for (int i = 0; i < ingredients.size(); i++) {
+            formattedIngredients.append(ingredients.get(i));
+            if (i != ingredients.size() - 1)
+                formattedIngredients.append("\n");
         }
         this.tvIngredients.setText(formattedIngredients.toString());
     }
@@ -150,23 +148,13 @@ public class RecipeDetailsView extends FrameLayout {
     }
 
     @SuppressLint("DefaultLocale")
-    public void setShareCount(int count) {
-        tvSharesCount.setText(String.format("%d %s", count, " shares"));
-    }
-
-    @SuppressLint("DefaultLocale")
-    public void updateSharesCount(Long newSharesCount) {
-        tvSharesCount.setText(String.format("%d %s", newSharesCount, " shares"));
-    }
-
-    @SuppressLint("DefaultLocale")
     public void setLikesCount(int count) {
-        tvLikesCount.setText(String.format("%d %s", count, " likes"));
+        tvLikesCount.setText(String.format("%d %s", count, getContext().getString(R.string.likes)));
     }
 
     @SuppressLint("DefaultLocale")
-    public void setCommentsCount(int count) {
-        tvCommentsCount.setText(String.format("%d %s", count, " comments"));
+    public void setCommentsCount(long count) {
+        tvCommentsCount.setText(String.format("%d %s", count, getContext().getString(R.string.comments)));
     }
 
     public void setRecipeLiked() {
@@ -181,6 +169,10 @@ public class RecipeDetailsView extends FrameLayout {
         ivLike.setVisibility(VISIBLE);
         likeClick();
         unlikeClick();
+    }
+
+    public void setNoRecipeContent() {
+
     }
 
     Observable<Void> likeClick() {
@@ -198,6 +190,4 @@ public class RecipeDetailsView extends FrameLayout {
     Observable<Void> shareClick() {
         return RxView.clicks(ivShare);
     }
-
-
 }

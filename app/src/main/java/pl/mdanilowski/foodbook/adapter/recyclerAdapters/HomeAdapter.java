@@ -1,6 +1,7 @@
 package pl.mdanilowski.foodbook.adapter.recyclerAdapters;
 
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,23 +20,23 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import pl.mdanilowski.foodbook.R;
-import pl.mdanilowski.foodbook.model.userUpdates.MyFollowerLikes;
-import pl.mdanilowski.foodbook.model.userUpdates.MyRecipeLike;
+import pl.mdanilowski.foodbook.app.dagger.module.GlideApp;
 import pl.mdanilowski.foodbook.model.userUpdates.MyRecipeNewComment;
-import pl.mdanilowski.foodbook.model.userUpdates.NewFollowersComment;
-import pl.mdanilowski.foodbook.model.userUpdates.NewFollowersRecipe;
-import pl.mdanilowski.foodbook.model.userUpdates.UserUpdatesBase;
+import pl.mdanilowski.foodbook.model.userUpdates.UpdateType;
+import pl.mdanilowski.foodbook.model.userUpdates.UserUpdate;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.UserUpdateHolder> {
 
-    private List<UserUpdatesBase> userUpdatesList = new ArrayList<>();
+    private List<UserUpdate> userUpdatesList = new ArrayList<>();
+    private Context context;
     private OnMessageItemClickListener listener;
 
-    public HomeAdapter(OnMessageItemClickListener listener) {
+    public HomeAdapter(Context context, OnMessageItemClickListener listener) {
+        this.context = context;
         this.listener = listener;
     }
 
-    public void addUpdate(UserUpdatesBase update) {
+    public void addUpdate(UserUpdate update) {
         userUpdatesList.add(0, update);
         notifyItemInserted(0);
         Collections.sort(userUpdatesList, (o1, o2) -> {
@@ -45,67 +46,61 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.UserUpdateHold
         notifyDataSetChanged();
     }
 
-    public void removeFollowersLike(MyFollowerLikes like) {
-        Iterator<UserUpdatesBase> iterator = userUpdatesList.iterator();
-        while (iterator.hasNext()) {
-            UserUpdatesBase tempObject = iterator.next();
-            if (tempObject instanceof MyFollowerLikes) {
-                MyFollowerLikes tempLike = (MyFollowerLikes) tempObject;
-                if (like != null) {
-                    if (tempLike.getLiker().getUid().equals(like.getLiker().getUid()) &&
-                            tempLike.getRecipe().getRid().equals(like.getRecipe().getRid())) {
-                        iterator.remove();
+    public void removeUpdate(UserUpdate update) {
+        switch (update.getUpdateType()) {
+            case FOLLOWERS_NEW_COMMENT:
+            case MY_RECIPE_NEW_COMMENT:
+                Iterator<UserUpdate> iterator = userUpdatesList.iterator();
+                while (iterator.hasNext()) {
+                    UserUpdate updateHolder = iterator.next();
+                    if (updateHolder.getUpdateType() == UpdateType.MY_RECIPE_NEW_COMMENT || updateHolder.getUpdateType() == UpdateType.FOLLOWERS_NEW_COMMENT) {
+                        if (updateHolder.getCid().equals(update.getCid())) {
+                            iterator.remove();
+                            notifyDataSetChanged();
+                        }
+                    }
+                }
+                break;
+            case MY_RECIPE_LIKE:
+            case FOLLOWERS_NEW_RECIPE:
+            case FOLLOWERS_NEW_LIKE:
+                Iterator<UserUpdate> iterator2 = userUpdatesList.iterator();
+                while (iterator2.hasNext()) {
+                    UserUpdate updateHolder = iterator2.next();
+                    if (updateHolder.getUpdateType() == UpdateType.MY_RECIPE_LIKE ||
+                            updateHolder.getUpdateType() == UpdateType.FOLLOWERS_NEW_RECIPE ||
+                            updateHolder.getUpdateType() == UpdateType.FOLLOWERS_NEW_LIKE) {
+                        if (updateHolder.getRid().equals(update.getRid()) && updateHolder.getUid().equals(update.getUid())) {
+                            iterator2.remove();
+                            notifyDataSetChanged();
+                        }
+                    }
+                }
+                break;
+        }
+    }
+
+    public void modifyUpdate(UserUpdate update) {
+        switch (update.getUpdateType()) {
+            case FOLLOWERS_NEW_COMMENT:
+            case MY_RECIPE_NEW_COMMENT:
+                for (int i = 0; i < userUpdatesList.size(); i++) {
+                    if (userUpdatesList.get(i).getCid() == update.getCid()) {
+
+                    }
+                }
+                break;
+            case MY_RECIPE_LIKE:
+            case FOLLOWERS_NEW_RECIPE:
+            case FOLLOWERS_NEW_LIKE:
+                for (int i = 0; i < userUpdatesList.size(); i++) {
+                    if (userUpdatesList.get(i).getRid().equals(update.getRid()) && userUpdatesList.get(i).getUid().equals(update.getUid())) {
+                        userUpdatesList.set(i, update);
                         notifyDataSetChanged();
                     }
                 }
-            }
-        }
-    }
 
-    public void removeMyRecipeLike(MyRecipeLike myRecipeLike) {
-        Iterator<UserUpdatesBase> iterator = userUpdatesList.iterator();
-        while (iterator.hasNext()) {
-            UserUpdatesBase tempObject = iterator.next();
-            if (tempObject instanceof MyRecipeLike) {
-                MyRecipeLike tempLike = (MyRecipeLike) tempObject;
-                if (myRecipeLike != null) {
-                    if (tempLike.getLiker().getUid().equals(myRecipeLike.getLiker().getUid()) &&
-                            tempLike.getRecipe().getRid().equals(myRecipeLike.getRecipe().getRid())) {
-                        iterator.remove();
-                        notifyDataSetChanged();
-                    }
-                }
-            }
-        }
-    }
-
-    public void removeNewFollowersRecipe(NewFollowersRecipe newFollowersRecipe) {
-        Iterator<UserUpdatesBase> iterator = userUpdatesList.iterator();
-        while (iterator.hasNext()) {
-            UserUpdatesBase tempObject = iterator.next();
-            if (tempObject instanceof NewFollowersRecipe) {
-                NewFollowersRecipe followersRecipe = (NewFollowersRecipe) tempObject;
-                if (newFollowersRecipe.getUser().getUid().equals(followersRecipe.getUser().getUid()) &&
-                        newFollowersRecipe.getRecipe().getRid().equals(followersRecipe.getRecipe().getRid())) {
-                    iterator.remove();
-                    notifyDataSetChanged();
-                }
-            }
-        }
-    }
-
-    public void removeFollowersComment(NewFollowersComment newFollowersComment) {
-        Iterator<UserUpdatesBase> iterator = userUpdatesList.iterator();
-        while (iterator.hasNext()) {
-            UserUpdatesBase tempObject = iterator.next();
-            if (tempObject instanceof NewFollowersRecipe) {
-                NewFollowersRecipe followersRecipe = (NewFollowersRecipe) tempObject;
-                if (newFollowersComment.getComment().getUid().equals(followersRecipe.getUser().getUid()) &&
-                        newFollowersComment.getRecipe().getRid().equals(followersRecipe.getRecipe().getRid())) {
-                    iterator.remove();
-                    notifyDataSetChanged();
-                }
-            }
+                break;
         }
     }
 
@@ -124,51 +119,44 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.UserUpdateHold
 
     @Override
     public void onBindViewHolder(UserUpdateHolder holder, int position) {
-        switch (holder.getItemViewType()) {
-            default:
-                UserUpdatesBase userUpdate = userUpdatesList.get(position);
-                holder.bindWithClickListener(userUpdate, listener);
-                if (userUpdate instanceof MyRecipeLike) {
-                    MyRecipeLike myRecipeLike = (MyRecipeLike) userUpdate;
-                    Glide.with(holder.itemView).load(myRecipeLike.getLiker().getAvatarUrl()).into(holder.ivAvatar);
-                    holder.tvMessageText.setText(String.format("%s %s", myRecipeLike.getLiker().getName(), " lubi twoj przepis"));
-                    if (!myRecipeLike.getRecipe().getPhotosUrls().isEmpty())
-                        Glide.with(holder.itemView).load(myRecipeLike.getRecipe().getPhotosUrls().get(0)).into(holder.ivFoodImage);
-                    holder.tvFoodName.setText(myRecipeLike.getRecipe().getName());
+        UserUpdate update = userUpdatesList.get(position);
+        holder.bindWithClickListener(update, listener);
+        if (update.getUserAvatar() != null) {
+            GlideApp.with(holder.itemView).load(update.getUserAvatar()).placeholder(context.getResources().getDrawable(R.drawable.temp_avatar)).into(holder.ivAvatar);
+        } else {
+            holder.ivAvatar.setImageResource(R.drawable.temp_avatar);
+        }
+        if (update.getRecipeImage() != null) {
+            GlideApp.with(holder.itemView).load(update.getRecipeImage()).placeholder(context.getResources().getDrawable(R.drawable.placeholder_food_image)).into(holder.ivFoodImage);
+        } else {
+            Glide.with(holder.itemView).load(context.getResources().getDrawable(R.drawable.foodbackgroungplaceholder)).into(holder.ivFoodImage);
+        }
+        holder.tvFoodName.setText(update.getRecipeName());
+
+        switch (update.getUpdateType()) {
+            case MY_RECIPE_LIKE:
+                holder.tvMessageText.setText(String.format("%s %s", update.getUserName(), context.getResources().getString(R.string.likes_your_recipe)));
+                break;
+            case FOLLOWERS_NEW_LIKE:
+                holder.tvMessageText.setText(String.format("%s %s", update.getUserName(), context.getResources().getString(R.string.likes_recipe)));
+                break;
+            case FOLLOWERS_NEW_RECIPE:
+                holder.tvMessageText.setText(String.format("%s %s", update.getUserName(), context.getResources().getString(R.string.added_new_recipe)));
+                break;
+            case FOLLOWERS_NEW_COMMENT:
+                if(update.getUid().equals(update.getOid())){
+                    holder.tvMessageText.setText(String.format("%s %s", update.getUserName(), "skomentował swój przepis"));
+                }else {
+                    holder.tvMessageText.setText(String.format("%s %s %s", update.getUserName(), context.getResources().getString(R.string.commented_on_recipe), update.getRecipeOwnerName()));
                 }
-                if (userUpdate instanceof NewFollowersComment) {
-                    NewFollowersComment newFollowersComment = (NewFollowersComment) userUpdate;
-                    Glide.with(holder.itemView).load(newFollowersComment.getComment().getAvatarUrl()).into(holder.ivAvatar);
-                    holder.tvMessageText.setText(String.format("%s %s %s", newFollowersComment.getComment().getName(), " skomentował przepis użytkownika ", newFollowersComment.getOwner().getName()));
-                    if (!newFollowersComment.getRecipe().getPhotosUrls().isEmpty())
-                        Glide.with(holder.itemView).load(newFollowersComment.getRecipe().getPhotosUrls().get(0)).into(holder.ivFoodImage);
-                    holder.tvFoodName.setText(newFollowersComment.getRecipe().getName());
+                break;
+            case MY_RECIPE_NEW_COMMENT:
+                if (!update.getUid().equals(update.getOid())) {
+                    holder.tvMessageText.setText(String.format("%s %s %s", context.getResources().getString(R.string.user), update.getUserName(), context.getResources().getString(R.string.commented_your_recipe)));
+                }else {
+                    holder.tvMessageText.setText(R.string.own_recipe_comment);
                 }
-                if (userUpdate instanceof NewFollowersRecipe) {
-                    NewFollowersRecipe newFollowersRecipe = (NewFollowersRecipe) userUpdate;
-                    Glide.with(holder.itemView).load(newFollowersRecipe.getUser().getAvatarUrl()).into(holder.ivAvatar);
-                    holder.tvMessageText.setText(String.format("%s %s", newFollowersRecipe.getUser().getName(), " dodał nowy przepis"));
-                    if (newFollowersRecipe.getRecipe().getPhotosUrls() != null && !newFollowersRecipe.getRecipe().getPhotosUrls().isEmpty())
-                        Glide.with(holder.itemView).load(newFollowersRecipe.getRecipe().getPhotosUrls().get(0)).into(holder.ivFoodImage);
-                    holder.tvFoodName.setText(newFollowersRecipe.getRecipe().getName());
-                }
-                if (userUpdate instanceof MyFollowerLikes) {
-                    MyFollowerLikes myFollowerLikes = (MyFollowerLikes) userUpdate;
-                    Glide.with(holder.itemView).load(myFollowerLikes.getLiker().getAvatarUrl()).into(holder.ivAvatar);
-                    holder.tvMessageText.setText(String.format("%s %s", myFollowerLikes.getLiker().getName(), " polubił przepis"));
-                    if (myFollowerLikes.getRecipe().getPhotosUrls() != null && !myFollowerLikes.getRecipe().getPhotosUrls().isEmpty())
-                        Glide.with(holder.itemView).load(myFollowerLikes.getRecipe().getPhotosUrls().get(0)).into(holder.ivFoodImage);
-                    holder.tvFoodName.setText(myFollowerLikes.getRecipe().getName());
-                }
-                if (userUpdate instanceof MyRecipeNewComment) {
-                    MyRecipeNewComment myRecipeNewComment = (MyRecipeNewComment) userUpdate;
-                    if (myRecipeNewComment.getComment().getAvatarUrl() != null && !myRecipeNewComment.getComment().getAvatarUrl().isEmpty())
-                        Glide.with(holder.itemView).load(myRecipeNewComment.getComment().getAvatarUrl()).into(holder.ivAvatar);
-                    holder.tvMessageText.setText(String.format("%s %s", myRecipeNewComment.getComment().getName(), " skomentował Twój przepis"));
-                    if (myRecipeNewComment.getRecipe().getPhotosUrls() != null && !myRecipeNewComment.getRecipe().getPhotosUrls().isEmpty())
-                        Glide.with(holder.itemView).load(myRecipeNewComment.getRecipe().getPhotosUrls().get(0)).into(holder.ivFoodImage);
-                    holder.tvFoodName.setText(myRecipeNewComment.getRecipe().getName());
-                }
+                break;
         }
     }
 
@@ -201,13 +189,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.UserUpdateHold
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindWithClickListener(UserUpdatesBase userUpdatesBase, OnMessageItemClickListener listener) {
-            itemView.setOnClickListener(__ -> listener.onMessageClick(userUpdatesBase));
+        public void bindWithClickListener(UserUpdate userUpdate, OnMessageItemClickListener listener) {
+            itemView.setOnClickListener(__ -> listener.onMessageClick(userUpdate));
         }
     }
 
     public interface OnMessageItemClickListener {
 
-        void onMessageClick(UserUpdatesBase update);
+        void onMessageClick(UserUpdate update);
     }
 }

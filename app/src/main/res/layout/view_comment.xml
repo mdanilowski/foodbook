@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/colorPrimary"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="100dp"
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -19,24 +20,28 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:textColor="@color/white_98"
-                android:textSize="12sp"
+                android:layout_margin="4dp"
+                android:textColor="@color/white_100"
+                android:textSize="14sp"
+                tools:text="Karolina"
                 android:textStyle="italic" />
 
             <TextView
                 android:id="@+id/tvCommentText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                tools:text="Text text text text Text text text text Text text text text Text text text text Text text text text "
                 android:layout_margin="4dp"
-                android:textColor="@color/white_98"
-                android:textSize="12sp" />
+                android:textColor="@color/white_100"
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 

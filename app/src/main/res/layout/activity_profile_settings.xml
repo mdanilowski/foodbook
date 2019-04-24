@@ -7,7 +7,9 @@
     android:orientation="vertical"
     tools:context="pl.mdanilowski.foodbook.activity.settingsProfile.ProfileSettingsActivity">
 
-    <include layout="@layout/view_toolbar_dafault" />
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/view_toolbar_dafault" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -24,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/foodbackgroungplaceholder" />
+                android:src="@color/primary_dark"/>
 
             <Button
                 android:id="@+id/btnChangeBackground"
@@ -59,6 +61,7 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/tilName"
                 android:layout_width="match_parent"
+                android:textColorHint="@color/white_98"
                 android:layout_height="wrap_content"
                 android:hint="@string/name">
 
@@ -66,33 +69,35 @@
                     android:id="@+id/etName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorAccent" />
+                    android:textColor="@color/white_100" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/tilAboutMe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColorHint="@color/white_98"
                 android:hint="@string/about_me">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etAboutMe"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:lines="2"
-                    android:nestedScrollingEnabled="false" />
+                    android:textColor="@color/white_100"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/tilEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColorHint="@color/white_98"
                 android:hint="@string/email_address">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/white_100"
                     android:inputType="textEmailAddress" />
             </android.support.design.widget.TextInputLayout>
 
@@ -100,12 +105,14 @@
                 android:id="@+id/tilCountry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColorHint="@color/white_98"
                 android:hint="@string/country">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etCountry"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/white_100"
                     android:inputType="textCapWords" />
             </android.support.design.widget.TextInputLayout>
 
@@ -113,12 +120,14 @@
                 android:id="@+id/tilCity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColorHint="@color/white_98"
                 android:hint="@string/city">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etCity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/white_100"
                     android:inputType="textCapWords" />
             </android.support.design.widget.TextInputLayout>
 
