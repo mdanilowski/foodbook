@@ -11,6 +11,6 @@ This project is **only for code reviewing**. It wont run since I've removed `goo
 
 ### Design & Architecture
 
-This was my bachelor degree project. **For in depth architecture, functionalities and design review go to my** [Google Drive Folder](http://https://drive.google.com/drive/folders/1LimhOzOZ5qVrSvGPq4rX-jysgHrprqRz?usp=sharing "Google Drive Folder") which contains the thesis, presentation, and a short film that shows the functionalities in action! You will find a good explanation there.
+This was my bachelor degree project. **For in depth architecture, functionalities and design review go to my** [Google Drive Folder](https://drive.google.com/drive/folders/1LimhOzOZ5qVrSvGPq4rX-jysgHrprqRz?usp=sharing "Google Drive Folder") which contains the thesis, presentation, and a short film that shows the functionalities in action! You will find a good explanation there.
 It is ** only in polish**, unfortunetely. 
 If you wish to have it explained in english -- contact my via email: michaldanilowski@gmail.com
